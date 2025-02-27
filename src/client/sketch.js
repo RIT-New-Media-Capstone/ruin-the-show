@@ -88,4 +88,15 @@ function drawContestant(){
 
 // need to figure out a way to wire 
 
-// module.exports = { cheat, hideApplause }
+
+function keyPressed() {
+  if (keyCode === LEFT_ARROW) {
+    console.log("Left arrow pressed");
+  } else if (keyCode === RIGHT_ARROW) {
+    console.log("Right arrow pressed");
+  } else if (key === 'a') {
+    audience()
+  } else if (key === 'c') {
+    cheat()
+  }
+}
