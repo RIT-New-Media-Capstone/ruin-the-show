@@ -1,4 +1,12 @@
 // Holds game state, logic, variables
+/**
+ * Pseudo Code Algorithm - Event Manager
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 
 const user = {id: "DEFAULT", score: 0}
 const state = {difficulty: 0, score: 0, lightPosition: 0}
