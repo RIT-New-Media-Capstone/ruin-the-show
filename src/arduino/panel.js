@@ -47,6 +47,5 @@ const lightsMoved = (direction) => {
     game.updateScore(otherScoreIncrement)
 }
 
-
 oscClient.open();
 serialSetup();

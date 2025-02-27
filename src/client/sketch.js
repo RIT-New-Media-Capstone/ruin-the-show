@@ -15,6 +15,8 @@ function draw() {
   background(220);
   hostInteract()
   audience()
+
+  if(applauseVis) drawApplause()
   
 }
 
@@ -31,17 +33,30 @@ function audience(){
   fill(0,0,0)
   rect(0 , 325 ,width,75);
 
-  let rContest =  random(0, width);
   let speed = 0.5;
-  let chance = .5;
+  const chanceApplause = .9;
+  const applause = random()
 
-  if(chance < 1){
-    fill(255)
-    ellipse(rContest, 300, 30 , 30) 
-
+  if(applause < chanceApplause && time != second() ){
+    moveApplause()
+    time = second()
   }
   
 
+}
+
+let applauseX = 0
+let applauseVis = false
+let time;
+
+function drawApplause() {
+  fill(255)
+  ellipse(applauseX, 300, 30 , 30) 
+}
+
+function moveApplause() {
+    applauseX = randomGaussian(50, width - 50);
+    applauseVis = true
 }
 
 
