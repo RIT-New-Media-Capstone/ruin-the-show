@@ -15,8 +15,9 @@ function draw() {
   background(220);
   hostInteract()
   audience()
-
+  contestantInteract()
   if(applauseVis) drawApplause()
+
   
 }
 
@@ -44,8 +45,6 @@ function audience(){
     moveApplause()
     time = second()
   }
-  
-
 }
 
 let applauseX = 0
@@ -66,9 +65,9 @@ function moveApplause() {
 // contestant podium lights up 
 function contestantInteract(){
   fill(233);
-  rect(width/2 ,150,50,90);
-  rect(width/2+ 30,50,250,90);
-  rect(width/2+ 60,60,50,90);
+  rect(width/2 ,350,50,90);
+  rect(width/2+ 200,350,50,90);
+  rect(width/2+ 260,350,50,90);
 
 }
 
