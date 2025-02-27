@@ -15,15 +15,16 @@ function draw() {
   background(220);
   hostInteract()
   audience()
-
+  drawContestant()
   if(applauseVis) drawApplause()
+
   
 }
 
 //May go into classes 
 // Host  will be moving back and forth 
 // random cheat button
-function cheat(){
+const cheat = () => {
   fill(0, 102, 255); // Set fill color to blue
   ellipse(host, height, 50, 50); 
 }
@@ -34,23 +35,19 @@ function audience(){
   rect(0 , 500 ,width,150);
 
   let speed = 0.5;
-  const chanceApplause = .9;//0.05
+  const chanceApplause = .05;
   const applause = random()
 
   // if chance of it happening within bounds to trigger and 
   // state that it just move 
   //if not true sets visible to true 
-  if(applause < chanceApplause && time != second() ){
+  if(applause < chanceApplause && !applauseVis ){
     moveApplause()
-    time = second()
   }
-  
-
 }
 
 let applauseX = 0
-let applauseVis = false // is applause visibile 
-let time;
+let applauseVis = false // is applause visible
 
 function drawApplause() {
   fill(255)
@@ -62,13 +59,16 @@ function moveApplause() {
     applauseVis = true;
 }
 
+const hideApplause = () => {
+  applauseVis = false
+}
 
 // contestant podium lights up 
-function contestantInteract(){
+function drawContestant(){
   fill(233);
-  rect(width/2 ,150,50,90);
-  rect(width/2+ 30,50,250,90);
-  rect(width/2+ 60,60,50,90);
+  rect(width/2 ,350,50,90);
+  rect(width/2+ 200,350,50,90);
+  rect(width/2+ 260,350,50,90);
 
 }
 
