@@ -35,7 +35,7 @@ function audience(){
   rect(0 , 500 ,width,150);
 
   let speed = 0.5;
-  const chanceApplause = .2;
+  const chanceApplause = .5;
   const applause = random()
 
   // if chance of it happening within bounds to trigger and 
@@ -51,7 +51,7 @@ let applauseVis = false // is applause visible
 
 function drawApplause() {
   fill(255)
-  ellipse(applauseX, height, 30 , 30) 
+  ellipse(applauseX, height/2, 30 , 30) 
 }
 
 function moveApplause() {
@@ -95,7 +95,7 @@ function keyPressed() {
   } else if (keyCode === RIGHT_ARROW) {
     console.log("Right arrow pressed");
   } else if (key === 'a') {
-    audience()
+    hideApplause()
   } else if (key === 'c') {
     cheat()
   }
