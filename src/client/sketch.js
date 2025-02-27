@@ -3,7 +3,7 @@
 //linke to events ( mouse pressed etc )
 
 //variables 
-let host = 0 // initial x position
+let lightPos = 0 // initial light position
 let speed = 3 // speed of 
 
 function setup() {
@@ -13,7 +13,7 @@ function setup() {
 
 function draw() {
   background(220);
-  hostInteract()
+  lightInteract()
   audience()
   drawContestant()
   if(applauseVis) drawApplause()
@@ -26,7 +26,7 @@ function draw() {
 // random cheat button
 const cheat = () => {
   fill(0, 102, 255); // Set fill color to blue
-  ellipse(host, height, 50, 50); 
+  ellipse(lightPos, height, 50, 50); 
 }
 // Audience applause when board lights up same as speech bubble 
 // Over random audience member for the list 
@@ -35,7 +35,7 @@ function audience(){
   rect(0 , 500 ,width,150);
 
   let speed = 0.5;
-  const chanceApplause = .05;
+  const chanceApplause = .2;
   const applause = random()
 
   // if chance of it happening within bounds to trigger and 
@@ -63,6 +63,18 @@ const hideApplause = () => {
   applauseVis = false
 }
 
+// edit to oscilate  based direction
+function lightInteract(){
+  fill("yellow"); // Set fill color to yellow
+  ellipse(lightPos, height / 2, 50, 50); // Draw the circle host bobble head 
+  
+  lightPos += speed; 
+  
+  // Reset position when it goes off screen
+  if (lightPos > width) {
+    lightPos = 0;
+  }
+}
 // contestant podium lights up 
 function drawContestant(){
   fill(233);
@@ -72,18 +84,7 @@ function drawContestant(){
 
 }
 
-// edit to oscilate  based direction
-function hostInteract(){
-  fill(0, 102, 255); // Set fill color to blue
-  ellipse(host, height / 2, 50, 50); // Draw the circle host bobble head 
-  
-  host += speed; 
-  
-  // Reset position when it goes off screen
-  if (host > width) {
-    host = 0;
-  }
-}
+
 
 // need to figure out a way to wire 
 
