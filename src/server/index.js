@@ -1,6 +1,7 @@
 // server/index.js
 const express = require('express');
 const path = require('path');
+const game = require("./game.js")
 
 const app = express();
 const PORT = 3000;
@@ -14,4 +15,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  game.rfidScan()
 });
