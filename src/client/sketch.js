@@ -8,6 +8,7 @@ let speed = 3 // speed of
 
 function setup() {
   createCanvas(400, 400);
+  resizeCanvas(windowWidth - 20, windowHeight - 20)
 }
 
 function draw() {
