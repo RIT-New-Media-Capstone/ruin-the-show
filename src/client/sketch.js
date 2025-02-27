@@ -35,7 +35,7 @@ function audience(){
   rect(0 , 500 ,width,150);
 
   let speed = 0.5;
-  const chanceApplause = .5;
+  const chanceApplause = 0.5;
   const applause = random()
 
   // if chance of it happening within bounds to trigger and 
@@ -55,7 +55,7 @@ function drawApplause() {
 }
 
 function moveApplause() {
-    applauseX = randomGaussian(50, width - 50);
+    applauseX = random(100, 200);
     applauseVis = true;
 }
 
