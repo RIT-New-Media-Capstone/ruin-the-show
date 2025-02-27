@@ -4,6 +4,7 @@ const { SerialPort } = require('serialport')
 const { ReadlineParser } = require('@serialport/parser-readline')
 
 const game = require("../server/game.js")
+const render = require("../client/sketch.js")
 
 let port;
 
@@ -36,10 +37,12 @@ const otherScoreIncrement = 1
 
 const cheatButtonPressed = () => { 
     game.updateScore(cheatScoreIncrement) 
+    render.cheat()
 }
 
 const applauseButtonPressed = () => { 
     game.updateScore(otherScoreIncrement) 
+    render.hideApplause()
 }
 
 const lightsMoved = (direction) => {

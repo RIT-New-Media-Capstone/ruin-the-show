@@ -23,7 +23,7 @@ function draw() {
 //May go into classes 
 // Host  will be moving back and forth 
 // random cheat button
-function cheat(){
+const cheat = () => {
   fill(0, 102, 255); // Set fill color to blue
   ellipse(host, height, 50, 50); 
 }
@@ -34,20 +34,16 @@ function audience(){
   rect(0 , 325 ,width,75);
 
   let speed = 0.5;
-  const chanceApplause = .9;
+  const chanceApplause = .05;
   const applause = random()
 
-  if(applause < chanceApplause && time != second() ){
+  if(applause < chanceApplause && !applauseVis ){
     moveApplause()
-    time = second()
   }
-  
-
 }
 
 let applauseX = 0
 let applauseVis = false
-let time;
 
 function drawApplause() {
   fill(255)
@@ -59,6 +55,9 @@ function moveApplause() {
     applauseVis = true
 }
 
+const hideApplause = () => {
+  applauseVis = false
+}
 
 // contestant podium lights up 
 function contestantInteract(){
@@ -82,3 +81,5 @@ function hostInteract(){
 }
 
 // need to figure out a way to wire 
+
+module.exports = { cheat, hideApplause }
