@@ -31,28 +31,31 @@ const cheat = () => {
 // Over random audience member for the list 
 function audience(){
   fill(0,0,0)
-  rect(0 , 325 ,width,75);
+  rect(0 , 500 ,width,150);
 
   let speed = 0.5;
   const chanceApplause = .05;
   const applause = random()
 
+  // if chance of it happening within bounds to trigger and 
+  // state that it just move 
+  //if not true sets visible to true 
   if(applause < chanceApplause && !applauseVis ){
     moveApplause()
   }
 }
 
 let applauseX = 0
-let applauseVis = false
+let applauseVis = false // is applause visible
 
 function drawApplause() {
   fill(255)
-  ellipse(applauseX, 300, 30 , 30) 
+  ellipse(applauseX, height, 30 , 30) 
 }
 
 function moveApplause() {
     applauseX = randomGaussian(50, width - 50);
-    applauseVis = true
+    applauseVis = true;
 }
 
 const hideApplause = () => {
@@ -61,9 +64,10 @@ const hideApplause = () => {
 
 // contestant podium lights up 
 function contestantInteract(){
-  rect(50,150,50,50);
-  rect(50,50,250,50);
-  rect(50,60,50,50);
+  fill(233);
+  rect(width/2 ,150,50,90);
+  rect(width/2+ 30,50,250,90);
+  rect(width/2+ 60,60,50,90);
 
 }
 
@@ -82,4 +86,4 @@ function hostInteract(){
 
 // need to figure out a way to wire 
 
-module.exports = { cheat, hideApplause }
+// module.exports = { cheat, hideApplause }
