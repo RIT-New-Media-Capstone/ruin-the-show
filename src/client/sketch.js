@@ -15,7 +15,7 @@ function draw() {
   background(220);
   hostInteract()
   audience()
-  contestantInteract()
+  drawContestant()
   if(applauseVis) drawApplause()
 
   
@@ -64,7 +64,7 @@ const hideApplause = () => {
 }
 
 // contestant podium lights up 
-function contestantInteract(){
+function drawContestant(){
   fill(233);
   rect(width/2 ,350,50,90);
   rect(width/2+ 200,350,50,90);
