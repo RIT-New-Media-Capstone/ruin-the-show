@@ -11,6 +11,9 @@ function setup() {
   resizeCanvas(windowWidth - 20, windowHeight - 20)
 }
 
+/*
+
+*/
 function draw() {
   background(220);
   lightInteract()
@@ -55,7 +58,7 @@ function drawApplause() {
 }
 
 function moveApplause() {
-    applauseX = random(100, 200);
+    applauseX = random(100, 250);
     applauseVis = true;
 }
 
@@ -63,6 +66,13 @@ const hideApplause = () => {
   applauseVis = false
 }
 
+function drawHost(){
+   ellipse(10,0,50,50)
+}
+
+function hostPos(){
+
+}
 // edit to oscilate  based direction
 function lightInteract(){
   fill("yellow"); // Set fill color to yellow
