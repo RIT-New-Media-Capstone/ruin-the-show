@@ -3,7 +3,7 @@
 //linke to events ( mouse pressed etc )
 
 //variables 
-let lightPos = 0 // initial light position
+hostPos = 0 // initial host position
 let speed = 3 // speed of 
 let score = 10 //getScore
 
@@ -17,7 +17,7 @@ function setup() {
 */
 function draw() {
   background(220);
-  lightInteract()
+  hostInteract()
   audience()
   drawContestant()
   drawStars(30,30,5, score)
@@ -32,7 +32,7 @@ function draw() {
 // random cheat button
 const cheat = () => {
   fill("red"); // Set fill color to red
-  ellipse(lightPos, height, 50, 50); 
+ // ellipse(hostPos, height, 50, 50); 
 }
 // Audience applause when board lights up same as speech bubble 
 // Over random audience member for the list 
@@ -69,6 +69,8 @@ const hideApplause = () => {
   applauseVis = false
 }
 
+//light producer has to host with light, producer cannot move host
+//key controls
 function drawHost(){
    ellipse(10,0,50,50)
 }
@@ -78,16 +80,16 @@ function hostPos(){
 }
 
 
-// light moves with keys 
-function lightInteract(){
+// host moves on his own 
+function hostInteract(){
   fill("yellow"); // Set fill color to yellow
-  ellipse(lightPos, height / 2, 50, 50); // Draw the circle host bobble head 
+  ellipse(hostPos, height / 2, 50, 50); // Draw the circle host bobble head 
   
-  lightPos += speed; 
+  hostPos += speed; 
   
-  // Reset position when it goes off screen
-  if (lightPos > width) {
-    lightPos = 0;
+  // Reverse direction 
+  if (hostPos >= width || hostPos <= 0) {
+    speed *= -1;  // Flip the direction
   }
 }
 // contestant podium lights up 
