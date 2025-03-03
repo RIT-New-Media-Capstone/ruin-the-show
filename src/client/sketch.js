@@ -5,6 +5,7 @@
 //variables 
 let lightPos = 0 // initial light position
 let speed = 3 // speed of 
+let score = 10 //getScore
 
 function setup() {
   createCanvas(400, 400);
@@ -19,20 +20,18 @@ function draw() {
   lightInteract()
   audience()
   drawContestant()
+  drawStars(30,30,5, score)
   if(applauseVis) drawApplause()
 
   
 }
 
-function displayRatings(){
-
-}
 
 //May go into classes 
 // Host  will be moving back and forth 
 // random cheat button
 const cheat = () => {
-  fill(0, 102, 255); // Set fill color to blue
+  fill("red"); // Set fill color to red
   ellipse(lightPos, height, 50, 50); 
 }
 // Audience applause when board lights up same as speech bubble 
@@ -77,6 +76,8 @@ function drawHost(){
 function hostPos(){
 
 }
+
+
 // light moves with keys 
 function lightInteract(){
   fill("yellow"); // Set fill color to yellow
@@ -111,4 +112,37 @@ function keyPressed() {
   } else if (key === 'c') {
     cheat()
   }
+}
+
+//Rating visualization
+let rating = 100; 
+
+function drawStars(x, y, numStars, value) {
+  let starSize = 30;
+  let spacing = 40;
+  let maxRating = 100;
+  let filledStars = (value / maxRating) * numStars; // Convert value to star count
+
+  for (let i = 0; i < numStars; i++) {
+    // constrain(value, min, max) limit to specified range
+    let fillAmount = constrain(filledStars - i, 0, 1); // 1 = full star, 0.5 = half star, etc.
+    drawStar(x + i * spacing, y, starSize, fillAmount);
+  }
+}
+
+function drawStar(x, y, size, fillAmount) {
+  push();
+  translate(x, y);
+  stroke(0);
+  fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
+  beginShape();
+  for (let i = 0; i < 10; i++) {
+    let angle = PI / 5 * i;
+    let radius = (i % 2 === 0) ? size / 2 : size / 4;
+    let sx = cos(angle) * radius;
+    let sy = sin(angle) * radius;
+    vertex(sx, sy);
+  }
+  endShape(CLOSE);
+  pop();
 }
