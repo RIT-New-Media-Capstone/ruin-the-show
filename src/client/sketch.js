@@ -3,7 +3,8 @@
 //linke to events ( mouse pressed etc )
 
 //variables 
-hostPos = 0 // initial host position
+let lightPosX = 0; // initial light position 
+let hostPos = 0;// initial host position
 let speed = 3 // speed of 
 let score = 10 //getScore
 
@@ -21,6 +22,7 @@ function draw() {
   audience()
   drawContestant()
   drawStars(30,30,5, score)
+  drawLights()
   if(applauseVis) drawApplause()
 
   
@@ -71,16 +73,16 @@ const hideApplause = () => {
 
 //light producer has to host with light, producer cannot move host
 //key controls
-function drawHost(){
-   ellipse(10,0,50,50)
+
+function drawLights(){
+  fill("orange")
+   ellipse(lightPosX,300,50,50)
 }
 
-function hostPos(){
-
-}
 
 
-// host moves on his own 
+
+// host moves on his own he should also pause every now and then
 function hostInteract(){
   fill("yellow"); // Set fill color to yellow
   ellipse(hostPos, height / 2, 50, 50); // Draw the circle host bobble head 
@@ -105,10 +107,16 @@ function drawContestant(){
 
 // need to figure out a way to wire 
 function keyPressed() {
+  let lightSpeed  = 25; 
+   
   if (keyCode === LEFT_ARROW) {
     console.log("Left arrow pressed");
+    lightPosX -= lightSpeed; // Move left
+
   } else if (keyCode === RIGHT_ARROW) {
     console.log("Right arrow pressed");
+    lightPosX += lightSpeed; // Move right
+
   } else if (key === 'a') {
     hideApplause()
   } else if (key === 'c') {
