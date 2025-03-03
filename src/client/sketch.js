@@ -24,6 +24,10 @@ function draw() {
   
 }
 
+function displayRatings(){
+
+}
+
 //May go into classes 
 // Host  will be moving back and forth 
 // random cheat button
@@ -73,7 +77,7 @@ function drawHost(){
 function hostPos(){
 
 }
-// edit to oscilate  based direction
+// light moves with keys 
 function lightInteract(){
   fill("yellow"); // Set fill color to yellow
   ellipse(lightPos, height / 2, 50, 50); // Draw the circle host bobble head 
@@ -97,8 +101,6 @@ function drawContestant(){
 
 
 // need to figure out a way to wire 
-
-
 function keyPressed() {
   if (keyCode === LEFT_ARROW) {
     console.log("Left arrow pressed");

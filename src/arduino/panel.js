@@ -32,6 +32,7 @@ const serialSetup = () => {
 
 }
 
+
 const cheatScoreIncrement = 5;
 const otherScoreIncrement = 1
 
@@ -40,6 +41,7 @@ const cheatButtonPressed = () => {
     render.cheat()
 }
 
+//hides applause after pressed
 const applauseButtonPressed = () => { 
     game.updateScore(otherScoreIncrement) 
     render.hideApplause()
