@@ -1,10 +1,15 @@
 // Event manager & boilerplate for hooking up ardiuno 
 
-const { SerialPort } = require('serialport')
-const { ReadlineParser } = require('@serialport/parser-readline')
+import { SerialPort } from 'serialport';
+import { ReadlineParser } from '@serialport/parser-readline';
 
-const game = require("../server/game.js")
-const render = require("../client/sketch.js")
+
+import * as game from '../server/game.js';
+
+import {
+    hideCheat,
+    hideApplause,
+  } from "../client/utils.js"
 
 let port;
 
@@ -38,13 +43,13 @@ const otherIncrement = 1;
 
 const cheatButtonPressed = () => { 
     game.updateRatings(cheatIncrement) 
-    render.cheat()
+    hideCheat()
 }
 
 //hides applause after pressed
 const applauseButtonPressed = () => { 
     game.updateRatings(otherIncrement) 
-    render.hideApplause()
+    hideApplause()
 }
 
 const lightsMoved = (direction) => {

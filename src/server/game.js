@@ -1,15 +1,11 @@
 // Holds game state, logic, variables
-/**
- * Pseudo Code Algorithm - Event Manager
- * 
- * 
- * 
- * 
- * 
- */
+const baseRatings = {'1': 10, '2': 5, '3': 0}
 
 const user = {id: "DEFAULT", score: 0} // from the RFID band
-const state = {difficulty: 0, ratings: 0, lightPosition: 0}
+const state = {difficulty: 1, ratings: baseRatings['1'], lightPosition: 0}
+
+
+import { resetVisuals } from "../client/utils.js"
 
 const rfidScan = (userId, userScore) => {
     // store valid RFID input 
@@ -24,8 +20,9 @@ const rfidScan = (userId, userScore) => {
 
 const newGame = () => {
     // reset all variables & state
-    state.difficulty = 0
-    state.ratings = 0
+    state.difficulty = 1
+    state.ratings = baseRatings[state.difficulty]
+    resetVisuals()
 
     state.difficulty = selectDifficulty()
 
@@ -42,5 +39,6 @@ const getRatings = () => { return state.ratings }
 const updateRatings = (value) => { state.ratings += value }
 const getDifficulty = () => { return state.difficulty }
 const changeLights = (value) => { state.lightPosition += value }
+const getLights = () => {return state.lightPosition }
 
-module.exports = { updateRatings: updateRatings, getScore: getRatings, getDifficulty, changeLights, rfidScan, }
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights };
