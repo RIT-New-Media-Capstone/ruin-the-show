@@ -33,23 +33,23 @@ const serialSetup = () => {
 }
 
 
-const cheatScoreIncrement = 5;
-const otherScoreIncrement = 1
+const cheatIncrement = 5;
+const otherIncrement = 1;
 
 const cheatButtonPressed = () => { 
-    game.updateScore(cheatScoreIncrement) 
+    game.updateRatings(cheatIncrement) 
     render.cheat()
 }
 
 //hides applause after pressed
 const applauseButtonPressed = () => { 
-    game.updateScore(otherScoreIncrement) 
+    game.updateRatings(otherIncrement) 
     render.hideApplause()
 }
 
 const lightsMoved = (direction) => {
     game.changeLights(direction)
-    game.updateScore(otherScoreIncrement)
+    game.updateRatings(otherIncrement)
 }
 
 oscClient.open();

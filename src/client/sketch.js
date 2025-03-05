@@ -6,11 +6,11 @@
 let lightPosX = 0; // initial light position 
 let hostPos = 0;// initial host position
 let speed = 3 // speed of 
-let score = 10 //getScore
+let ratings = 10 //getRatings
 
 function setup() {
-  createCanvas(400, 400);
-  resizeCanvas(windowWidth - 20, windowHeight - 20)
+  createCanvas(windowWidth - 50, (windowWidth - 50) * 9 / 16);
+  // resizeCanvas(windowWidth - 20, windowHeight - 20)
 }
 
 /*
@@ -21,7 +21,7 @@ function draw() {
   hostInteract()
   audience()
   drawContestant()
-  drawStars(30,30,5, score)
+  drawStars(30,30,5, ratings)
   drawLights()
   cheater()
   if(applauseVis) drawApplause()
