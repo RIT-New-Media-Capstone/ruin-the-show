@@ -20,7 +20,7 @@ const moveAndShowCheat = () => {
     // state that it just move 
     //if not true sets visible to true 
     if (cheat < chanceOfCheat && !cheatVis) {
-        cheatX = randomRange(80, 250);
+        cheatX = randomRange(100, 600);
         cheatVis = true;
     }
 };

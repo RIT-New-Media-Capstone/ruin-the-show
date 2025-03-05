@@ -58,7 +58,7 @@ function updateCheat() {
 function drawCheat() {
   if (state.cheatVis) {
     fill(255, 0, 0)
-    ellipse(state.cheatX, 0, 100, 100)
+    ellipse(state.cheatX, 100, 100, 100)
   }
 }
 
@@ -66,7 +66,8 @@ function drawCheat() {
 // Over random audience member for the list 
 function drawAudience() {
   fill(0, 0, 0)
-  rect(0, 500, width, 150);
+  let audienceTextureHeight = 150
+  rect(0, height - audienceTextureHeight, width, audienceTextureHeight);
 
   showApplause()
 }
