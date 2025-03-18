@@ -10,8 +10,12 @@ const PORT = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files from the client folder
+// js & css files
 app.use(express.static(path.join(__dirname, '../client')));
+
+// images & assets folder 
+app.use('/assets', express.static(path.join(__dirname, '../client/assets/')));
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));

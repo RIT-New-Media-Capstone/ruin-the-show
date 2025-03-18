@@ -17,6 +17,12 @@ import {
   showApplause,
 } from "./utils.js";
 
+window.preload = function () {
+  // img = loadImage('/assets/Podium.png');
+
+  // ^^ use this directory to load images 
+}
+
 window.setup = function () {
   // 16:9 aspect ratio with slight padding
   createCanvas(windowWidth - 50, (windowWidth - 50) * 9 / 16);
