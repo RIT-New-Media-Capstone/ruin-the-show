@@ -72,6 +72,7 @@ const getState = async () => {
         lightPosX: state.lights,
         ratings: state.ratings,
         difficulty: state.difficulty,
+        volume: state.volume
     })
 };
 

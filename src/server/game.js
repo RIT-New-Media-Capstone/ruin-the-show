@@ -2,7 +2,7 @@
 const baseRatings = {'1': 10, '2': 5, '3': 0}
 
 const user = {id: "DEFAULT", score: 0} // from the RFID band
-const state = {difficulty: 1, ratings: baseRatings['1'], lightPosition: 0}
+const state = {difficulty: 1, ratings: baseRatings['1'], lightPosition: 0, volume: 50}
 
 
 import { resetVisuals } from "../client/utils.js"
@@ -40,5 +40,7 @@ const updateRatings = (value) => { state.ratings += value }
 const getDifficulty = () => { return state.difficulty }
 const changeLights = (value) => { state.lightPosition += value }
 const getLights = () => {return state.lightPosition }
+const getVolume = () => { return state.volume }
+const updateVolume = (value) => { state.volume = value }
 
-export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights };
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getVolume, updateVolume, };

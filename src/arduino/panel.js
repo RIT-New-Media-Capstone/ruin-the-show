@@ -30,9 +30,11 @@ const serialSetup = () => {
 
         // Get which input
         // logic to change based on how we send serial data 
-        if(data == "cheat") cheatButtonPressed();
-        else if (data == "applause") applauseButtonPressed();
-        else if (data == "lights") lightsMoved(-1)
+        if(data == "BUTTON2_PRESSED") cheatButtonPressed();
+        else if (data == "BUTTON1_PRESSED") applauseButtonPressed();
+        else if (data == "JOYSTICK_LEFT") lightsMoved(-1);
+        else if (data == "JOYSTICK_RIGHT") lightsMoved(1);
+        else if (data.substring(0, 15) == "LEVER_POSITION:") leverRotated(data.substring(15))
     })
 
 }
@@ -54,6 +56,12 @@ const applauseButtonPressed = () => {
 
 const lightsMoved = (direction) => {
     game.changeLights(direction)
+    game.updateRatings(otherIncrement)
+}
+
+const leverRotated = (newPosition) => {
+    let pos = Number(newPosition)
+    game.updateVolume(pos)
     game.updateRatings(otherIncrement)
 }
 

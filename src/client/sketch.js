@@ -42,6 +42,7 @@ window.draw = function () {
   drawCheat()
   drawRatings(30, 30, 5)
   drawContestant()
+  drawVolume()
   if (state.applauseVis) drawApplause()
 
   // Update game elements
@@ -112,6 +113,12 @@ function drawContestant() {
   rect(width / 3 + 200, 350, 50, 90);
   rect(width / 3 + 260, 350, 50, 90);
 
+}
+
+function drawVolume() {
+  textSize(48);
+  fill("black")
+  if(state.volume) text(`Volume: ${state.volume}`, windowWidth - 350, 75);
 }
 
 // DELETE - testing only  
