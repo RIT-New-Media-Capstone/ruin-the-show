@@ -115,23 +115,43 @@ function drawLights() {
 
 // host moves on his own he should also pause every now and then
 function drawHost() {
-  fill("yellow"); // Set fill color to yellow
-  ellipse(hostPos, height / 2, 50, 50); // Draw the circle host bobble head 
+  const yPos = height / 3
+
+  // resizing consistently 
+  const alWidth = assets.al.width / 4
+  const alHeight = assets.al.height / 4
+
+  image(assets.al, hostPos, yPos, alWidth, alHeight)
 
   hostPos += speed;
 
   // Reverse direction 
-  if (hostPos >= width || hostPos <= 0) {
+  if (hostPos >= width - alWidth || hostPos <= 0) {
     speed *= -1;  // Flip the direction
   }
 }
 
 // contestant podium lights up 
 function drawContestant() {
-  fill(233);
-  rect(width / 3, 350, 50, 90);
-  rect(width / 3 + 200, 350, 50, 90);
-  rect(width / 3 + 260, 350, 50, 90);
+  let x = width / 5
+  const y = height / 4
+  const spacing = 250
+
+  assets.contestants.forEach(contestant => {
+    const contestantWidth = contestant.width / 6
+    const contestantHeight = contestant.height / 6
+
+    image(contestant, x, y, contestantWidth, contestantHeight)
+
+    const podiumWidth = assets.podium.width / 4
+    const podiumHeight = assets.podium.height / 4
+    const podiumX = x + 2
+    const podiumY = y + contestantHeight - 25
+
+    image(assets.podium, podiumX, podiumY, podiumWidth, podiumHeight)
+
+    x += spacing
+  })
 
 }
 
