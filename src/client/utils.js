@@ -1,7 +1,6 @@
 // State variables for animations
 let cheatX = 0;
 let cheatVis = false;
-let applauseX = 0;
 let applauseVis = false;
 let lightPosX = 0;
 
@@ -9,8 +8,8 @@ let lightPosX = 0;
 const randomRange = (min, max) => Math.random() * (max - min) + min;
 
 // Cheat Visibility Handlers
-const moveAndShowCheat = () => {
-    cheatX = randomRange(100, 600);
+const showCheat = () => {
+    cheatX = 300
     cheatVis = true;
 };
 
@@ -20,7 +19,7 @@ const hideCheat = () => {
 
 // Applause Visibility Handlers
 const showApplause = () => {
-    applauseX = randomRange(100, 250);
+
     applauseVis = true;
 };
 
@@ -49,7 +48,7 @@ const getState = async () => {
     return ({
         cheatX,
         cheatVis,
-        applauseX,
+        applauseX: (state.applauseX) * (windowWidth - 100) + 100,
         applauseVis,
         lightPosX: state.lights,
         ratings: state.ratings,
@@ -60,7 +59,7 @@ const getState = async () => {
 
 // Export functions
 export {
-    moveAndShowCheat,
+    showCheat,
     hideCheat,
     showApplause,
     hideApplause,

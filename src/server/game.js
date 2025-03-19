@@ -12,14 +12,15 @@ const state = {
     applause: {
         applauseTimer: 0,
         threshold: 0.75,
-        maxTime: 1000,
+        maxTime: 3000,
+        x: -1
     },
     timer: {
         lastTime: 0,
     }
 }
 
-import { moveAndShowCheat, resetVisuals, showApplause } from "../client/utils.js"
+import { showCheat, resetVisuals, showApplause } from "../client/utils.js"
 import { turnOnApplauseLED, turnOnCheatLED } from "../arduino/panel.js"
 
 const rfidScan = (userId, userScore) => {
@@ -69,6 +70,7 @@ const startGame = () => {
         const chance = Math.random()
         if (chance < state.applause.threshold) {
             state.applause.applauseTimer = 0
+            state.applause.x = Math.random()
             triggerApplauseButton()
             console.log("Applause!")
         }
@@ -82,7 +84,7 @@ const selectDifficulty = () => {
 }
 
 const triggerCheatButton = () => {
-    moveAndShowCheat()
+    showCheat()
     turnOnCheatLED()
 }
 
@@ -98,5 +100,6 @@ const changeLights = (value) => { state.lightPosition += value }
 const getLights = () => { return state.lightPosition }
 const getVolume = () => { return state.volume }
 const updateVolume = (value) => { state.volume = value }
+const getApplauseX = () => { return state.applause.x }
 
-export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getVolume, updateVolume, triggerCheatButton, triggerApplauseButton, };
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getVolume, updateVolume, triggerCheatButton, triggerApplauseButton, getApplauseX };

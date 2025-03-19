@@ -11,11 +11,9 @@ let state;
 const assets = {
   contestants: [],
   applause: "",
-  audience: "", 
+  audience: "",
   al: "",
-  meterBack: "",
-  spinner: "", 
-  podium: "", 
+  podium: "",
 }
 
 import {
@@ -23,7 +21,7 @@ import {
   hideCheat,
   hideApplause,
   updateLightPosition,
-  moveAndShowCheat,
+  showCheat,
   showApplause,
 } from "./utils.js";
 
@@ -36,11 +34,9 @@ window.preload = function () {
   assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
   assets.audience = loadImage('/assets/audience.png')
   assets.al = loadImage('/assets/FullBodyAL.png')
-  assets.meterBack = loadImage('/assets/Applause-O-Meter.png')
-  assets.spinner = loadImage('/assets/Spinner.png')
   assets.podium = loadImage('/assets/Podium.png');
 
-  // ^^ use this format to load images 
+  // ^^ use this directory to load images 
 }
 
 window.setup = function () {
@@ -57,11 +53,11 @@ window.draw = function () {
 
   // Draw game elements
   drawAudience()
-  drawHost()
   drawLights()
   drawCheat()
   drawRatings(30, 30, 5)
   drawContestant()
+  drawHost()
   drawVolume()
   if (state.applauseVis) drawApplause()
 
@@ -79,7 +75,7 @@ const syncGameState = async () => {
 }
 
 function updateCheat() {
-  moveAndShowCheat()
+  showCheat()
 }
 
 function drawCheat() {
@@ -102,7 +98,7 @@ function drawAudience() {
 function drawApplause() {
   const applauseY = height / 2
   fill(255)
-  if(state.applauseX) ellipse(state.applauseX, applauseY, 30, 30)
+  if (state.applauseX) ellipse(state.applauseX, applauseY, 30, 30)
 }
 
 //light producer has to host with light, producer cannot move host
@@ -110,7 +106,7 @@ function drawApplause() {
 
 function drawLights() {
   fill("orange")
-  if(state.lightPosX) ellipse(state.lightPosX, 300, 50, 50)
+  if (state.lightPosX) ellipse(state.lightPosX, 300, 50, 50)
 }
 
 // host moves on his own he should also pause every now and then
@@ -118,15 +114,22 @@ function drawHost() {
   const yPos = height / 3
 
   // resizing consistently 
-  const alWidth = assets.al.width / 4
-  const alHeight = assets.al.height / 4
+  const alWidth = assets.al.width / 3.5
+  const alHeight = assets.al.height / 3.5
 
-  image(assets.al, hostPos, yPos, alWidth, alHeight)
+  // draw al facing the direction he's walking
+  if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
+  else {
+    push()
+    scale(-1,1)
+    image(assets.al, -hostPos, yPos, alWidth, alHeight)
+    pop()
+  }
 
   hostPos += speed;
 
   // Reverse direction 
-  if (hostPos >= width - alWidth || hostPos <= 0) {
+  if (hostPos >= width + alWidth || hostPos <= 0 - alWidth) {
     speed *= -1;  // Flip the direction
   }
 }
@@ -158,7 +161,7 @@ function drawContestant() {
 function drawVolume() {
   textSize(48);
   fill("black")
-  if(state.volume) text(`Volume: ${state.volume}`, windowWidth - 350, 75);
+  if (state.volume) text(`Volume: ${state.volume}`, windowWidth - 350, 75);
 }
 
 // DELETE - testing only  
@@ -167,10 +170,10 @@ window.keyPressed = function () {
 
   if (keyCode === LEFT_ARROW) {
     console.log("Left arrow pressed");
-    if(state.lightPosX) state.lightPosX += lightSpeed
+    if (state.lightPosX) state.lightPosX += lightSpeed
   } else if (keyCode === RIGHT_ARROW) {
     console.log("Right arrow pressed");
-    if(state.lightPosX) state.lightPosX += lightSpeed; // Move right
+    if (state.lightPosX) state.lightPosX += lightSpeed; // Move right
   } else if (key === 'a') {
     hideApplause()
   } else if (key === 'c') {
