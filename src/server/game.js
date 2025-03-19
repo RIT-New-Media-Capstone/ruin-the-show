@@ -48,33 +48,41 @@ const newGame = () => {
 }
 
 const startGame = () => {
-    const currentTime = Date.now()
-    const deltaTime = currentTime - state.timer.lastTime
-    state.timer.lastTime = currentTime
+    state.timer.lastTime = Date.now()
 
-    // Every second, 50% chance cheat button triggers
-    state.cheat.cheatTimer += deltaTime
+    const game = () => {
+        const currentTime = Date.now()
+        const deltaTime = currentTime - state.timer.lastTime
+        state.timer.lastTime = currentTime
 
-    if (state.cheat.cheatTimer > state.cheat.maxTime) {
-        const chance = Math.random()
-        if (chance < state.cheat.threshold) {
-            state.cheat.cheatTimer = 0
-            triggerCheatButton()
-            console.log("CHEAT!")
+        // Every second, 50% chance cheat button triggers
+        state.cheat.cheatTimer += deltaTime
+
+        if (state.cheat.cheatTimer > state.cheat.maxTime) {
+            const chance = Math.random()
+            if (chance < state.cheat.threshold) {
+                state.cheat.cheatTimer = 0
+                triggerCheatButton()
+                console.log("CHEAT!")
+            }
         }
+
+        // Every second, 75% chance applause button triggers
+        state.applause.applauseTimer += deltaTime
+        if (state.applause.applauseTimer > state.applause.maxTime) {
+            const chance = Math.random()
+            if (chance < state.applause.threshold) {
+                state.applause.applauseTimer = 0
+                state.applause.x = Math.random()
+                triggerApplauseButton()
+                console.log("Applause!")
+            }
+        }
+
+        setImmediate(game)
     }
 
-    // Every second, 75% chance applause button triggers
-    state.applause.applauseTimer += deltaTime
-    if (state.applause.applauseTimer > state.applause.maxTime) {
-        const chance = Math.random()
-        if (chance < state.applause.threshold) {
-            state.applause.applauseTimer = 0
-            state.applause.x = Math.random()
-            triggerApplauseButton()
-            console.log("Applause!")
-        }
-    }
+    game()
 }
 
 const selectDifficulty = () => {
