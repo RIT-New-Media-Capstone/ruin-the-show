@@ -8,6 +8,16 @@ let speed = 3 // speed of host
 
 let state;
 
+const assets = {
+  contestants: [],
+  applause: "",
+  audience: "", 
+  al: "",
+  meterBack: "",
+  spinner: "", 
+  podium: "", 
+}
+
 import {
   getState,
   hideCheat,
@@ -18,9 +28,19 @@ import {
 } from "./utils.js";
 
 window.preload = function () {
-  // img = loadImage('/assets/Podium.png');
+  assets.contestants.push(loadImage('/assets/1contestant.png'))
+  assets.contestants.push(loadImage('/assets/2contestant.png'))
+  assets.contestants.push(loadImage('/assets/3contestant.png'))
+  assets.contestants.push(loadImage('/assets/4contestant.png'))
 
-  // ^^ use this directory to load images 
+  assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
+  assets.audience = loadImage('/assets/audience.png')
+  assets.al = loadImage('/assets/FullBodyAL.png')
+  assets.meterBack = loadImage('/assets/Applause-O-Meter.png')
+  assets.spinner = loadImage('/assets/Spinner.png')
+  assets.podium = loadImage('/assets/Podium.png');
+
+  // ^^ use this format to load images 
 }
 
 window.setup = function () {
@@ -69,12 +89,12 @@ function drawCheat() {
   }
 }
 
-// Audience applause when board lights up same as speech bubble 
-// Over random audience member for the list 
 function drawAudience() {
-  fill(0, 0, 0)
-  let audienceTextureHeight = 150
-  rect(0, height - audienceTextureHeight, width, audienceTextureHeight);
+  const audienceTextureWidth = assets.audience.width
+  const audienceTextureHeight = assets.audience.height
+
+  // constrains to bottom of the screen
+  image(assets.audience, 0, 0, width, height, 0, 0, audienceTextureWidth, audienceTextureHeight, CONTAIN);
 
   showApplause()
 }
