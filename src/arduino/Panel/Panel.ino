@@ -44,7 +44,6 @@ const int LEVER_BOTTOM_LIMIT = 320;   // Movement limit on the lever when pushed
 
 // Serial communication variables
 String inputString = "";     // String to hold incoming data
-bool stringComplete = false; // Whether the string is complete
 
 void setup() {
   // Initialize serial communication
@@ -160,7 +159,7 @@ void handlePotentiometer(unsigned long currentTime) {
 
 void processSerialCommands() {
   // If a complete command was received
-  if (stringComplete) {
+  if (inputString != "") {
     inputString.trim();  // Remove any whitespace
     
     // Process the command
@@ -177,21 +176,12 @@ void processSerialCommands() {
     
     // Clear the string for the next command
     inputString = "";
-    stringComplete = false;
   }
 }
 
 // Serial event happens automatically when new data arrives
 void serialEvent() {
   while (Serial.available()) {
-    char inChar = (char)Serial.read();
-    
-    // Add character to input string
-    inputString += inChar;
-    
-    // If newline character, set flag to process the command
-    if (inChar == '\n') {
-      stringComplete = true;
-    }
+    inputString = Serial.readStringUntil('\n');
   }
 }

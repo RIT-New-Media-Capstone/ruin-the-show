@@ -13,7 +13,7 @@ import {
 let port;
 
 const serialSetup = () => {
-    port = new SerialPort({ path: 'COM6', baudRate: 9600 });
+    port = new SerialPort({ path: 'COM5', baudRate: 9600 });
     const serial = port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
     port.on('open', () => {
@@ -27,6 +27,9 @@ const serialSetup = () => {
     serial.on('data', (data) => {
         data = data.trim()
 
+        if(data.startsWith("System")) game.rfidScan()
+
+
         // Get which input
         // logic to change based on how we send serial data 
         if (data == "BUTTON2_PRESSED") cheatButtonPressed();
@@ -34,6 +37,7 @@ const serialSetup = () => {
         else if (data == "JOYSTICK_LEFT") lightsMoved(-1);
         else if (data == "JOYSTICK_RIGHT") lightsMoved(1);
         else if (data.startsWith("LEVER_POSITION:")) leverRotated(data.substring(15))
+        else console.log(data)
     })
 
 }
@@ -43,12 +47,14 @@ const cheatIncrement = 5;
 const otherIncrement = 1;
 
 const cheatButtonPressed = () => {
+    console.log("cheat")
     game.updateRatings(cheatIncrement)
     hideCheat()
 }
 
 //hides applause after pressed
 const applauseButtonPressed = () => {
+    console.log("applause")
     game.updateRatings(otherIncrement)
     hideApplause()
 }
@@ -66,7 +72,7 @@ const leverRotated = (newPosition) => {
 
 const turnOnCheatLED = () => {
     if (port && port.isOpen) {
-        port.write('LED2_ON\n', (err) => {
+        port.write('LED2_ON\r\n', (err) => {
             if (err) {
                 console.error('Error sending data:', err);
             } else {
@@ -80,7 +86,7 @@ const turnOnCheatLED = () => {
 
 const turnOnApplauseLED = () => {
     if (port && port.isOpen) {
-        port.write('LED1_ON\n', (err) => {
+        port.write('LED1_ON\r\n', (err) => {
             if (err) {
                 console.error('Error sending data:', err);
             } else {
