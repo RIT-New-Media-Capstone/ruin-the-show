@@ -22,10 +22,8 @@ const serialSetup = () => {
 
     port.on('error', (err) => {
         console.log('Error: ', err.message);
-        if(err.message.split(':')[1].trim() == "File not found") {
-            console.log("Running in developer mode")
-            game.rfidScan()
-        }
+        console.log("Running in developer mode")
+        game.rfidScan()
     });
 
     serial.on('data', (data) => {
