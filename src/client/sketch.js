@@ -14,6 +14,10 @@ const assets = {
   audience: "",
   al: "",
   podium: "",
+  stars: "",
+  stage: "",
+  background: "",
+  light: "",
 }
 
 import {
@@ -35,31 +39,38 @@ window.preload = function () {
   assets.audience = loadImage('/assets/audience.png')
   assets.al = loadImage('/assets/FullBodyAL.png')
   assets.podium = loadImage('/assets/Podium.png');
+  assets.light = loadImage('/assets/lightShine.png');
+
+  assets.stars = loadImage('/assets/stars.png');
+
+  assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
+  assets.background = loadImage('/assets/Background.png');
 
   // ^^ use this directory to load images 
 }
 
 window.setup = function () {
   // 16:9 aspect ratio with slight padding
-  createCanvas(windowWidth - 50, (windowWidth - 50) * 9 / 16);
+  createCanvas(assets.background.width / 6, assets.background.height / 6);
   state = getState()
 }
 
 window.draw = function () {
-  background(220);
+  background(255);
+  drawBackground()
 
   syncGameState()
 
 
   // Draw game elements
-  drawAudience()
   drawLights()
-  drawCheat()
+  // drawCheat()
   drawRatings(30, 30, 5)
   drawContestant()
   drawHost()
   drawVolume()
-  if (state.applauseVis) drawApplause()
+  drawAudience()
+  // if (state.applauseVis) drawApplause()
 
   // Update game elements
   // May move out of this file into utils.js
@@ -72,6 +83,11 @@ const syncGameState = async () => {
   if (frameCount % 60 === 0) { // Every second
     state = await getState();
   }
+}
+
+function drawBackground() {
+  image(assets.background, 0, 0, width, height)
+  image(assets.stage, 0, 0, width, height)
 }
 
 function updateCheat() {
@@ -105,23 +121,25 @@ function drawApplause() {
 //key controls
 
 function drawLights() {
-  fill("orange")
-  if (state.lightPosX) ellipse(state.lightPosX, 300, 50, 50)
+  const lightWidth = assets.light.width / 4
+  const lightHeight = assets.light.height / 4
+  if (state.lightPosX) image(assets.light, state.lightPosX, height / 4, lightWidth, lightHeight)
+  else image(assets.light, -300, (height / 3) - 75, lightWidth, lightHeight)
 }
 
 // host moves on his own he should also pause every now and then
 function drawHost() {
-  const yPos = height / 3
+  const yPos = height / 2.25
 
   // resizing consistently 
-  const alWidth = assets.al.width / 3.5
-  const alHeight = assets.al.height / 3.5
+  const alWidth = assets.al.width / 2.75
+  const alHeight = assets.al.height / 2.75
 
   // draw al facing the direction he's walking
   if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
   else {
     push()
-    scale(-1,1)
+    scale(-1, 1)
     image(assets.al, -hostPos, yPos, alWidth, alHeight)
     pop()
   }
@@ -136,9 +154,9 @@ function drawHost() {
 
 // contestant podium lights up 
 function drawContestant() {
-  let x = width / 5
-  const y = height / 4
-  const spacing = 250
+  let x = width / 4
+  const y = height / 2.5
+  const spacing = 200
 
   assets.contestants.forEach(contestant => {
     const contestantWidth = contestant.width / 6
@@ -188,6 +206,7 @@ function drawRatings(x, y, numStars) {
   let currentRatings = state.ratings || 0
   let filledStars = (currentRatings / maxRating) * numStars; // Convert value to star count
 
+  image(assets.stars, x - 30, y - 25, 220, 50)
   console.log(state.ratings)
 
   for (let i = 0; i < numStars; i++) {

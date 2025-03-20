@@ -3,7 +3,7 @@ const baseRatings = { '1': 10, '2': 5, '3': 0 }
 
 const user = { id: "DEFAULT", score: 0 } // from the RFID band
 const state = {
-    difficulty: 1, ratings: baseRatings['1'], lightPosition: 0, volume: 50,
+    difficulty: 1, ratings: baseRatings['1'], lightPosition: -300, volume: 50,
     cheat: {
         cheatTimer: 0,
         threshold: 0.50,
