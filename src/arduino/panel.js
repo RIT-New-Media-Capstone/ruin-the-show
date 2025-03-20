@@ -60,7 +60,7 @@ const applauseButtonPressed = () => {
 }
 
 const lightsMoved = (direction) => {
-    game.changeLights(direction)
+    game.changeLights(direction * 40)
     game.updateRatings(otherIncrement)
 }
 
