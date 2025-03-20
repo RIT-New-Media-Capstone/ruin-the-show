@@ -86,6 +86,20 @@ const turnOnCheatLED = () => {
     }
 }
 
+const turnOffCheatLED = () => {
+    if (port && port.isOpen) {
+        port.write('LED2_OFF\r\n', (err) => {
+            if (err) {
+                console.error('Error sending data:', err);
+            } else {
+                console.log('Sent "LED2_OFF" to Arduino');
+            }
+        });
+    } else {
+        console.error('Serial port not open. Cannot send LED2_OFF');
+    }
+}
+
 const turnOnApplauseLED = () => {
     if (port && port.isOpen) {
         port.write('LED1_ON\r\n', (err) => {
@@ -100,6 +114,20 @@ const turnOnApplauseLED = () => {
     }
 }
 
-export { turnOnCheatLED, turnOnApplauseLED }
+const turnOffApplauseLED = () => {
+    if (port && port.isOpen) {
+        port.write('LED1_OFF\r\n', (err) => {
+            if (err) {
+                console.error('Error sending data:', err);
+            } else {
+                console.log('Sent "LED1_OFF" to Arduino');
+            }
+        });
+    } else {
+        console.error('Serial port not open. Cannot send LED1_OFF');
+    }
+}
+
+export { turnOnCheatLED, turnOnApplauseLED, turnOffCheatLED, turnOffApplauseLED }
 
 serialSetup();
