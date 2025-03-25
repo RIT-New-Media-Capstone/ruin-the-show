@@ -2,9 +2,54 @@
 // fill out function interaction animation 
 //linke to events ( mouse pressed etc )
 
+
+/**
+ * How to add a spriteSheet *****
+to do so manually.... I added a spritesheet library called p5.play...
+
+call drawSprites() I think and learn more about library 
+
+let spriteSheet;
+let frameWidth = 32; // Adjust according to your sprite
+let frameHeight = 32;
+let totalFrames = 4;
+let currentFrame = 0;
+let frameRateSpeed = 6; // Controls animation speed
+
+function preload() {
+  spriteSheet = loadImage('spritesheet.png'); // Load your sprite sheet
+}
+
+function setup() {
+  createCanvas(200, 200);
+  frameRate(frameRateSpeed); // Controls animation speed
+}
+
+function draw() {
+  background(220);
+  
+  // Calculate the x position of the current frame
+  let sx = currentFrame * frameWidth;
+  
+  // Draw the current frame from the sprite sheet
+  image(spriteSheet, 50, 50, frameWidth, frameHeight, sx, 0, frameWidth, frameHeight);
+  
+  // Update the frame
+  currentFrame = (currentFrame + 1) % totalFrames; // Loop animation
+
+
+
+  mySprite.animation.frameDelay = 5;
+
+}
+
+ */
+
+
 //variables 
 let hostPos = 0; // initial host position
 let speed = 3 // speed of host
+let alSprite;
 
 let state;
 
@@ -30,7 +75,39 @@ import {
 } from "./utils.js";
 
 window.preload = function () {
-  assets.contestants.push(loadImage('/assets/1contestant.png'))
+
+  // Al Animation 
+  const alWidth = assets.al.width / 2.75;
+  const alHeight = assets.al.height / 2.75;
+
+  alSprite = createSprite(alWidth,alHeight);
+  let alAnimation = alSprite.addAnimation("Walk","SpritesheetAL.png", {
+    frameSize: [alWidth, alHeight], // Frame width & height
+    frames: 5 // Number of frames
+  });
+
+
+
+  // Contestant Animation - should go into a forEach : assets.contestants.forEach(contestant => {
+  const contestantWidth = contestant.width / 6
+  const contestantHeight = contestant.height / 6
+  contestantSprite = createSprite(contestantWidth,contestantHeight);
+  let contestantAnimation = contestantSprite.addAnimation("Mood","SpritesheetContestant.png", {
+    frameSize: [contestantWidth, contestantHeight], // Frame width & height
+    frames: 3 // Number of frames
+  });
+
+  // Audience Applause Animation
+  const audienceTextureWidth = assets.audience.width
+  const audienceTextureHeight = assets.audience.height
+
+  audienceSprite = createSprite(audienceTextureWidth,audienceTextureHeight);
+  let audienceAnimation = audienceSprite.addAnimation("Applause","SpritesheetAudience.png", {
+    frameSize: [audienceTextureWidth, audienceTextureHeight], // Frame width & height
+    frames: 2 // Number of frames
+  });
+
+ /* assets.contestants.push(loadImage('/assets/1contestant.png'))
   assets.contestants.push(loadImage('/assets/2contestant.png'))
   assets.contestants.push(loadImage('/assets/3contestant.png'))
   assets.contestants.push(loadImage('/assets/4contestant.png'))
@@ -44,7 +121,7 @@ window.preload = function () {
   assets.stars = loadImage('/assets/stars.png');
 
   assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
-  assets.background = loadImage('/assets/Background.png');
+  assets.background = loadImage('/assets/Background.png');*/
 
   // ^^ use this directory to load images 
 }
@@ -128,12 +205,13 @@ function drawLights() {
 }
 
 // host moves on his own he should also pause every now and then
-function drawHost() {
+/*function drawHost() {
   const yPos = height / 2.25
 
   // resizing consistently 
   const alWidth = assets.al.width / 2.75
   const alHeight = assets.al.height / 2.75
+
 
   // draw al facing the direction he's walking
   if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
@@ -150,7 +228,7 @@ function drawHost() {
   if (hostPos >= width + alWidth || hostPos <= 0 - alWidth) {
     speed *= -1;  // Flip the direction
   }
-}
+}*/
 
 // contestant podium lights up 
 function drawContestant() {
