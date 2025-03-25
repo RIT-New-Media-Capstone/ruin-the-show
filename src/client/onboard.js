@@ -7,6 +7,7 @@ let applauseBtnScr; // image variables
 let hostJstkScr;
 let cheatScr
 let contestantBtnScr;
+let splashScr; 
 
 //user inputs 
 let hostJstk;
@@ -41,25 +42,35 @@ window.preload = function () {
   
     // ^^ use this directory to load images 
   }
-  
+   function setup(){
 
-//edit to check for button pressed
-if ((currentScr == applauseBtnScr) && (currentBtn == applauseBtn)){
-    //switch screen
-    currentScr = hostJstkScr
-}
+   }
 
-if ((currentScr == hostJstkScr) && (currentBtn == hostJstk)){
-    //switch screen
-    currentScr = contestantBtnScreen
-}
+   function draw(){
+
+    if((currentScr == splashScr) ){
+        console.log("ready to start")
+    }
+
+    //edit to check for button inputs 
+    if ((currentScr == applauseBtnScr) && (currentBtn == applauseBtn)){
+        //switch screen
+        currentScr = hostJstkScr;
+    }
+
+    if ((currentScr == hostJstkScr) && (currentBtn == hostJstk)){
+        //switch screen
+        currentScr = contestantBtnScr;
+    }
 
 
-if ((currentScr == contestantBtnScr)){
-   // make sure the user presses all 4 buttons 
-    currentScr = hostJstkScr
-}
+    if ((currentScr == contestantBtnScr)){
+    // make sure the user presses all 4 buttons 
+        currentScr = hostJstkScr
+    }
 
-if((currentScr == cheatScr)){
-    
-}
+    if((currentScr == cheatScr)){
+        
+    }
+
+   }
