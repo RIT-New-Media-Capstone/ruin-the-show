@@ -1,187 +1,251 @@
-/*
-DEMO CONTROL PANNEL
+// Game Controller Script
+// Components:
+// - 6 buttons with LEDs (4 podium, 1 cheat, 1 applause)
+// - Joystick (left/right buttons)
+// - Potentiometer lever (mapped to 1-100)
 
-Led buttons light up when "LED1_ON" or "LED2_ON" is sent and when pressed it turns off the light on the button and returns "LED1_OFF"
-Joystick will send out "JOYSTICK_LEFT" or "JOYSTICK_RIGHT" when moved and will continue until let go of
-Lever will send "LEVER_POSITION:"" and a number between 1-100
-*/
-
-
-
-// Combined code for arcade joystick, potentiometer and two LED controllers with serial communication
 // Pin definitions
-const int LEFT_PIN = 4;      // Digital pin for left direction switch
-const int RIGHT_PIN = 5;     // Digital pin for right direction switch
-const int BUTTON_PIN_1 = 2;  // First game button
-const int LED_PIN_1 = 13;    // First game LED
-const int BUTTON_PIN_2 = 6;  // Second game button
-const int LED_PIN_2 = 12;    // Second game LED
-const int POT_PIN = A0;      // Analog pin for potentiometer
+// Buttons - Digital inputs
+const int PODIUM_BTN_1 = 4;
+const int PODIUM_BTN_2 = 5;
+const int PODIUM_BTN_3 = 6;
+const int PODIUM_BTN_4 = 7;
+const int CHEAT_BTN = 2;
+const int APPLAUSE_BTN = 3;
 
+// Button LEDs - Digital outputs
+const int PODIUM_LED_1 = 10;
+const int PODIUM_LED_2 = 11;
+const int PODIUM_LED_3 = 12;
+const int PODIUM_LED_4 = 13;
+const int CHEAT_LED = 8;
+const int APPLAUSE_LED = 9;
 
-// Joystick variables
-unsigned long lastJoystickChangeTime = 0;  // For debouncing joystick
-const int debounceDelay = 200;     // Milliseconds between input updates
+// Joystick buttons
+const int JOYSTICK_LEFT = A0;
+const int JOYSTICK_RIGHT = A1;
 
-// LED/button 1 variables
-int buttonState1 = 0;        // Variable to store button state
-bool ledOn1 = false;         // Track if LED is currently on
-unsigned long lastButton1ChangeTime = 0;  // Last time button1 was pressed
+// Potentiometer lever
+const int LEVER_POT = A2;
 
-// LED/button 2 variables
-int buttonState2 = 0;        // Variable to store button state
-bool ledOn2 = false;         // Track if LED is currently on
-unsigned long lastButton2ChangeTime = 0;  // Last time button2 was pressed
+// Variables to store button states
+int podium1State = 0;
+int podium2State = 0;
+int podium3State = 0;
+int podium4State = 0;
+int cheatState = 0;
+int applauseState = 0;
+int joystickLeftState = 0;
+int joystickRightState = 0;
 
-// Potentiometer variables
-int potValue = 0;            // Raw potentiometer value (0-1023)
-int mappedValue = 50;        // Mapped value (1-100)
-int lastMappedValue = 50;    // Previous mapped value
-unsigned long lastPotReadTime = 0;  // Last time pot was read
-const int potReadInterval = 100;    // Read pot every 100ms to avoid flooding serial
-const int LEVER_TOP_LIMIT = 36;   // Movement limit on the lever when pushed all the way up
-const int LEVER_BOTTOM_LIMIT = 320;   // Movement limit on the lever when pushed all the way down
+// Variables to store previous button states for edge detection
+int prevPodium1State = 0;
+int prevPodium2State = 0;
+int prevPodium3State = 0;
+int prevPodium4State = 0;
+int prevCheatState = 0;
+int prevApplauseState = 0;
+int prevJoystickLeftState = 0;
+int prevJoystickRightState = 0;
 
-// Serial communication variables
-String inputString = "";     // String to hold incoming data
+// Lever variables
+int leverValue = 0;
+int prevLeverValue = 0;
+const int LEVER_THRESHOLD = 2; // Threshold for lever value change
 
 void setup() {
   // Initialize serial communication
   Serial.begin(9600);
-  inputString.reserve(200);  // Reserve space for the input string
   
-  // Set up joystick switch pins with internal pull-up resistors
-  pinMode(LEFT_PIN, INPUT_PULLUP);
-  pinMode(RIGHT_PIN, INPUT_PULLUP);
+  // Initialize button pins as inputs with pull-up resistors
+  pinMode(PODIUM_BTN_1, INPUT_PULLUP);
+  pinMode(PODIUM_BTN_2, INPUT_PULLUP);
+  pinMode(PODIUM_BTN_3, INPUT_PULLUP);
+  pinMode(PODIUM_BTN_4, INPUT_PULLUP);
+  pinMode(CHEAT_BTN, INPUT_PULLUP);
+  pinMode(APPLAUSE_BTN, INPUT_PULLUP);
   
-  // Set up button and LED pins
-  pinMode(LED_PIN_1, OUTPUT);
-  pinMode(BUTTON_PIN_1, INPUT_PULLUP);
-  pinMode(LED_PIN_2, OUTPUT);
-  pinMode(BUTTON_PIN_2, INPUT_PULLUP);
+  // Joystick buttons also use pull-up resistors
+  pinMode(JOYSTICK_LEFT, INPUT_PULLUP);
+  pinMode(JOYSTICK_RIGHT, INPUT_PULLUP);
   
-  // Initialize LEDs to off
-  digitalWrite(LED_PIN_1, LOW);
-  digitalWrite(LED_PIN_2, LOW);
+  // Initialize LED pins as outputs
+  pinMode(PODIUM_LED_1, OUTPUT);
+  pinMode(PODIUM_LED_2, OUTPUT);
+  pinMode(PODIUM_LED_3, OUTPUT);
+  pinMode(PODIUM_LED_4, OUTPUT);
+  pinMode(CHEAT_LED, OUTPUT);
+  pinMode(APPLAUSE_LED, OUTPUT);
   
-  // Take initial potentiometer reading
-  potValue = analogRead(POT_PIN);
-  mappedValue = map(potValue, 0, 1023, 1, 100);
-  // Map lever movement (4-29) to range 1-100 
-  mappedValue = map(mappedValue, LEVER_BOTTOM_LIMIT, LEVER_TOP_LIMIT, 1, 100);
-  lastMappedValue = mappedValue;
+  // Initially turn off all LEDs
+  digitalWrite(PODIUM_LED_1, LOW);
+  digitalWrite(PODIUM_LED_2, LOW);
+  digitalWrite(PODIUM_LED_3, LOW);
+  digitalWrite(PODIUM_LED_4, LOW);
+  digitalWrite(CHEAT_LED, LOW);
+  digitalWrite(APPLAUSE_LED, LOW);
   
-  Serial.println("System ready for serial commands");
-  Serial.println("Send 'LED1_ON' or 'LED2_ON' to turn on LEDs");
-  Serial.print("Initial lever position: ");
-  Serial.println(mappedValue);
+  Serial.println("Game Controller initialized!");
 }
 
 void loop() {
-  // Current time used by all systems
-  unsigned long currentTime = millis();
+  // Read button states (invert because pull-up resistors)
+  podium1State = !digitalRead(PODIUM_BTN_1);
+  podium2State = !digitalRead(PODIUM_BTN_2);
+  podium3State = !digitalRead(PODIUM_BTN_3);
+  podium4State = !digitalRead(PODIUM_BTN_4);
+  cheatState = !digitalRead(CHEAT_BTN);
+  applauseState = !digitalRead(APPLAUSE_BTN);
   
-  // Handle joystick inputs
-  handleJoystick(currentTime);
+  // Read joystick states (invert because pull-up resistors)
+  joystickLeftState = !digitalRead(JOYSTICK_LEFT);
+  joystickRightState = !digitalRead(JOYSTICK_RIGHT);
   
-  // Handle buttons and LEDs
-  handleButton(currentTime, BUTTON_PIN_1, LED_PIN_1, &buttonState1, &ledOn1, 
-               &lastButton1ChangeTime, 1);
-  handleButton(currentTime, BUTTON_PIN_2, LED_PIN_2, &buttonState2, &ledOn2, 
-               &lastButton2ChangeTime, 2);
+  // Read potentiometer and map to 1-100
+  int rawLeverValue = analogRead(LEVER_POT);
+  leverValue = map(rawLeverValue, 0, 1023, 1, 100);
   
-  // Handle potentiometer readings
-  handlePotentiometer(currentTime);
-  
-  // Process any received serial commands
-  processSerialCommands();
-}
-
-void handleJoystick(unsigned long currentTime) {
-  // Read switch states (LOW when pressed because of pull-up resistors)
-  bool leftPressed = (digitalRead(LEFT_PIN) == LOW);
-  bool rightPressed = (digitalRead(RIGHT_PIN) == LOW);
-  
-  // Only process input after debounce delay has passed
-  if (currentTime - lastJoystickChangeTime > debounceDelay) {
-    if (leftPressed) {
-      Serial.println("JOYSTICK_LEFT");
-      lastJoystickChangeTime = currentTime;  // Reset the timer
-    }
-    else if (rightPressed) {
-      Serial.println("JOYSTICK_RIGHT");
-      lastJoystickChangeTime = currentTime;  // Reset the timer
-    }
+  // Check for button presses (rising edge detection)
+  if (podium1State && !prevPodium1State) {
+    Serial.println("PODIUM_1_PRESSED");
   }
-}
-
-void handleButton(unsigned long currentTime, int buttonPin, int ledPin, 
-                  int *buttonState, bool *ledOn, unsigned long *lastChangeTime, 
-                  int buttonNumber) {
-  // Read the state of the button (LOW when pressed due to pull-up resistor)
-  *buttonState = digitalRead(buttonPin);
+  if (podium2State && !prevPodium2State) {
+    Serial.println("PODIUM_2_PRESSED");
+  }
+  if (podium3State && !prevPodium3State) {
+    Serial.println("PODIUM_3_PRESSED");
+  }
+  if (podium4State && !prevPodium4State) {
+    Serial.println("PODIUM_4_PRESSED");
+  }
+  if (cheatState && !prevCheatState) {
+    Serial.println("CHEAT_PRESSED");
+  }
+  if (applauseState && !prevApplauseState) {
+    Serial.println("APPLAUSE_PRESSED");
+  }
   
-  // Check if button is pressed and LED is on
-  if (*buttonState == LOW && *ledOn && (currentTime - *lastChangeTime > debounceDelay)) {
-    digitalWrite(ledPin, LOW);  // Turn off LED
-    *ledOn = false;
-    *lastChangeTime = currentTime;
-    
-    // Send message that button was pressed
-    Serial.print("BUTTON");
-    Serial.print(buttonNumber);
-    Serial.println("_PRESSED");
+  // Check for joystick position changes
+  if (joystickLeftState && !prevJoystickLeftState) {
+    Serial.println("JOYSTICK_LEFT");
   }
+  if (joystickRightState && !prevJoystickRightState) {
+    Serial.println("JOYSTICK_RIGHT");
+  }
+  
+  // Check for significant lever value changes
+  if (abs(leverValue - prevLeverValue) >= LEVER_THRESHOLD) {
+    Serial.print("LEVER_VALUE:");
+    Serial.println(leverValue);
+    prevLeverValue = leverValue;
+  }
+  
+  // Update previous states
+  prevPodium1State = podium1State;
+  prevPodium2State = podium2State;
+  prevPodium3State = podium3State;
+  prevPodium4State = podium4State;
+  prevCheatState = cheatState;
+  prevApplauseState = applauseState;
+  prevJoystickLeftState = joystickLeftState;
+  prevJoystickRightState = joystickRightState;
+  
+  // Check for serial commands
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+    
+    // Process commands
+    processCommand(command);
+  }
+  
+  // Short delay to debounce
+  delay(20);
 }
 
-void handlePotentiometer(unsigned long currentTime) {
-  // Only read the pot periodically to avoid flooding serial port
-  if (currentTime - lastPotReadTime >= potReadInterval) {
-    // Read the potentiometer value
-    potValue = analogRead(POT_PIN);
-
-    // Map the raw analog value (0-1023) to a range from 1-100
-    mappedValue = map(potValue, LEVER_BOTTOM_LIMIT, LEVER_TOP_LIMIT, 1, 100);
-
-    // Apply some smoothing to avoid jitter
-    mappedValue = constrain(mappedValue, 1, 100);
-    
-    // If the value has changed by at least 1, report it
-    if (abs(mappedValue - lastMappedValue) >= 1) {
-      Serial.print("LEVER_POSITION:");
-      Serial.println(mappedValue);
-      lastMappedValue = mappedValue;
-    }
-    
-    lastPotReadTime = currentTime;
+void processCommand(String command) {
+  // LED control commands
+  if (command == "PODIUM_1_LED_ON") {
+    digitalWrite(PODIUM_LED_1, HIGH);
+    Serial.println("PODIUM_1_LED_ON_ACK");
   }
-}
-
-void processSerialCommands() {
-  // If a complete command was received
-  if (inputString != "") {
-    inputString.trim();  // Remove any whitespace
-    
-    // Process the command
-    if (inputString == "LED1_ON" && !ledOn1) {
-      digitalWrite(LED_PIN_1, HIGH);
-      ledOn1 = true;
-      Serial.println("LED1 turned on");
-    }
-    else if (inputString == "LED2_ON" && !ledOn2) {
-      digitalWrite(LED_PIN_2, HIGH);
-      ledOn2 = true;
-      Serial.println("LED2 turned on");
-    }
-    
-    // Clear the string for the next command
-    inputString = "";
+  else if (command == "PODIUM_1_LED_OFF") {
+    digitalWrite(PODIUM_LED_1, LOW);
+    Serial.println("PODIUM_1_LED_OFF_ACK");
   }
-}
-
-// Serial event happens automatically when new data arrives
-void serialEvent() {
-  while (Serial.available()) {
-    inputString = Serial.readStringUntil('\n');
+  else if (command == "PODIUM_2_LED_ON") {
+    digitalWrite(PODIUM_LED_2, HIGH);
+    Serial.println("PODIUM_2_LED_ON_ACK");
+  }
+  else if (command == "PODIUM_2_LED_OFF") {
+    digitalWrite(PODIUM_LED_2, LOW);
+    Serial.println("PODIUM_2_LED_OFF_ACK");
+  }
+  else if (command == "PODIUM_3_LED_ON") {
+    digitalWrite(PODIUM_LED_3, HIGH);
+    Serial.println("PODIUM_3_LED_ON_ACK");
+  }
+  else if (command == "PODIUM_3_LED_OFF") {
+    digitalWrite(PODIUM_LED_3, LOW);
+    Serial.println("PODIUM_3_LED_OFF_ACK");
+  }
+  else if (command == "PODIUM_4_LED_ON") {
+    digitalWrite(PODIUM_LED_4, HIGH);
+    Serial.println("PODIUM_4_LED_ON_ACK");
+  }
+  else if (command == "PODIUM_4_LED_OFF") {
+    digitalWrite(PODIUM_LED_4, LOW);
+    Serial.println("PODIUM_4_LED_OFF_ACK");
+  }
+  else if (command == "CHEAT_LED_ON") {
+    digitalWrite(CHEAT_LED, HIGH);
+    Serial.println("CHEAT_LED_ON_ACK");
+  }
+  else if (command == "CHEAT_LED_OFF") {
+    digitalWrite(CHEAT_LED, LOW);
+    Serial.println("CHEAT_LED_OFF_ACK");
+  }
+  else if (command == "APPLAUSE_LED_ON") {
+    digitalWrite(APPLAUSE_LED, HIGH);
+    Serial.println("APPLAUSE_LED_ON_ACK");
+  }
+  else if (command == "APPLAUSE_LED_OFF") {
+    digitalWrite(APPLAUSE_LED, LOW);
+    Serial.println("APPLAUSE_LED_OFF_ACK");
+  }
+  else if (command == "ALL_LEDS_ON") {
+    digitalWrite(PODIUM_LED_1, HIGH);
+    digitalWrite(PODIUM_LED_2, HIGH);
+    digitalWrite(PODIUM_LED_3, HIGH);
+    digitalWrite(PODIUM_LED_4, HIGH);
+    digitalWrite(CHEAT_LED, HIGH);
+    digitalWrite(APPLAUSE_LED, HIGH);
+    Serial.println("ALL_LEDS_ON_ACK");
+  }
+  else if (command == "ALL_LEDS_OFF") {
+    digitalWrite(PODIUM_LED_1, LOW);
+    digitalWrite(PODIUM_LED_2, LOW);
+    digitalWrite(PODIUM_LED_3, LOW);
+    digitalWrite(PODIUM_LED_4, LOW);
+    digitalWrite(CHEAT_LED, LOW);
+    digitalWrite(APPLAUSE_LED, LOW);
+    Serial.println("ALL_LEDS_OFF_ACK");
+  }
+  else if (command == "STATUS") {
+    // Send current state of all inputs and outputs
+    Serial.println("STATUS_BEGIN");
+    Serial.print("PODIUM_1_BTN:"); Serial.println(podium1State);
+    Serial.print("PODIUM_2_BTN:"); Serial.println(podium2State);
+    Serial.print("PODIUM_3_BTN:"); Serial.println(podium3State);
+    Serial.print("PODIUM_4_BTN:"); Serial.println(podium4State);
+    Serial.print("CHEAT_BTN:"); Serial.println(cheatState);
+    Serial.print("APPLAUSE_BTN:"); Serial.println(applauseState);
+    Serial.print("JOYSTICK_LEFT:"); Serial.println(joystickLeftState);
+    Serial.print("JOYSTICK_RIGHT:"); Serial.println(joystickRightState);
+    Serial.print("LEVER_VALUE:"); Serial.println(leverValue);
+    Serial.println("STATUS_END");
+  }
+  else {
+    Serial.println("UNKNOWN_COMMAND");
   }
 }
