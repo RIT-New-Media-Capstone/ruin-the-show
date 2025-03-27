@@ -34,11 +34,11 @@ const serialSetup = () => {
 
         // Get which input
         // logic to change based on how we send serial data 
-        if (data == "BUTTON2_PRESSED") cheatButtonPressed();
-        else if (data == "BUTTON1_PRESSED") applauseButtonPressed();
+        if (data == "CHEAT_PRESSED") cheatButtonPressed();
+        else if (data == "APPLAUSE_PRESSED") applauseButtonPressed();
         else if (data == "JOYSTICK_LEFT") lightsMoved(-1);
         else if (data == "JOYSTICK_RIGHT") lightsMoved(1);
-        else if (data.startsWith("LEVER_POSITION:")) leverRotated(data.substring(15))
+        else if (data.startsWith("LEVER_VALUE:")) leverRotated(data.substring(15))
         else console.log(data)
     })
 
