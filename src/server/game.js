@@ -1,13 +1,22 @@
 // Holds game state, logic, variables
 const baseRatings = { '1': 10, '2': 5, '3': 0 }
+const lightStartingPos = -300
+const volumeStart = 50
+const baseCheat = {
+    '1': {
+        threshold: 0.50, 
+        delayMaxTime: 10000, 
+        maxTime: 2500, 
+    }
+}
 
 const user = { id: "DEFAULT", score: 0 } // from the RFID band
 const state = {
-    difficulty: 1, ratings: baseRatings['1'], lightPosition: -300, volume: 50,
+    difficulty: 1, ratings: baseRatings['1'], lightPosition: lightStartingPos, volume: volumeStart,
     cheat: {
         cheatTimer: 0,
-        threshold: 0.50,
-        delayMaxTime: 5000,
+        threshold: baseCheat['1'].threshold,
+        delayMaxTime: 10000,
         onTimer: 0,
         maxTime: 2500,
         cheatOn: false,
@@ -42,13 +51,13 @@ const rfidScan = (userId, userScore) => {
 
 const newGame = () => {
     // reset all variables & state
-    state.difficulty = 1
-    state.ratings = baseRatings[state.difficulty]
-    resetVisuals()
-
     state.difficulty = selectDifficulty()
+    state.ratings = baseRatings[state.difficulty]
 
     console.log("Difficulty: " + state.difficulty)
+
+    resetState()
+    resetVisuals()
 
     startGame()
 }
@@ -109,6 +118,28 @@ const startGame = () => {
     }
 
     game()
+}
+
+const resetState = () => {
+    state.lightPosition = lightStartingPos
+    state.volume = volumeStart
+
+    // reset cheat params based on difficulty
+    state.cheat.cheatTimer = 0
+    state.cheat.cheatOn = false
+    state.cheat.delayMaxTime = 10000
+    state.cheat.maxTime = 2500
+    state.cheat.onTimer = 0
+    state.cheat.threshold =  baseCheat[state.difficulty].threshold
+
+    // reset applause params based on difficulty
+    state.applause.applauseOn = false
+    state.applause.applauseTimer = 0
+    state.applause.delayMaxTime = 3000
+    state.applause.maxTime = 10000
+    state.applause.onTimer = 0
+    state.applause.threshold = 0.75
+    state.applause.x = -1
 }
 
 const selectDifficulty = () => {
