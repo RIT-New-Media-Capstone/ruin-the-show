@@ -71,14 +71,19 @@ const podiumButtonPressed = (podiumNum) => {
 }
  
 const lightsMoved = (direction) => {
-    console.log("NO WAY THE LIGHTS ARE MOVING IN" + direction)
+    console.log("Light direction: " + direction)
     game.changeLights(direction * 40)
     game.updateRatings(otherIncrement)
 }
 
 const leverRotated = (newPosition) => {
-    console.log("NO WAY THE LEVER ROTATED IN TO" + Number(newPosition))
+    console.log("Lever position: " + Number(newPosition))
     let pos = Number(newPosition)
+    let oldPos = game.getVolume()
+
+    // Tolerance - if sent again, don't count it again, +/- 1
+    if(pos === oldPos || pos + 1 === oldPos || pos - 1 === oldPos) return 
+
     game.updateVolume(pos)
     game.updateRatings(otherIncrement)
 }
