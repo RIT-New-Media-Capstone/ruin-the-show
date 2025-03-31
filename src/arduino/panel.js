@@ -54,7 +54,10 @@ const otherIncrement = 1;
 
 const cheatButtonPressed = () => {
     console.log("cheat")
-    game.updateRatings(cheatIncrement)
+    let prompted = game.getCheatState()
+    if(prompted) game.updateRatings(cheatIncrement)
+    else game.updateRatings(-cheatIncrement)
+
     hideCheat()
 }
 

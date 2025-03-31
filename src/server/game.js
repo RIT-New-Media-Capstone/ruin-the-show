@@ -182,5 +182,6 @@ const getLights = () => { return state.lightPosition }
 const getVolume = () => { return state.volume }
 const updateVolume = (value) => { state.volume = value }
 const getApplauseX = () => { return state.applause.x }
+const getCheatState = () => { return state.cheat.cheatOn }
 
-export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getVolume, updateVolume, triggerCheatButton, triggerApplauseButton, getApplauseX };
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getVolume, updateVolume, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState,  };
