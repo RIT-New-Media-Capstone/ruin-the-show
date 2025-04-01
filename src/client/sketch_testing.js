@@ -5,21 +5,16 @@
 
 
 //variables 
-let hostPos = 0; // initial host position
+let hostXPos = 0; // initial host position
 let speed = 3 // speed of host
-let alWalkingSS; //al walking 
-let p1idleSS; // player 1 idle 
-let p2idleSS; // player 2 idle 
-let p3idleSS; // player3idle
-let p4idleSS;
-let frameWidth = 1922; // Original sprite width
-let frameHeight = 1082; // Original sprite height
-let cols = 6;
-let rows = 9;
-let totalFrames = cols * rows;
+const frameWidth = 1922; // Original sprite width
+const frameHeight = 1082; // Original sprite height
+const cols = 6;
+const rows = 9;
+const totalFrames = cols * rows;
 let currentFrame = 0;
-let frameRateSpeed = 10; // Adjust speed
-let scaleFactor; // Scale factor for resizing
+const frameRateSpeed = 10; // Adjust speed
+const scaleFactor = 0.25; // Scale factor for resizing
 
 let state;
 
@@ -45,15 +40,15 @@ import {
 } from "./utils.js";
 
 window.preload = function () {
-  alWalkingSS = loadImage("/assets/SpriteSheets/AlWalking.png");
-  p1idleSS = loadImage("/assets/SpriteSheets/player1idle.png");
-  p2idleSS = loadImage("/assets/SpriteSheets/player2idle.png");
-  p3idleSS = loadImage("/assets/SpriteSheets/player3idle.png");
-  p4idleSS = loadImage("/assets/SpriteSheets/player4idle.png");
+  assets.al = loadImage("/assets/SpriteSheets/AlWalking.png");
+
+  assets.contestants.push(loadImage("/assets/SpriteSheets/player1idle.png"));
+  assets.contestants.push(loadImage("/assets/SpriteSheets/player2idle.png"));
+  assets.contestants.push(loadImage("/assets/SpriteSheets/player3idle.png"));
+  assets.contestants.push(loadImage("/assets/SpriteSheets/player4idle.png"));
 
   assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
   assets.audience = loadImage('/assets/audience.png')
-  assets.al = loadImage('/assets/FullBodyAL.png')
   assets.podium = loadImage('/assets/Podium.png');
   assets.light = loadImage('/assets/lightShine.png');
 
@@ -70,7 +65,6 @@ window.setup = function () {
   // 16:9 aspect ratio with slight padding
   createCanvas(assets.background.width / 6, assets.background.height / 6);
   frameRate(frameRateSpeed);
-  calculateScale();
   state = getState()
 }
 
@@ -84,26 +78,18 @@ window.draw = function () {
   let sx = col * frameWidth;
   let sy = row * frameHeight;
 
-  let newWidth = frameWidth * scaleFactor;
-  let newHeight = frameHeight * scaleFactor;
-
- // image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-  image(p1idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-  image(p2idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-  image(p3idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-  image(p4idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-
   currentFrame = (currentFrame + 1) % totalFrames; // Loop animation
 
-  syncGameState()
+  // Run every second - sync state
+  setInterval(syncGameState, 1000);
 
 
   // Draw game elements
   drawLights()
   // drawCheat()
   drawRatings(30, 30, 5)
-  drawContestant()
-  drawHost()
+  drawContestant(sx, sy)
+  drawHost(sx, sy)
   drawVolume()
   drawAudience()
   // if (state.applauseVis) drawApplause()
@@ -111,19 +97,6 @@ window.draw = function () {
   // Update game elements
   // May move out of this file into utils.js
   updateCheat()
-}
-
-// Recalculate scale when window resizes
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  calculateScale();
-}
-
-// Scale the sprite to fit the screen
-function calculateScale() {
-  let scaleX = windowWidth / frameWidth;
-  let scaleY = windowHeight / frameHeight;
-  scaleFactor = min(scaleX, scaleY); // Maintain aspect ratio
 }
 
 const syncGameState = async () => {
@@ -155,23 +128,12 @@ function drawCheat() {
   }
 }
 
-function drawHost() {
-  let row = currentFrame % rows; // Frames go top to bottom
-  let col = Math.floor(currentFrame / rows); // Move horizontally
-
-  let sx = col * frameWidth;
-  let sy = row * frameHeight;
-
-  let newWidth = frameWidth * scaleFactor;
-  let newHeight = frameHeight * scaleFactor;
-
-  image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-
-  const yPos = height / 2.25
+function drawHost(sx, sy) {
+  const alY = height / 2.25
 
   // resizing consistently 
-  const alWidth = assets.al.width / 2.75
-  const alHeight = assets.al.height / 2.75
+  const alWidth = frameWidth * scaleFactor;
+  const alHeight = frameHeight * scaleFactor;
 
   // // draw al facing the direction he's walking
   // if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
@@ -182,10 +144,12 @@ function drawHost() {
   //   pop()
   // }
 
-  hostPos += speed;
+  image(assets.al, hostXPos, alY, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
+  
+  hostXPos += speed;
 
   // Reverse direction 
-  if (hostPos >= width + alWidth || hostPos <= 0 - alWidth) {
+  if (hostXPos >= width + alWidth || hostXPos <= 0 - alWidth) {
     speed *= -1;  // Flip the direction
   }
 }
@@ -217,20 +181,19 @@ function drawLights() {
 
 
 // contestant podium lights up 
-function drawContestant() {
-  let x = width / 4
-  const y = height / 2.5
-  const spacing = 200
+function drawContestant(sx, sy) {
+  let x = 275
+  const y = 250
+  const spacing = 150
+  const contestantWidth = frameWidth * scaleFactor * 0.75
+  const contestantHeight = frameHeight * scaleFactor * 0.75
 
   assets.contestants.forEach(contestant => {
-    const contestantWidth = contestant.width / 6
-    const contestantHeight = contestant.height / 6
-
-    image(contestant, x, y, contestantWidth, contestantHeight)
+    image(contestant, x, y, contestantWidth, contestantHeight, sx, sy, frameWidth, frameHeight)
 
     const podiumWidth = assets.podium.width / 4
     const podiumHeight = assets.podium.height / 4
-    const podiumX = x + 2
+    const podiumX = x + contestantWidth / 3 + 10
     const podiumY = y + contestantHeight - 25
 
     image(assets.podium, podiumX, podiumY, podiumWidth, podiumHeight)
