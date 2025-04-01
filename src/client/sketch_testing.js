@@ -49,7 +49,16 @@ function draw() {
 //variables 
 let hostPos = 0; // initial host position
 let speed = 3 // speed of host
-let alSprite;
+let alWalkingSS; //al walking 
+let p1idleSS; // player 1 idle 
+let p2idleSS; // player 2 idle 
+let p3idleSS; // player3idle
+let p4idleSS;
+let frameWidth = 1922; // Original sprite width
+let frameHeight = 1082; // Original sprite height
+let cols = 6;
+let rows = 9;
+let totalFrames = cols * rows;
 
 let state;
 
@@ -75,66 +84,46 @@ import {
 } from "./utils.js";
 
 window.preload = function () {
-
-  // Al Animation 
-  const alWidth = assets.al.width / 2.75;
-  const alHeight = assets.al.height / 2.75;
-
-  alSprite = createSprite(alWidth,alHeight);
-  let alAnimation = alSprite.addAnimation("Walk","SpritesheetAL.png", {
-    frameSize: [alWidth, alHeight], // Frame width & height
-    frames: 5 // Number of frames
-  });
+  alWalkingSS = loadImage("AlWalking.png");
+  p1idleSS = loadImage("player1idle.png");
+  p2idleSS = loadImage("player2idle.png");
+  p3idleSS = loadImage("player3idle.png");
+  p4idleSS = loadImage("player4idle.png");
 
 
-
-  // Contestant Animation - should go into a forEach : assets.contestants.forEach(contestant => {
-  const contestantWidth = contestant.width / 6
-  const contestantHeight = contestant.height / 6
-  contestantSprite = createSprite(contestantWidth,contestantHeight);
-  let contestantAnimation = contestantSprite.addAnimation("Mood","SpritesheetContestant.png", {
-    frameSize: [contestantWidth, contestantHeight], // Frame width & height
-    frames: 3 // Number of frames
-  });
-
-  // Audience Applause Animation
-  const audienceTextureWidth = assets.audience.width
-  const audienceTextureHeight = assets.audience.height
-
-  audienceSprite = createSprite(audienceTextureWidth,audienceTextureHeight);
-  let audienceAnimation = audienceSprite.addAnimation("Applause","SpritesheetAudience.png", {
-    frameSize: [audienceTextureWidth, audienceTextureHeight], // Frame width & height
-    frames: 2 // Number of frames
-  });
-
- /* assets.contestants.push(loadImage('/assets/1contestant.png'))
-  assets.contestants.push(loadImage('/assets/2contestant.png'))
-  assets.contestants.push(loadImage('/assets/3contestant.png'))
-  assets.contestants.push(loadImage('/assets/4contestant.png'))
-
-  assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
-  assets.audience = loadImage('/assets/audience.png')
-  assets.al = loadImage('/assets/FullBodyAL.png')
-  assets.podium = loadImage('/assets/Podium.png');
-  assets.light = loadImage('/assets/lightShine.png');
-
-  assets.stars = loadImage('/assets/stars.png');
-
-  assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
-  assets.background = loadImage('/assets/Background.png');*/
-
-  // ^^ use this directory to load images 
 }
 
 window.setup = function () {
   // 16:9 aspect ratio with slight padding
   createCanvas(assets.background.width / 6, assets.background.height / 6);
+  frameRate(frameRateSpeed);
+  calculateScale();
   state = getState()
 }
 
 window.draw = function () {
   background(255);
   drawBackground()
+
+  let row = currentFrame % rows; // Frames go top to bottom
+  let col = Math.floor(currentFrame / rows); // Move horizontally
+
+  let sx = col * frameWidth;
+  let sy = row * frameHeight;
+
+  let newWidth = frameWidth * scaleFactor;
+  let newHeight = frameHeight * scaleFactor;
+
+  image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p1idleSSSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p2idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p3idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p4idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+
+  currentFrame = (currentFrame + 1) % totalFrames; // Loop animation
+
+
+
 
   syncGameState()
 
@@ -152,6 +141,19 @@ window.draw = function () {
   // Update game elements
   // May move out of this file into utils.js
   updateCheat()
+}
+
+// Recalculate scale when window resizes
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  calculateScale();
+}
+
+// Scale the sprite to fit the screen
+function calculateScale() {
+  let scaleX = windowWidth / frameWidth;
+  let scaleY = windowHeight / frameHeight;
+  scaleFactor = min(scaleX, scaleY); // Maintain aspect ratio
 }
 
 const syncGameState = async () => {

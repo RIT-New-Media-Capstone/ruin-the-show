@@ -21,25 +21,8 @@ let applauseBtn;
 let currentScr;
 let currentBtn;
 
-window.preload = function () {
-
-    // replace with screen videos or images 
-    assets.contestants.push(loadImage('/assets/.png'))
-    assets.contestants.push(loadImage('/assets/.png'))
-    assets.contestants.push(loadImage('/assets/.png'))
-    assets.contestants.push(loadImage('/assets/.png'))
-  
-    assets.applause = loadImage('/assets/.png')
-    assets.audience = loadImage('/assets/.png')
-    assets.al = loadImage('/assets/.png')
-    assets.podium = loadImage('/assets/.png');
-    assets.light = loadImage('/assets/.png');
-  
-    assets.stars = loadImage('/assets/.png');
-  
-    assets.stage = loadImage('/assets/.png');
-    assets.background = loadImage('/assets/.png');
-  
+window.preload = function () {                          
+   
     // ^^ use this directory to load images 
   }
    function setup(){
