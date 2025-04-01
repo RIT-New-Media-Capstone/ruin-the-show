@@ -43,10 +43,10 @@ import {
 
 window.preload = function () {
   alWalkingSS = loadImage("/assets/SpriteSheets/AlWalking.png");
-  p1idleSS = loadImage("/assets/SpriteSheets/Aplayer1idle.png");
-  p2idleSS = loadImage("/assets/SpriteSheets/Aplayer2idle.png");
-  p3idleSS = loadImage("/assets/SpriteSheets/Aplayer3idle.png");
-  p4idleSS = loadImage("/assets/SpriteSheets/Aplayer4idle.png");
+  p1idleSS = loadImage("/assets/SpriteSheets/player1idle.png");
+  p2idleSS = loadImage("/assets/SpriteSheets/player2idle.png");
+  p3idleSS = loadImage("/assets/SpriteSheets/player3idle.png");
+  p4idleSS = loadImage("/assets/SpriteSheets/player4idle.png");
 
 
 }
