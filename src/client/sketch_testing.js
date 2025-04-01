@@ -155,6 +155,40 @@ function drawCheat() {
   }
 }
 
+function drawHost() {
+  let row = currentFrame % rows; // Frames go top to bottom
+  let col = Math.floor(currentFrame / rows); // Move horizontally
+
+  let sx = col * frameWidth;
+  let sy = row * frameHeight;
+
+  let newWidth = frameWidth * scaleFactor;
+  let newHeight = frameHeight * scaleFactor;
+
+  image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  
+  const yPos = height / 2.25
+
+  // resizing consistently 
+  const alWidth = assets.al.width / 2.75
+  const alHeight = assets.al.height / 2.75
+
+  // draw al facing the direction he's walking
+  if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
+  else {
+    push()
+    scale(-1, 1)
+    image(assets.al, -hostPos, yPos, alWidth, alHeight)
+    pop()
+  }
+
+  hostPos += speed;
+
+  // Reverse direction 
+  if (hostPos >= width + alWidth || hostPos <= 0 - alWidth) {
+    speed *= -1;  // Flip the direction
+  }
+}
 function drawAudience() {
   const audienceTextureWidth = assets.audience.width
   const audienceTextureHeight = assets.audience.height
