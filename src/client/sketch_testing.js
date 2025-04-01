@@ -3,48 +3,6 @@
 //linke to events ( mouse pressed etc )
 
 
-/**
- * How to add a spriteSheet *****
-to do so manually.... I added a spritesheet library called p5.play...
-
-call drawSprites() I think and learn more about library 
-
-let spriteSheet;
-let frameWidth = 32; // Adjust according to your sprite
-let frameHeight = 32;
-let totalFrames = 4;
-let currentFrame = 0;
-let frameRateSpeed = 6; // Controls animation speed
-
-function preload() {
-  spriteSheet = loadImage('spritesheet.png'); // Load your sprite sheet
-}
-
-function setup() {
-  createCanvas(200, 200);
-  frameRate(frameRateSpeed); // Controls animation speed
-}
-
-function draw() {
-  background(220);
-  
-  // Calculate the x position of the current frame
-  let sx = currentFrame * frameWidth;
-  
-  // Draw the current frame from the sprite sheet
-  image(spriteSheet, 50, 50, frameWidth, frameHeight, sx, 0, frameWidth, frameHeight);
-  
-  // Update the frame
-  currentFrame = (currentFrame + 1) % totalFrames; // Loop animation
-
-
-
-  mySprite.animation.frameDelay = 5;
-
-}
-
- */
-
 
 //variables 
 let hostPos = 0; // initial host position
@@ -84,11 +42,11 @@ import {
 } from "./utils.js";
 
 window.preload = function () {
-  alWalkingSS = loadImage("AlWalking.png");
-  p1idleSS = loadImage("player1idle.png");
-  p2idleSS = loadImage("player2idle.png");
-  p3idleSS = loadImage("player3idle.png");
-  p4idleSS = loadImage("player4idle.png");
+  alWalkingSS = loadImage("/assets/SpriteSheets/AlWalking.png");
+  p1idleSS = loadImage("/assets/SpriteSheets/Aplayer1idle.png");
+  p2idleSS = loadImage("/assets/SpriteSheets/Aplayer2idle.png");
+  p3idleSS = loadImage("/assets/SpriteSheets/Aplayer3idle.png");
+  p4idleSS = loadImage("/assets/SpriteSheets/Aplayer4idle.png");
 
 
 }
@@ -206,31 +164,6 @@ function drawLights() {
   else image(assets.light, -300, (height / 3) - 75, lightWidth, lightHeight)
 }
 
-// host moves on his own he should also pause every now and then
-/*function drawHost() {
-  const yPos = height / 2.25
-
-  // resizing consistently 
-  const alWidth = assets.al.width / 2.75
-  const alHeight = assets.al.height / 2.75
-
-
-  // draw al facing the direction he's walking
-  if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
-  else {
-    push()
-    scale(-1, 1)
-    image(assets.al, -hostPos, yPos, alWidth, alHeight)
-    pop()
-  }
-
-  hostPos += speed;
-
-  // Reverse direction 
-  if (hostPos >= width + alWidth || hostPos <= 0 - alWidth) {
-    speed *= -1;  // Flip the direction
-  }
-}*/
 
 // contestant podium lights up 
 function drawContestant() {
