@@ -87,7 +87,7 @@ window.draw = function () {
   let newWidth = frameWidth * scaleFactor;
   let newHeight = frameHeight * scaleFactor;
 
-  image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+ // image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
   image(p1idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
   image(p2idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
   image(p3idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
@@ -162,16 +162,17 @@ function drawHost() {
   let sx = col * frameWidth;
   let sy = row * frameHeight;
 
-   // resizing consistently 
-   const alWidth = assets.al.width / 2.75
-   const alHeight = assets.al.height / 2.75
- 
+  let newWidth = frameWidth * scaleFactor;
+  let newHeight = frameHeight * scaleFactor;
 
-  image(alWalkingSS, 0, 0, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
+  image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
 
   const yPos = height / 2.25
 
- 
+  // resizing consistently 
+  const alWidth = assets.al.width / 2.75
+  const alHeight = assets.al.height / 2.75
+
   // // draw al facing the direction he's walking
   // if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
   // else {
