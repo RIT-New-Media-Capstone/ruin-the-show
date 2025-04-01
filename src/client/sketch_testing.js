@@ -42,10 +42,10 @@ import {
 window.preload = function () {
   assets.al = loadImage("/assets/SpriteSheets/AlWalking.png");
 
-  assets.contestants.push(loadImage("/assets/SpriteSheets/player1idle.png"));
-  assets.contestants.push(loadImage("/assets/SpriteSheets/player2idle.png"));
-  assets.contestants.push(loadImage("/assets/SpriteSheets/player3idle.png"));
-  assets.contestants.push(loadImage("/assets/SpriteSheets/player4idle.png"));
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player1idle.png")});
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player2idle.png")});
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player3idle.png")});
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player4idle.png")});
 
   assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
   assets.audience = loadImage('/assets/audience.png')
@@ -189,7 +189,7 @@ function drawContestant(sx, sy) {
   const contestantHeight = frameHeight * scaleFactor * 0.75
 
   assets.contestants.forEach(contestant => {
-    image(contestant, x, y, contestantWidth, contestantHeight, sx, sy, frameWidth, frameHeight)
+    image(contestant.src, x, y, contestantWidth, contestantHeight, sx, sy, frameWidth, frameHeight)
 
     const podiumWidth = assets.podium.width / 4
     const podiumHeight = assets.podium.height / 4
