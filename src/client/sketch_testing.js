@@ -51,12 +51,17 @@ window.preload = function () {
   p3idleSS = loadImage("/assets/SpriteSheets/player3idle.png");
   p4idleSS = loadImage("/assets/SpriteSheets/player4idle.png");
 
-  assets.background = loadImage("/assets/background.png");
-  assets.stage = loadImage("/assets/stage.png");
-  assets.audience = loadImage("/assets/audience.png");
-  assets.light = loadImage("/assets/light.png");
-  assets.podium = loadImage("/assets/podium.png");
-  assets.stars = loadImage("/assets/stars.png");
+  assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
+  assets.audience = loadImage('/assets/audience.png')
+  assets.al = loadImage('/assets/FullBodyAL.png')
+  assets.podium = loadImage('/assets/Podium.png');
+  assets.light = loadImage('/assets/lightShine.png');
+
+  assets.stars = loadImage('/assets/stars.png');
+
+  assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
+  assets.background = loadImage('/assets/Background.png');
+
 
 
 }
