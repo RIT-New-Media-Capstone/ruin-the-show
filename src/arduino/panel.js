@@ -48,7 +48,6 @@ const serialSetup = () => {
 
 }
 
-
 const cheatIncrement = 5;
 const otherIncrement = 1;
 
@@ -89,6 +88,34 @@ const leverRotated = (newPosition) => {
 
     game.updateVolume(pos)
     game.updateRatings(otherIncrement)
+}
+
+const turnOnPodiumLED = (podiumNum) => {
+    if (port && port.isOpen) {
+        port.write('PODIUM_'+podiumNum+'LED_ON\r\n', (err) => {
+            if (err) {
+                console.log('Error sending data:', err);
+            } else {
+                console.log('Sent "PODIUM_'+podiumNum+'LED_ON" to Arduino');
+            }
+        });
+    } else {
+        console.log('Serial port not open. Cannot send PODIUM'+podiumNum+'LED_ON" to Arduino');
+    }
+}
+
+const turnOffPodiumLED = (podiumNum) => {
+    if (port && port.isOpen) {
+        port.write('PODIUM_'+podiumNum+'LED_OFF\r\n', (err) => {
+            if (err) {
+                console.log('Error sending data:', err);
+            } else {
+                console.log('Sent "PODIUM_'+podiumNum+'LED_OFF" to Arduino');
+            }
+        });
+    } else {
+        console.log('Serial port not open. Cannot send PODIUM'+podiumNum+'LED_OFF" to Arduino');
+    }
 }
 
 const turnOnCheatLED = () => {
