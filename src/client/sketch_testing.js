@@ -51,6 +51,13 @@ window.preload = function () {
   p3idleSS = loadImage("/assets/SpriteSheets/player3idle.png");
   p4idleSS = loadImage("/assets/SpriteSheets/player4idle.png");
 
+  assets.background = loadImage("/assets/background.png");
+  assets.stage = loadImage("/assets/stage.png");
+  assets.audience = loadImage("/assets/audience.png");
+  assets.light = loadImage("/assets/light.png");
+  assets.podium = loadImage("/assets/podium.png");
+  assets.stars = loadImage("/assets/stars.png");
+
 
 }
 
@@ -76,15 +83,12 @@ window.draw = function () {
   let newHeight = frameHeight * scaleFactor;
 
   image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-  image(p1idleSSSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p1idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
   image(p2idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
   image(p3idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
   image(p4idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
 
   currentFrame = (currentFrame + 1) % totalFrames; // Loop animation
-
-
-
 
   syncGameState()
 
@@ -126,8 +130,13 @@ const syncGameState = async () => {
 }
 
 function drawBackground() {
-  image(assets.background, 0, 0, width, height)
-  image(assets.stage, 0, 0, width, height)
+  if (assets.background) {
+    image(assets.background, 0, 0, width, height);
+  }
+  if (assets.stage) {
+    image(assets.stage, 0, 0, width, height);
+  }
+
 }
 
 function updateCheat() {
