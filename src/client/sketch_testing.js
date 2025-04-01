@@ -17,6 +17,9 @@ let frameHeight = 1082; // Original sprite height
 let cols = 6;
 let rows = 9;
 let totalFrames = cols * rows;
+let currentFrame = 0;
+let frameRateSpeed = 10; // Adjust speed
+let scaleFactor; // Scale factor for resizing
 
 let state;
 
