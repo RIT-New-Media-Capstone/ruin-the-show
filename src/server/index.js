@@ -25,14 +25,14 @@ app.get('/getState', (req, res) => {
   const ratings = game.getRatings()
   const difficulty = game.getDifficulty()
   const lights = game.getLights()
-  const volume = game.getVolume()
+  const volume = game.getZoom()
   const applauseX = game.getApplauseX()
 
   const state = { 
     ratings, 
     difficulty, 
     lights, 
-    volume,
+    zoom,
     applauseX,
   }
 
