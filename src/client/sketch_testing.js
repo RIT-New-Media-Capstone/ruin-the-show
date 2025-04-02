@@ -42,10 +42,10 @@ import {
 window.preload = function () {
   assets.al = loadImage("/assets/SpriteSheets/AlWalking.png");
 
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player1idle.png")});
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player2idle.png")});
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player3idle.png")});
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player4idle.png")});
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player1idle.png"), cols: 6, rows: 9, maxFrames: (6 * 9) - 4});
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player2idle.png"), cols: 7, rows: 11, maxFrames: (7 * 11) - 8});
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player3idle.png"), cols: 6, rows: 11, maxFrames: (6 * 11) - 4});
+  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player4idle.png"), cols: 6, rows: 9, maxFrames: (6 * 9) - 5});
 
   assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
   assets.audience = loadImage('/assets/audience.png')
