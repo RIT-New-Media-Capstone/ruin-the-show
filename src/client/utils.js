@@ -41,6 +41,14 @@ const updateLightPosition = async () => {
     lightPosX = state.lights;
 };
 
+const lightUpPodium = (index) => {
+    // fill out 
+}
+
+const hidePodiumLight = (index) => {
+    // fill out
+}
+
 // Get the current animation state (for sketch.js)
 const getState = async () => {
     const response = await fetch('/getState');
@@ -53,7 +61,7 @@ const getState = async () => {
         lightPosX: state.lights,
         ratings: state.ratings,
         difficulty: state.difficulty,
-        volume: state.volume
+        zoom: state.zoom
     })
 };
 
@@ -66,4 +74,6 @@ export {
     resetVisuals,
     updateLightPosition,
     getState,
+    lightUpPodium,
+    hidePodiumLight,
 };

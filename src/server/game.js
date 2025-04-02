@@ -1,7 +1,7 @@
 // Holds game state, logic, variables
 const baseRatings = { '1': 10, '2': 5, '3': 0 }
 const lightStartingPos = -300
-const volumeStart = 50
+const zoomStart = 50
 const baseCheat = {
     '1': {
         threshold: 0.50, 
@@ -12,7 +12,7 @@ const baseCheat = {
 
 const user = { id: "DEFAULT", score: 0 } // from the RFID band
 const state = {
-    difficulty: 1, ratings: baseRatings['1'], lightPosition: lightStartingPos, volume: volumeStart,
+    difficulty: 1, ratings: baseRatings['1'], lightPosition: lightStartingPos, zoom: zoomStart,
     cheat: {
         cheatTimer: 0,
         threshold: baseCheat['1'].threshold,
@@ -29,6 +29,16 @@ const state = {
         maxTime: 10000,
         x: -1,
         applauseOn: false,
+    },
+    podium: {
+        index: 0,
+        totalPodiums: 4,
+        lightTimer: 0, 
+        threshold: 0.5,
+        delayMaxTime: 10000, 
+        onTimer: 0, 
+        maxTime: 2000,
+        lightOn: false,
     },
     timer: {
         lastTime: 0,
@@ -114,6 +124,28 @@ const startGame = () => {
             }
         }
 
+        // Every 10 seconds, 50% chance a podium button triggers
+        if(!state.podium.lightOn) {
+            state.podium.lightTimer += deltaTime
+            if (state.podium.lightTimer > state.podium.delayMaxTime) {
+                const chance = Math.random()
+                if (chance < state.podium.threshold) {
+                    state.podium.lightTimer = 0
+                    triggerPodiumButton(state.podium.index)
+                    console.log(`Podium ${state.podium.index} lit up!`)
+                    state.podium.index++
+                }
+            }
+        }
+        // If the podium button is on for 2 seconds, turn it off
+        else {
+            state.podium.onTimer += deltaTime
+            if (state.podium.onTimer > state.podium.maxTime) {
+                state.podium.onTimer = 0
+                turnOffPodiumButton(state.podium.index)
+            }
+        }
+
         setImmediate(game)
     }
 
@@ -122,7 +154,7 @@ const startGame = () => {
 
 const resetState = () => {
     state.lightPosition = lightStartingPos
-    state.volume = volumeStart
+    state.zoom = zoomStart
 
     // reset cheat params based on difficulty
     state.cheat.cheatTimer = 0
@@ -174,14 +206,27 @@ const turnOffApplauseButton = () => {
     console.log("Applause - off")
 }
 
+const triggerPodiumButton = (index) => {
+    state.podium.lightOn = true
+    lightUpPodium(index)
+    turnOnPodiumLED(index)
+}
+
+const turnOffPodiumButton = (index) => {
+    state.podium.lightOn = false
+    hidePodiumLight(index)
+    turnOffPodiumLED(index)
+    console.log(`Podium ${index} light - off`)
+}
+
 const getRatings = () => { return state.ratings }
 const updateRatings = (value) => { state.ratings += value }
 const getDifficulty = () => { return state.difficulty }
 const changeLights = (value) => { state.lightPosition += value }
 const getLights = () => { return state.lightPosition }
-const getVolume = () => { return state.volume }
-const updateVolume = (value) => { state.volume = value }
+const getZoom = () => { return state.zoom }
+const updateZoom = (value) => { state.zoom = value }
 const getApplauseX = () => { return state.applause.x }
 const getCheatState = () => { return state.cheat.cheatOn }
 
-export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getVolume, updateVolume, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState,  };
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState,  };

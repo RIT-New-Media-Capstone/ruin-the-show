@@ -81,12 +81,12 @@ const lightsMoved = (direction) => {
 const leverRotated = (newPosition) => {
     console.log("Lever position: " + Number(newPosition))
     let pos = Number(newPosition)
-    let oldPos = game.getVolume()
+    let oldPos = game.getZoom()
 
     // Tolerance - if sent again, don't count it again, +/- 1
     if(pos === oldPos || pos + 1 === oldPos || pos - 1 === oldPos) return 
 
-    game.updateVolume(pos)
+    game.updateZoom(pos)
     game.updateRatings(otherIncrement)
 }
 
@@ -174,6 +174,6 @@ const turnOffApplauseLED = () => {
     }
 }
 
-export { turnOnCheatLED, turnOnApplauseLED, turnOffCheatLED, turnOffApplauseLED }
+export { turnOnCheatLED, turnOnApplauseLED, turnOffCheatLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED, }
 
 serialSetup();

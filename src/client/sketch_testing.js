@@ -90,7 +90,7 @@ window.draw = function () {
   drawRatings(30, 30, 5)
   drawContestant(sx, sy)
   drawHost(sx, sy)
-  drawVolume()
+  drawZoom()
   drawAudience()
   // if (state.applauseVis) drawApplause()
 
@@ -203,10 +203,10 @@ function drawContestant(sx, sy) {
 
 }
 
-function drawVolume() {
+function drawZoom() {
   textSize(48);
   fill("black")
-  if (state.volume) text(`Volume: ${state.volume}`, windowWidth - 350, 75);
+  if (state.zoom) text(`Volume: ${state.zoom}`, windowWidth - 350, 75);
 }
 
 // DELETE - testing only  
