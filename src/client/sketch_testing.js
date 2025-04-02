@@ -226,36 +226,47 @@ window.keyPressed = function () {
   }
 }
 
-function drawRatings(x, y, numStars) {
-  let starSize = 30;
-  let spacing = 40;
-  let maxRating = 100;
-  let currentRatings = state.ratings || 0
-  let filledStars = (currentRatings / maxRating) * numStars; // Convert value to star count
+function drawRatings(x, y) {
+  // let starSize = 30;
+  // let spacing = 40;
+  // let maxRating = 100;
+  // let currentRatings = state.ratings || 0
+  // let filledStars = (currentRatings / maxRating) * numStars; // Convert value to star count
 
+  let ratingsFilled = state.rating || 10
+  if (ratingsFilled > 200) ratingsFilled = 200
+
+  noStroke()
+  fill('#d9d9d9')
+  rect(x - 20, y - 25, 200, 50)
+
+  fill('#fff7c2')
+  rect(x - 20, y - 25, ratingsFilled, 50)
   image(assets.stars, x - 30, y - 25, 220, 50)
-  console.log(state.ratings)
+  // console.log(state.ratings)
 
-  for (let i = 0; i < numStars; i++) {
-    // constrain(value, min, max) limit to specified range
-    let fillAmount = constrain(filledStars - i, 0, 1); // 1 = full star, 0.5 = half star, etc.
-    drawStar(x + i * spacing, y, starSize, fillAmount);
-  }
+  // for (let i = 0; i < numStars; i++) {
+  //   // constrain(value, min, max) limit to specified range
+  //   let fillAmount = constrain(filledStars - i, 0, 1); // 1 = full star, 0.5 = half star, etc.
+  //   drawStar(x + i * spacing, y, starSize, fillAmount);
+  // }
+
+
 }
 
-function drawStar(x, y, size, fillAmount) {
-  push();
-  translate(x, y);
-  stroke(0);
-  fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
-  beginShape();
-  for (let i = 0; i < 10; i++) {
-    let angle = PI / 5 * i;
-    let radius = (i % 2 === 0) ? size / 2 : size / 4;
-    let sx = cos(angle) * radius;
-    let sy = sin(angle) * radius;
-    vertex(sx, sy);
-  }
-  endShape(CLOSE);
-  pop();
-}
+// function drawStar(x, y, size, fillAmount) {
+//   push();
+//   translate(x, y);
+//   stroke(0);
+//   fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
+//   beginShape();
+//   for (let i = 0; i < 10; i++) {
+//     let angle = PI / 5 * i;
+//     let radius = (i % 2 === 0) ? size / 2 : size / 4;
+//     let sx = cos(angle) * radius;
+//     let sy = sin(angle) * radius;
+//     vertex(sx, sy);
+//   }
+//   endShape(CLOSE);
+//   pop();
+// }
