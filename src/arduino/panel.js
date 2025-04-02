@@ -13,7 +13,7 @@ import {
 let port;
 
 const serialSetup = () => {
-    port = new SerialPort({ path: '/dev/tty.usbserial-DA017SAV', baudRate: 9600 });
+    port = new SerialPort({ path: 'COM5', baudRate: 9600 });
     const serial = port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
     port.on('open', () => {
