@@ -46,7 +46,7 @@ const state = {
 }
 
 import { showCheat, resetVisuals, showApplause, hideCheat, hideApplause } from "../client/utils.js"
-import { turnOffApplauseLED, turnOffCheatLED, turnOnApplauseLED, turnOnCheatLED } from "../arduino/panel.js"
+import { turnOffApplauseLED, turnOffCheatLED, turnOnApplauseLED, turnOnCheatLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
 const rfidScan = (userId, userScore) => {
     // store valid RFID input 
