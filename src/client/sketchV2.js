@@ -91,8 +91,8 @@ window.draw = function () {
 
     //draw rest of background here
     drawPodiums();
-    drawCheat();
     drawHUD();
+    drawCheat();
     //displayTimer();
 }
 
@@ -140,7 +140,7 @@ function drawHUD() {
 
 function drawCheat(){
     if(assets.cheat) {
-        image(assets.cheat, width - 250, -200, width/4, height/4);
+        image(assets.cheat, -20, -40, width/4, height/4);
     }
 }
 //function drawApplause(){
