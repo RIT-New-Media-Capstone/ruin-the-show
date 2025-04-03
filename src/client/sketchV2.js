@@ -93,7 +93,7 @@ window.draw = function () {
     drawPodiums();
     drawCheat();
     drawHUD();
-    displayTimer();
+    //displayTimer();
 }
 
 const syncGameState = async () => {
