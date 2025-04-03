@@ -145,7 +145,7 @@ function displayTimer(){
      //}  
      let elaspedTime = (millis() - startTime/ 1000);
      let remainingTime = max(timerDuration - elaspedTime, 0); // no neg vals
-     console.log(elapseTime);
+     console.log(elapsedTime);
      console.log(timerDuration)
      console.log(remainingTime)
      fill(0);
