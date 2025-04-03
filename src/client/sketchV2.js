@@ -29,6 +29,7 @@ const assets = {
     podium4: "",
     stars: "",
     timer: "",
+    cheat: "",
 }
 
 import {
@@ -55,7 +56,9 @@ window.preload = function () {
     p1idleSS = loadImage('/assets/SpriteSheets/p1/P1_Idle.png');
     p2idleSS = loadImage('/assets/SpriteSheets/p2/P2_Idle.png');
     p3idleSS = loadImage('/assets/SpriteSheets/p3/P3_Idle.png');
-    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png')
+    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png');
+
+    assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
 }
 
 window.setup = function () {
@@ -88,6 +91,7 @@ window.draw = function () {
 
     //draw rest of background here
     drawPodiums();
+    drawCheat();
     drawHUD();
     displayTimer();
 }
@@ -133,14 +137,21 @@ function drawHUD() {
     }
 }
 
-function drawApplause(){
- if(assets.applause){
-    //image()
- }
 
-
+function drawCheat(){
+    if(assets.cheat) {
+        image(assets.cheat, width - 250, -200, width/4, height/4);
+    }
 }
+//function drawApplause(){
+ //if(assets.applause){
+    //image()
+ //}
+
+
+
  
+/*
 function displayTimer(){
    
      //}  
@@ -158,4 +169,4 @@ function displayTimer(){
           text("Time's up!", -20, -40);
          }
      
-  }
+  }*/
