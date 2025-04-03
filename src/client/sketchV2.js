@@ -15,6 +15,7 @@ let frameRateSpeed = 10;
 const scaleFactor = 0.2;
 
 const assets = {
+    al: "",
     background: "",
     stage: "",
     stagelights: "",
@@ -44,8 +45,13 @@ window.preload = function () {
     assets.stars = loadImage('/assets/Background/StarRatings.png');
     assets.timer = loadImage('/assets/Background/Timer.png');
 
+    //AL 
+    al = loadImage('/assets/SpriteSheets/Al/AL_idleState.png')
     //CONTESTANT ANIMATIONS
     p1idleSS = loadImage('/assets/SpriteSheets/p1/P1_Idle.png');
+    p2idleSS = loadImage('/assets/SpriteSheets/p2/P2_Idle.png');
+    p3idleSS = loadImage('/assets/SpriteSheets/p3/P3_Idle.png');
+    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png')
 }
 
 window.setup = function () {
@@ -66,6 +72,9 @@ window.draw = function () {
     let newWidth = frameWidth * scaleFactor;
     let newHeight = frameHeight * scaleFactor;
     image(p1idleSS, 270, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+    image(p2idleSS, 300, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+    image(p3idleSS, 320, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+    image(p4idleSS, 340, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     currentFrame = (currentFrame + 1) % totalFrames; // Looping Animation
 
     syncGameState();
@@ -83,7 +92,7 @@ function drawBackground() {
     if (assets.background) {
         image(assets.background, 0, 0, width, height);
     }
-    if (assets.stage) {
+    if (assets.stage) {                  
         image(assets.stage, width/10, height/1.75, width/1.25, height/2);
     }
     if (assets.stagelights) {
@@ -106,6 +115,7 @@ function drawPodiums() {
     }
 }
 
+// heads up display
 function drawHUD() {
     if(assets.stars) {
         image(assets.stars, width - 350, -20, width/4, height/4);
