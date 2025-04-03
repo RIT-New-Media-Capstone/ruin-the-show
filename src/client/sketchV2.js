@@ -2,6 +2,7 @@ let state;
 
 //Sprite Sheet Animation Variables for Contestants
 let al;
+let hostXPos = 0;
 let p1idleSS;
 let p2idleSS;
 let p3idleSS;
@@ -13,7 +14,7 @@ let rows = 4;
 let totalFrames = cols * rows;
 let currentFrame = 0;
 let frameRateSpeed = 10;
-const scaleFactor = 0.2;
+const scaleFactor = 0.25;
 let startTime;
 let timerDuration;
 let elaspedTime;
@@ -30,15 +31,16 @@ const assets = {
     stars: "",
     timer: "",
     cheat: "",
+    curtains: "",
 }
 
 import {
     getState,
     hideCheat,
-  hideApplause,
-  updateLightPosition,
-  showCheat,
-  showApplause,
+    hideApplause,
+    updateLightPosition,
+    showCheat,
+    showApplause,
 } from "./utils.js";
   
 window.preload = function () {
@@ -57,11 +59,13 @@ window.preload = function () {
 
     //AL 
     al = loadImage('/assets/SpriteSheets/AL/AL_Talk_R.png'); // should be idle sprite but its not working
+    
+    /*
     //CONTESTANT ANIMATIONS
     p1idleSS = loadImage('/assets/SpriteSheets/p1/P1_Idle.png');
     p2idleSS = loadImage('/assets/SpriteSheets/p2/P2_Idle.png');
     p3idleSS = loadImage('/assets/SpriteSheets/p3/P3_Idle.png');
-    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png');
+    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png');*/
 
     assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
     assets.applause = loadImage('/assets/Interactions/applause/AudiencePopIn_OFF.png');
@@ -70,6 +74,7 @@ window.preload = function () {
     assets.podiumlit2 = loadImage('/assets/Interactions/podiums/2light_YellowPodium.png');
     assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
     assets.podiumlit3 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
+    assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
 }
 
 window.setup = function () {
@@ -91,7 +96,7 @@ window.draw = function () {
     let sy = row * frameHeight;
     let newWidth = frameWidth * scaleFactor;
     let newHeight = frameHeight * scaleFactor;
-    image(al, 180,500, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
+   
     image(p1idleSS, 270, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     image(p2idleSS, 400, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     image(p3idleSS, 600, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
@@ -106,19 +111,25 @@ window.draw = function () {
     if(state.cheatVis) drawCheat();
     drawApplause()
     if(state.applauseVis) drawApplauseON()
+    
+    updateCheat()
+
+
+    //drawHost()
     // podiumLight1()
     // podiumLight2()
     // podiumLight3()
     // podiumLight4()
     //displayTimer();
+    if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
 }
 
 const syncGameState = async () => {
     // Sync variables with gamestate
-    // updateLightPosition()
-  if (frameCount % 60 === 0) { // Every second
-    state = await getState();
-  }
+    updateLightPosition()
+    if (frameCount % 60 === 0) { // Every second
+        state = await getState();
+    }
 }
 
 function drawBackground() {
@@ -166,9 +177,12 @@ function drawHUD() {
 
 
 function drawCheat(){
-    if(assets.cheat) {
-        image(assets.cheat, -20, -40, width/4, height/4);
+    if(state.cheatVis){
+        if(assets.cheat) {
+            image(assets.cheat, 100, 100, width/4, height/4);
+        }
     }
+    
 }
 
 function drawApplause(){
@@ -182,6 +196,65 @@ function drawApplauseON(){
         image(assets.applauseon, width/2,-50, width/4, height/4)
     }
 }
+
+function updateCheat() {
+    showCheat()
+}
+ 
+  
+/*
+function drawHost(sx, sy){
+    const alY = height / 2.25
+    const alWidth = frameWidth * scaleFactor;
+    const alHeight = frameHeight * scaleFactor;
+
+    image(al, hostXPos, alY, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
+   
+    hostXPos += speed;
+  
+    // Reverse direction 
+    if (hostXPos >= width + alWidth || hostXPos <= 0 - alWidth) {
+      speed *= -1;  // Flip the direction
+    }
+
+    //image(al, 180,500, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
+}*/
+
+/*
+function drawContestant(sx,sy){
+
+   let x = 275
+   const y = 250
+   const spacing = 150
+   const contestantWidth = frameWidth * scaleFactor * 0.75
+   const contestantHeight = frameHeight * scaleFactor * 0.75
+   
+   assets.contestants.forEach(contestant => {
+        image(contestant, x, y, contestantWidth, contestantHeight, sx, sy, frameWidth, frameHeight)
+    
+        const podiumWidth = assets.podium.width / 4
+        const podiumHeight = assets.podium.height / 4
+        const podiumX = x + contestantWidth / 3 + 10
+        const podiumY = y + contestantHeight - 25
+
+        image(assets.podium, podiumX, podiumY, podiumWidth, podiumHeight)
+   });
+}*/
+
+function drawZoom() {
+    textSize(48);
+    fill("black");
+    if (state.zoom) text(`Zoom: ${state.zoom}`, windowWidth - 350, 75);
+  }
+
+  /*
+  function drawLights(){
+
+   const lightWidth = assets.light.width / 4
+   const lightHeight = assets.light.height / 4
+   if (state.lightPosX) image(assets.light, state.lightPosX, height / 4, lightWidth, lightHeight)
+   else image(assets.light, -300, (height / 3) - 75, lightWidth, lightHeight)
+  }*/
 
 // function podiumLight1(){
 //     if(assets.podiumlit1){
@@ -206,7 +279,37 @@ function drawApplauseON(){
 //     }
     
 // }
-
+function drawRatings(x, y) {
+    let ratingsFilled = state.rating || 10
+    if (ratingsFilled > 200) ratingsFilled = 200
+  
+    noStroke()
+    fill('#d9d9d9')
+    rect(x - 20, y - 25, 200, 50)
+  
+    fill('#fff7c2')
+    rect(x - 20, y - 25, ratingsFilled, 50)
+    image(assets.stars, x - 30, y - 25, 220, 50)
+  
+  }
+  
+  //TODO check again
+  function drawStar(x, y, size, fillAmount) {
+    push();
+    translate(x, y);
+    stroke(0);
+    fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
+    beginShape();
+    for (let i = 0; i < 10; i++) {
+      let angle = PI / 5 * i;
+      let radius = (i % 2 === 0) ? size / 2 : size / 4;
+      let sx = cos(angle) * radius;
+      let sy = sin(angle) * radius;
+      vertex(sx, sy);
+    }
+    endShape(CLOSE);
+    pop();
+  }
  
 /*
 function displayTimer(){
