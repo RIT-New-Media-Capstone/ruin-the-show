@@ -14,6 +14,7 @@ let totalFrames = cols * rows;
 let currentFrame = 0;
 let frameRateSpeed = 10;
 const scaleFactor = 0.2;
+let startTime;
 
 const assets = {
 
@@ -142,7 +143,7 @@ function displayTimer(){
      //}  
      let elaspedTime = (millis() - startTime/ 1000);
      let remainingTime = max(timerDuration - elaspedTime, 0); // no neg vals
-     Fill(0);
+     fill(0);
      textSize(30);
      textAlign(CENTER, CENTER)
      text(remainingTime.toFixed(1), -20 , -40);
