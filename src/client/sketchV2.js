@@ -15,7 +15,7 @@ let frameRateSpeed = 10;
 const scaleFactor = 0.2;
 
 const assets = {
-    al: "",
+
     background: "",
     stage: "",
     stagelights: "",
@@ -46,7 +46,7 @@ window.preload = function () {
     assets.timer = loadImage('/assets/Background/Timer.png');
 
     //AL 
-    al = loadImage('/assets/SpriteSheets/Al/AL_idleState.png')
+    al = loadImage('/assets/SpriteSheets/AL/AL_idleState.png');
     //CONTESTANT ANIMATIONS
     p1idleSS = loadImage('/assets/SpriteSheets/p1/P1_Idle.png');
     p2idleSS = loadImage('/assets/SpriteSheets/p2/P2_Idle.png');
@@ -71,6 +71,7 @@ window.draw = function () {
     let sy = row * frameHeight;
     let newWidth = frameWidth * scaleFactor;
     let newHeight = frameHeight * scaleFactor;
+    image(al, 250,250, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
     image(p1idleSS, 270, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     image(p2idleSS, 300, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     image(p3idleSS, 320, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
@@ -124,3 +125,7 @@ function drawHUD() {
         image(assets.timer, -20, -40, width/4, height/4);
     }
 }
+
+//function drawApplause(){
+
+//}
