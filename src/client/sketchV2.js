@@ -1,6 +1,7 @@
 let state;
 
 //Sprite Sheet Animation Variables for Contestants
+let al;
 let p1idleSS;
 let p2idleSS;
 let p3idleSS;
