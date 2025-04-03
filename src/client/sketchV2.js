@@ -15,6 +15,8 @@ let currentFrame = 0;
 let frameRateSpeed = 10;
 const scaleFactor = 0.2;
 let startTime;
+let timerDuration;
+let elaspedTime;
 
 const assets = {
 
