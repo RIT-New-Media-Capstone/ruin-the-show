@@ -1,4 +1,3 @@
-/*
 //events set up  with arduino and visual back 
 // fill out function interaction animation 
 //linke to events ( mouse pressed etc )
@@ -53,7 +52,7 @@ window.preload = function () {
   p4idleSS = loadImage("/assets/SpriteSheets/player4idle.png");
 
   assets.audience = loadImage('/assets/audience.png')
-  /*assets.al = loadImage('/assets/FullBodyAL.png')
+  /*assets.al = loadImage('/assets/FullBodyAL.png')*/
   assets.podium = loadImage('/assets/Podium.png');
 //  assets.stars = loadImage('/assets/stars.png');
   assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
@@ -124,7 +123,7 @@ function calculateScale() {
   let scaleX = windowWidth / frameWidth;
   let scaleY = windowHeight / frameHeight;
   scaleFactor = min(scaleX, scaleY); // Maintain aspect ratio
-}
+}*/
 
 const syncGameState = async () => {
   // Sync variables with gamestate
@@ -304,4 +303,3 @@ function drawStar(x, y, size, fillAmount) {
   endShape(CLOSE);
   pop();
 }
-*/
