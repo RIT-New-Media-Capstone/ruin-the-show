@@ -59,6 +59,7 @@ window.preload = function () {
     p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png');
 
     assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
+    assets.applause = loadImage('/assets/Interactions/applause/AudiencePopIn_OFF.png');
 }
 
 window.setup = function () {
