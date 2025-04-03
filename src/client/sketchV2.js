@@ -72,11 +72,11 @@ window.draw = function () {
     let sy = row * frameHeight;
     let newWidth = frameWidth * scaleFactor;
     let newHeight = frameHeight * scaleFactor;
-    image(al, 250,600, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
+    image(al, 250,450, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
     image(p1idleSS, 270, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     image(p2idleSS, 400, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-    image(p3idleSS, 700, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-    image(p4idleSS, 1000, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+    image(p3idleSS, 550, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+    image(p4idleSS, 730, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     currentFrame = (currentFrame + 1) % totalFrames; // Looping Animation
 
     syncGameState();
