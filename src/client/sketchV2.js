@@ -64,6 +64,7 @@ window.setup = function () {
     frameRate(frameRateSpeed);
     state = getState();
     let startTime = millis();
+    timerDuration = 60;
 }
 
 window.draw = function () {
@@ -143,11 +144,12 @@ function drawApplause(){
 function displayTimer(){
    
      //}  
-     let elaspedTime = (millis() - startTime/ 1000);
-     let remainingTime = max(timerDuration - elaspedTime, 0); // no neg vals
+      elapsedTime = (millis() - startTime) / 1000;
+
+      remainingTime = max(timerDuration - elapsedTime, 0); // no neg vals
      console.log(elapsedTime);
-     console.log(timerDuration)
-     console.log(remainingTime)
+     console.log(timerDuration);
+     console.log(remainingTime);
      fill(0);
      textSize(30);
      textAlign(CENTER, CENTER)
