@@ -139,7 +139,7 @@ function drawApplause(){
 }
  
 function displayTimer(){
-    if(assets.timer){
+   
      //}  
      let elaspedTime = (millis() - startTime/ 1000);
      let remainingTime = max(timerDuration - elaspedTime, 0); // no neg vals
@@ -151,5 +151,5 @@ function displayTimer(){
           text("Time's up!", width/2, height/2 + 40);
  
          }
-     }
+     
   }
