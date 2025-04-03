@@ -31,7 +31,7 @@ const state = {
         applauseOn: false,
     },
     podium: {
-        index: 0,
+        index: 1,
         totalPodiums: 4,
         lightTimer: 0, 
         threshold: 0.5,
@@ -45,7 +45,7 @@ const state = {
     }
 }
 
-import { showCheat, resetVisuals, showApplause, hideCheat, hideApplause } from "../client/utils.js"
+import { showCheat, resetVisuals, showApplause, hideCheat, hideApplause, lightUpPodium, hidePodiumLight } from "../client/utils.js"
 import { turnOffApplauseLED, turnOffCheatLED, turnOnApplauseLED, turnOnCheatLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
 const rfidScan = (userId, userScore) => {
@@ -134,6 +134,7 @@ const startGame = () => {
                     triggerPodiumButton(state.podium.index)
                     console.log(`Podium ${state.podium.index} lit up!`)
                     state.podium.index++
+                    if (state.podium.index > state.podium.totalPodiums) state.podium.index = 1;
                 }
             }
         }

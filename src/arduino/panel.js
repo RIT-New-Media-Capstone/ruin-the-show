@@ -12,12 +12,21 @@ import {
 
 let port;
 
+// find a better way to do this
+const devPorts = {
+    max: '/dev/tty.usbserial-DA017SAV', 
+    kaiden: 'COM5',
+}
+
 const serialSetup = () => {
-    port = new SerialPort({ path: 'COM5', baudRate: 9600 });
+    // Change based on which dev is running the program 
+    const portPath = devPorts.kaiden
+
+    port = new SerialPort({ path: portPath, baudRate: 9600 });
     const serial = port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
     port.on('open', () => {
-        console.log('Serial port opened.');
+        console.log(`Serial port opened at ${portPath}.`);
     });
 
     port.on('error', (err) => {
@@ -29,7 +38,7 @@ const serialSetup = () => {
     serial.on('data', (data) => {
         data = data.trim()
 
-        if (data.startsWith("System")) game.rfidScan()
+        if (data.startsWith("Game Controller")) game.rfidScan()
 
 
         // Get which input
@@ -43,7 +52,7 @@ const serialSetup = () => {
         else if (data == "JOYSTICK_LEFT") lightsMoved(-1);
         else if (data == "JOYSTICK_RIGHT") lightsMoved(1);
         else if (data.startsWith("LEVER_VALUE:")) leverRotated(data.substring(15))
-        else console.log(data)
+        else if (data.lastIndexOf("ACK") === -1) console.log(data) // if it isn't ack 
     })
 
 }
@@ -69,7 +78,7 @@ const applauseButtonPressed = () => {
 
 //function for all 4 small podium buttons
 const podiumButtonPressed = (podiumNum) => {
-    console.log("THE PODIUM" + podiumNum + "IS PRESSED")
+    console.log("Podium " + podiumNum + " pressed")
 }
  
 const lightsMoved = (direction) => {
@@ -92,11 +101,11 @@ const leverRotated = (newPosition) => {
 
 const turnOnPodiumLED = (podiumNum) => {
     if (port && port.isOpen) {
-        port.write('PODIUM_'+podiumNum+'LED_ON\r\n', (err) => {
+        port.write('PODIUM_'+podiumNum+'_LED_ON\r\n', (err) => {
             if (err) {
                 console.log('Error sending data:', err);
             } else {
-                console.log('Sent "PODIUM_'+podiumNum+'LED_ON" to Arduino');
+                console.log('Sent "PODIUM_'+podiumNum+'_LED_ON" to Arduino');
             }
         });
     } else {
@@ -106,15 +115,15 @@ const turnOnPodiumLED = (podiumNum) => {
 
 const turnOffPodiumLED = (podiumNum) => {
     if (port && port.isOpen) {
-        port.write('PODIUM_'+podiumNum+'LED_OFF\r\n', (err) => {
+        port.write('PODIUM_'+podiumNum+'_LED_OFF\r\n', (err) => {
             if (err) {
                 console.log('Error sending data:', err);
             } else {
-                console.log('Sent "PODIUM_'+podiumNum+'LED_OFF" to Arduino');
+                console.log('Sent "PODIUM_'+podiumNum+'_LED_OFF" to Arduino');
             }
         });
     } else {
-        console.log('Serial port not open. Cannot send PODIUM'+podiumNum+'LED_OFF" to Arduino');
+        console.log('Serial port not open. Cannot send PODIUM_'+podiumNum+'LED_OFF" to Arduino');
     }
 }
 
