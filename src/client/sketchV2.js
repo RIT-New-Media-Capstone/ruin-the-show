@@ -80,7 +80,7 @@ window.draw = function () {
     let sy = row * frameHeight;
     let newWidth = frameWidth * scaleFactor;
     let newHeight = frameHeight * scaleFactor;
-    image(al, 180,500, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
+    image(al, 180,500, newWidth, newHeight, sx*1.2, sy*1.2, frameWidth, frameHeight)
     image(p1idleSS, 270, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     image(p2idleSS, 400, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
     image(p3idleSS, 600, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
@@ -93,6 +93,7 @@ window.draw = function () {
     drawPodiums();
     drawHUD();
     drawCheat();
+    drawApplause()
     //displayTimer();
 }
 
