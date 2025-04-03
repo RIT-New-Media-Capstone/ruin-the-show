@@ -1,0 +1,98 @@
+let state;
+
+//Idle Animations for Contestants
+let p1idleSS;
+let p2idleSS;
+let p3idleSS;
+let p4idleSS;
+
+const assets = {
+    background: "",
+    stage: "",
+    stagelights: "",
+    podium1: "",
+    podium2: "",
+    podium3: "",
+    podium4: "",
+    stars: "",
+    timer: "",
+}
+
+import {
+    getState
+} from "./utils.js";
+  
+window.preload = function () {
+    //background
+    assets.background = loadImage('/assets/Background/MainBackground.png');
+    assets.stage = loadImage('/assets/Background/Stage.png');
+    assets.stagelights = loadImage('/assets/Background/StageLights.png');
+    //podiums are in front of animated contestants
+    assets.podium1 = loadImage('/assets/Background/PodiumYellow Resized0.png');
+    assets.podium2 = loadImage('/assets/Background/PodiumWhite Resized0.png');
+    assets.podium3 = loadImage('/assets/Background/PodiumRed Resized0.png');
+    assets.podium4 = loadImage('/assets/Background/PodiumBlue Resized0.png');
+    //HUD (timer & score)
+    assets.stars = loadImage('/assets/Background/StarRatings.png');
+    assets.timer = loadImage('/assets/Background/Timer.png');
+}
+
+window.setup = function () {
+    // 16:9 aspect ratio with slight padding
+    createCanvas(assets.background.width / 6, assets.background.height / 6);
+    //frameRate(frameRateSpeed);
+    state = getState();
+}
+
+window.draw = function () {
+    background(255);
+    drawBackground();
+
+    //animate here?
+
+    syncGameState();
+
+    //draw rest of background here
+    drawPodiums();
+    drawHUD();
+}
+
+const syncGameState = async () => {
+    // Sync variables with gamestate
+}
+
+function drawBackground() {
+    if (assets.background) {
+        image(assets.background, 0, 0, width, height);
+    }
+    if (assets.stage) {
+        image(assets.stage, width/10, height/1.75, width/1.25, height/2);
+    }
+    if (assets.stagelights) {
+        image(assets.stagelights, 0, -45, width, height/3);
+    }
+}
+
+function drawPodiums() {
+    if (assets.podium1) {
+        image(assets.podium1, width/4.5, height/2 + 20, width/4, height/4);
+    }
+    if (assets.podium2) {
+        image(assets.podium2, width/3, height/2 + 20, width/4, height/4);
+    }
+    if (assets.podium3) {
+        image(assets.podium3, width/2.2, height/2 + 20, width/4, height/4);
+    }
+    if (assets.podium4) {
+        image(assets.podium4, width/1.75, height/2 + 20, width/4, height/4);
+    }
+}
+
+function drawHUD() {
+    if(assets.stars) {
+        image(assets.stars, width - 350, -20, width/4, height/4);
+    }
+    if(assets.timer) {
+        image(assets.timer, -20, -40, width/4, height/4);
+    }
+}
