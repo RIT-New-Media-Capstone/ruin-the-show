@@ -60,6 +60,7 @@ window.setup = function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(frameRateSpeed);
     state = getState();
+    startTime = millis();
 }
 
 window.draw = function () {
@@ -84,6 +85,7 @@ window.draw = function () {
     //draw rest of background here
     drawPodiums();
     drawHUD();
+    displayTimer();
 }
 
 const syncGameState = async () => {
@@ -127,6 +129,24 @@ function drawHUD() {
     }
 }
 
-//function drawApplause(){
+function drawApplause(){
+ if(assets.applause){
+    //image()
+ }
 
-//}
+ function displayTimer(){
+   // if(assets.timer, -20, -40, width/4, height/4){
+    //}
+    let elaspedTime = (millis() - startTime/ 1000);
+    let remainingTime = max(timerDuration - elaspedTime, 0); // no neg vals
+    Fill(0);
+    textSize(30);
+    textAlign(CENTER, CENTER)
+    text(remainingTime.toFixed(1), width/2 , height/2);
+    if(remainingTime <= 0){
+         text("Time's up!", width/2, height/2 + 40);
+
+    }
+ }
+
+}
