@@ -103,7 +103,7 @@ void loop() {
   
   // Read potentiometer and map to 1-100
   int rawLeverValue = analogRead(LEVER_POT);
-  leverValue = map(rawLeverValue, 0, 1023, 1, 100);
+  leverValue = map(rawLeverValue, 834, 327, 1, 100);
   
   // Check for button presses (rising edge detection)
   if (podium1State && !prevPodium1State) {
