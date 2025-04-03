@@ -33,7 +33,12 @@ const assets = {
 }
 
 import {
-    getState
+    getState,
+    hideCheat,
+  hideApplause,
+  updateLightPosition,
+  showCheat,
+  showApplause,
 } from "./utils.js";
   
 window.preload = function () {
@@ -98,18 +103,22 @@ window.draw = function () {
     //draw rest of background here
     drawPodiums();
     drawHUD();
-    drawCheat();
+    if(state.cheatVis) drawCheat();
     drawApplause()
-    drawApplauseON()
-    podiumLight1()
-    podiumLight2()
-    podiumLight3()
-    podiumLight4()
+    if(state.applauseVis) drawApplauseON()
+    // podiumLight1()
+    // podiumLight2()
+    // podiumLight3()
+    // podiumLight4()
     //displayTimer();
 }
 
 const syncGameState = async () => {
     // Sync variables with gamestate
+    // updateLightPosition()
+  if (frameCount % 60 === 0) { // Every second
+    state = await getState();
+  }
 }
 
 function drawBackground() {
@@ -142,11 +151,17 @@ function drawPodiums() {
 // heads up display
 function drawHUD() {
     if(assets.stars) {
+        fill('#d9d9d9')
+        rect(width - 325, 50, 250, 50)
+        fill('#fff7c2')
+        let ratings = assets.ratings || 0
+        if (ratings > 250) ratings = 250
+        rect(width - 325, 50, ratings, 50)
         image(assets.stars, width - 350, -20, width/4, height/4);
     }
-    if(assets.timer) {
-        image(assets.timer, -20, -40, width/4, height/4);
-    }
+    // if(assets.timer) {
+    //     image(assets.timer, -20, -40, width/4, height/4);
+    // }
 }
 
 
@@ -158,39 +173,39 @@ function drawCheat(){
 
 function drawApplause(){
  if(assets.applause){
-    image(assets.applause,70, 40, width/4, height/4)
+    image(assets.applause,width/2, -50, width/4, height/4)
  }
 }
 
 function drawApplauseON(){
     if(assets.applauseon){
-        image(assets.applauseon, 80,40, width/4, height/4)
+        image(assets.applauseon, width/2,-50, width/4, height/4)
     }
 }
 
-function podiumLight1(){
-    if(assets.podiumlit1){
-        image(assets.podiumlit1, 80,40, width/4, height/4)
-    }
-}
-function podiumLight2(){
-    if(assets.podiumlit2){
-        image(assets.podiumlit1, 100,40, width/4, height/4)
-    }
+// function podiumLight1(){
+//     if(assets.podiumlit1){
+//         image(assets.podiumlit1, 80,40, width/4, height/4)
+//     }
+// }
+// function podiumLight2(){
+//     if(assets.podiumlit2){
+//         image(assets.podiumlit1, 100,40, width/4, height/4)
+//     }
     
-}
-function podiumLight3(){
-    if(assets.podiumlit3){
-        image(assets.podiumlit3, 120,40, width/4, height/4)
-    }
+// }
+// function podiumLight3(){
+//     if(assets.podiumlit3){
+//         image(assets.podiumlit3, 120,40, width/4, height/4)
+//     }
     
-}
-function podiumLight4(){
-    if(assets.podiumlit4){
-        image(assets.podiumlit4, 180,40, width/4, height/4)
-    }
+// }
+// function podiumLight4(){
+//     if(assets.podiumlit4){
+//         image(assets.podiumlit4, 180,40, width/4, height/4)
+//     }
     
-}
+// }
 
  
 /*
