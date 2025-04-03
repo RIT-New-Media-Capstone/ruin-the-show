@@ -149,7 +149,7 @@ function drawApplause(){
  if(assets.applause){
     image(assets.applause,40, width/4, height/4)
  }
-
+}
 
 
  
