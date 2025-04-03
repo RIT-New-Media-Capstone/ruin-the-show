@@ -60,7 +60,7 @@ window.setup = function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(frameRateSpeed);
     state = getState();
-    startTime = millis();
+    let startTime = millis();
 }
 
 window.draw = function () {
