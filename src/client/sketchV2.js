@@ -47,7 +47,7 @@ window.preload = function () {
     assets.timer = loadImage('/assets/Background/Timer.png');
 
     //AL 
-    al = loadImage('/assets/SpriteSheets/AL/AL_idleState.png');
+    al = loadImage('/assets/SpriteSheets/AL/AL_Talk_R.png'); // should be idle sprite but its not working
     //CONTESTANT ANIMATIONS
     p1idleSS = loadImage('/assets/SpriteSheets/p1/P1_Idle.png');
     p2idleSS = loadImage('/assets/SpriteSheets/p2/P2_Idle.png');
