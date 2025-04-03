@@ -61,6 +61,10 @@ window.preload = function () {
     assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
     assets.applause = loadImage('/assets/Interactions/applause/AudiencePopIn_OFF.png');
     assets.applauseon = loadImage('/assets/Interactions/applause/AudiencePopIn_ON.png');
+    assets.podiumlit1 = loadImage('/assets/Interactions/podiums/1light_WhitePodium.png');
+    assets.podiumlit2 = loadImage('/assets/Interactions/podiums/2light_YellowPodium.png');
+    assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
+    assets.podiumlit3 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
 }
 
 window.setup = function () {
@@ -97,6 +101,10 @@ window.draw = function () {
     drawCheat();
     drawApplause()
     drawApplauseON()
+    podiumLight1()
+    podiumLight2()
+    podiumLight3()
+    podiumLight4()
     //displayTimer();
 }
 
@@ -158,6 +166,30 @@ function drawApplauseON(){
     if(assets.applauseon){
         image(assets.applauseon, 80,40, width/4, height/4)
     }
+}
+
+function podiumLight1(){
+    if(assets.podiumlit1){
+        image(assets.podiumlit1, 80,40, width/4, height/4)
+    }
+}
+function podiumLight2(){
+    if(assets.podiumlit2){
+        image(assets.podiumlit1, 100,40, width/4, height/4)
+    }
+    
+}
+function podiumLight3(){
+    if(assets.podiumlit3){
+        image(assets.podium3, 120,40, width/4, height/4)
+    }
+    
+}
+function podiumLight4(){
+    if(assets.podiumlit4){
+        image(assets.podiumlit4, 180,40, width/4, height/4)
+    }
+    
 }
 
  
