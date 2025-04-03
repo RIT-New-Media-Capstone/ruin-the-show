@@ -5,16 +5,21 @@
 
 
 //variables 
-let hostXPos = 0; // initial host position
+let hostPos = 0; // initial host position
 let speed = 3 // speed of host
-const frameWidth = 1922; // Original sprite width
-const frameHeight = 1082; // Original sprite height
-const cols = 6;
-const rows = 9;
-const totalFrames = cols * rows;
+let alWalkingSS; //al walking 
+let p1idleSS; // player 1 idle 
+let p2idleSS; // player 2 idle 
+let p3idleSS; // player3idle
+let p4idleSS;
+let frameWidth = 1922; // Original sprite width
+let frameHeight = 1082; // Original sprite height
+let cols = 6;
+let rows = 9;
+let totalFrames = cols * rows;
 let currentFrame = 0;
-const frameRateSpeed = 10; // Adjust speed
-const scaleFactor = 0.25; // Scale factor for resizing
+let frameRateSpeed = 10; // Adjust speed
+const scaleFactor = 0.2; // Scale factor for resizing
 
 let state;
 
@@ -28,7 +33,6 @@ const assets = {
   stage: "",
   background: "",
   light: "",
-  curtains: "", 
 }
 
 import {
@@ -41,15 +45,15 @@ import {
 } from "./utils.js";
 
 window.preload = function () {
-  assets.al = loadImage("/assets/SpriteSheets/AlWalking.png");
-
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player1idle.png"), cols: 6, rows: 9, maxFrames: (6 * 9) - 4});
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player2idle.png"), cols: 7, rows: 11, maxFrames: (7 * 11) - 8});
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player3idle.png"), cols: 6, rows: 11, maxFrames: (6 * 11) - 4});
-  assets.contestants.push({src: loadImage("/assets/SpriteSheets/player4idle.png"), cols: 6, rows: 9, maxFrames: (6 * 9) - 5});
+  alWalkingSS = loadImage("/assets/SpriteSheets/AlWalking.png");
+  p1idleSS = loadImage("/assets/SpriteSheets/player1idle.png");
+  p2idleSS = loadImage("/assets/SpriteSheets/player2idle.png");
+  p3idleSS = loadImage("/assets/SpriteSheets/player3idle.png");
+  p4idleSS = loadImage("/assets/SpriteSheets/player4idle.png");
 
   assets.applause = loadImage('/assets/Off Air Screen copy 8 1.png')
   assets.audience = loadImage('/assets/audience.png')
+  assets.al = loadImage('/assets/FullBodyAL.png')
   assets.podium = loadImage('/assets/Podium.png');
   assets.light = loadImage('/assets/lightShine.png');
 
@@ -58,7 +62,8 @@ window.preload = function () {
   assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
   assets.background = loadImage('/assets/Background.png');
 
-  assets.curtains = loadImage('/assets/Curtains-02 1.png');
+
+
 
 }
 
@@ -66,6 +71,7 @@ window.setup = function () {
   // 16:9 aspect ratio with slight padding
   createCanvas(assets.background.width / 6, assets.background.height / 6);
   frameRate(frameRateSpeed);
+  //calculateScale();
   state = getState()
 }
 
@@ -79,29 +85,50 @@ window.draw = function () {
   let sx = col * frameWidth;
   let sy = row * frameHeight;
 
+  let newWidth = frameWidth * scaleFactor;
+  let newHeight = frameHeight * scaleFactor;
+
+ // image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p1idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p2idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p3idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+  image(p4idleSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+
   currentFrame = (currentFrame + 1) % totalFrames; // Loop animation
 
-  // Run every second - sync state
-  setInterval(syncGameState, 1000);
+  syncGameState()
 
 
   // Draw game elements
   drawLights()
   // drawCheat()
   drawRatings(30, 30, 5)
-  drawContestant(sx, sy)
-  drawHost(sx, sy)
-  drawZoom()
+  drawContestant()
+  drawHost()
+  drawVolume()
   drawAudience()
-  // if (state.applauseVis) drawApplause()
+
+  if (state.applauseVis) drawApplause()
+  if (! state.applauseVis) hideApplause()
+  
 
   // Update game elements
   // May move out of this file into utils.js
   updateCheat()
-
-  // If gameover, show curtains 
-  if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
 }
+/*
+// Recalculate scale when window resizes
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  calculateScale();
+}
+
+// Scale the sprite to fit the screen
+function calculateScale() {
+  let scaleX = windowWidth / frameWidth;
+  let scaleY = windowHeight / frameHeight;
+  scaleFactor = min(scaleX, scaleY); // Maintain aspect ratio
+}*/
 
 const syncGameState = async () => {
   // Sync variables with gamestate
@@ -132,12 +159,23 @@ function drawCheat() {
   }
 }
 
-function drawHost(sx, sy) {
-  const alY = height / 2.25
+function drawHost() {
+  let row = currentFrame % rows; // Frames go top to bottom
+  let col = Math.floor(currentFrame / rows); // Move horizontally
+
+  let sx = col * frameWidth;
+  let sy = row * frameHeight;
+
+  let newWidth = frameWidth * scaleFactor;
+  let newHeight = frameHeight * scaleFactor;
+
+  image(alWalkingSS, 0, 0, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
+
+  const yPos = height / 2.25
 
   // resizing consistently 
-  const alWidth = frameWidth * scaleFactor;
-  const alHeight = frameHeight * scaleFactor;
+  const alWidth = assets.al.width / 2.75
+  const alHeight = assets.al.height / 2.75
 
   // // draw al facing the direction he's walking
   // if (speed < 0) image(assets.al, hostPos, yPos, alWidth, alHeight)
@@ -148,12 +186,10 @@ function drawHost(sx, sy) {
   //   pop()
   // }
 
-  image(assets.al, hostXPos, alY, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
-  
-  hostXPos += speed;
+  hostPos += speed;
 
   // Reverse direction 
-  if (hostXPos >= width + alWidth || hostXPos <= 0 - alWidth) {
+  if (hostPos >= width + alWidth || hostPos <= 0 - alWidth) {
     speed *= -1;  // Flip the direction
   }
 }
@@ -167,11 +203,19 @@ function drawAudience() {
   showApplause()
 }
 
-function drawApplause() {
-  const applauseY = height / 2
-  fill(255)
-  if (state.applauseX) ellipse(state.applauseX, applauseY, 30, 30)
+function drawApplauseOn(){
+  if(state.applause){
+    image(assets.applauseon, 0, 0, width, height)
+  }
 }
+
+function drawApplauseOff(){
+  if(!state.applause){
+    image(assets.applauseoff, 0, 0, width, height)
+  }
+}
+
+
 
 //light producer has to host with light, producer cannot move host
 //key controls
@@ -185,19 +229,20 @@ function drawLights() {
 
 
 // contestant podium lights up 
-function drawContestant(sx, sy) {
-  let x = 275
-  const y = 250
-  const spacing = 150
-  const contestantWidth = frameWidth * scaleFactor * 0.75
-  const contestantHeight = frameHeight * scaleFactor * 0.75
+function drawContestant() {
+  let x = width / 4
+  const y = height / 2.5
+  const spacing = 200
 
   assets.contestants.forEach(contestant => {
-    image(contestant.src, x, y, contestantWidth, contestantHeight, sx, sy, frameWidth, frameHeight)
+    const contestantWidth = contestant.width / 6
+    const contestantHeight = contestant.height / 6
+
+    image(contestant, x, y, contestantWidth, contestantHeight)
 
     const podiumWidth = assets.podium.width / 4
     const podiumHeight = assets.podium.height / 4
-    const podiumX = x + contestantWidth / 3 + 10
+    const podiumX = x + 2
     const podiumY = y + contestantHeight - 25
 
     image(assets.podium, podiumX, podiumY, podiumWidth, podiumHeight)
@@ -207,10 +252,10 @@ function drawContestant(sx, sy) {
 
 }
 
-function drawZoom() {
+function drawVolume() {
   textSize(48);
   fill("black")
-  if (state.zoom) text(`Volume: ${state.zoom}`, windowWidth - 350, 75);
+  if (state.volume) text(`Volume: ${state.volume}`, windowWidth - 350, 75);
 }
 
 // DELETE - testing only  
@@ -230,47 +275,36 @@ window.keyPressed = function () {
   }
 }
 
-function drawRatings(x, y) {
-  // let starSize = 30;
-  // let spacing = 40;
-  // let maxRating = 100;
-  // let currentRatings = state.ratings || 0
-  // let filledStars = (currentRatings / maxRating) * numStars; // Convert value to star count
+function drawRatings(x, y, numStars) {
+  let starSize = 30;
+  let spacing = 40;
+  let maxRating = 100;
+  let currentRatings = state.ratings || 0
+  let filledStars = (currentRatings / maxRating) * numStars; // Convert value to star count
 
-  let ratingsFilled = state.rating || 10
-  if (ratingsFilled > 200) ratingsFilled = 200
-
-  noStroke()
-  fill('#d9d9d9')
-  rect(x - 20, y - 25, 200, 50)
-
-  fill('#fff7c2')
-  rect(x - 20, y - 25, ratingsFilled, 50)
   image(assets.stars, x - 30, y - 25, 220, 50)
-  // console.log(state.ratings)
+  console.log(state.ratings)
 
-  // for (let i = 0; i < numStars; i++) {
-  //   // constrain(value, min, max) limit to specified range
-  //   let fillAmount = constrain(filledStars - i, 0, 1); // 1 = full star, 0.5 = half star, etc.
-  //   drawStar(x + i * spacing, y, starSize, fillAmount);
-  // }
-
-
+  for (let i = 0; i < numStars; i++) {
+    // constrain(value, min, max) limit to specified range
+    let fillAmount = constrain(filledStars - i, 0, 1); // 1 = full star, 0.5 = half star, etc.
+    drawStar(x + i * spacing, y, starSize, fillAmount);
+  }
 }
 
-// function drawStar(x, y, size, fillAmount) {
-//   push();
-//   translate(x, y);
-//   stroke(0);
-//   fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
-//   beginShape();
-//   for (let i = 0; i < 10; i++) {
-//     let angle = PI / 5 * i;
-//     let radius = (i % 2 === 0) ? size / 2 : size / 4;
-//     let sx = cos(angle) * radius;
-//     let sy = sin(angle) * radius;
-//     vertex(sx, sy);
-//   }
-//   endShape(CLOSE);
-//   pop();
-// }
+function drawStar(x, y, size, fillAmount) {
+  push();
+  translate(x, y);
+  stroke(0);
+  fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
+  beginShape();
+  for (let i = 0; i < 10; i++) {
+    let angle = PI / 5 * i;
+    let radius = (i % 2 === 0) ? size / 2 : size / 4;
+    let sx = cos(angle) * radius;
+    let sy = sin(angle) * radius;
+    vertex(sx, sy);
+  }
+  endShape(CLOSE);
+  pop();
+}
