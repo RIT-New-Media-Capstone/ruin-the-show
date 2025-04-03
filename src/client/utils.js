@@ -3,6 +3,7 @@ let cheatX = 0;
 let cheatVis = false;
 let applauseVis = false;
 let lightPosX = 0;
+let isGameOver = false
 
 // Utility to randomize values
 const randomRange = (min, max) => Math.random() * (max - min) + min;
@@ -61,7 +62,8 @@ const getState = async () => {
         lightPosX: state.lights,
         ratings: state.ratings,
         difficulty: state.difficulty,
-        zoom: state.zoom
+        zoom: state.zoom,
+        isGameOver: state.isGameOver
     })
 };
 

@@ -12,7 +12,7 @@ const baseCheat = {
 
 const user = { id: "DEFAULT", score: 0 } // from the RFID band
 const state = {
-    difficulty: 1, ratings: baseRatings['1'], lightPosition: lightStartingPos, zoom: zoomStart,
+    difficulty: 1, ratings: baseRatings['1'], lightPosition: lightStartingPos, zoom: zoomStart, isGameOver: false,
     cheat: {
         cheatTimer: 0,
         threshold: baseCheat['1'].threshold,
@@ -42,6 +42,7 @@ const state = {
     },
     timer: {
         lastTime: 0,
+        gameTime: 0,
     }
 }
 
@@ -79,6 +80,7 @@ const startGame = () => {
         const currentTime = Date.now()
         const deltaTime = currentTime - state.timer.lastTime
         state.timer.lastTime = currentTime
+        state.timer.gameTime += deltaTime
 
         // Every 5 seconds, 50% chance cheat button triggers
         if (!state.cheat.cheatOn) {
@@ -147,6 +149,8 @@ const startGame = () => {
             }
         }
 
+        if(state.timer.gameTime > 60000) return gameOver()
+
         setImmediate(game)
     }
 
@@ -173,6 +177,10 @@ const resetState = () => {
     state.applause.onTimer = 0
     state.applause.threshold = 0.75
     state.applause.x = -1
+}
+
+const gameOver = () => {
+    state.isGameOver = true
 }
 
 const selectDifficulty = () => {
@@ -229,5 +237,6 @@ const getZoom = () => { return state.zoom }
 const updateZoom = (value) => { state.zoom = value }
 const getApplauseX = () => { return state.applause.x }
 const getCheatState = () => { return state.cheat.cheatOn }
+const getGameOver = () => { return state.isGameOver }
 
-export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState,  };
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState,  getGameOver, };

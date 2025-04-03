@@ -28,6 +28,7 @@ const assets = {
   stage: "",
   background: "",
   light: "",
+  curtains: "", 
 }
 
 import {
@@ -57,7 +58,7 @@ window.preload = function () {
   assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
   assets.background = loadImage('/assets/Background.png');
 
-
+  assets.curtains = loadImage('/assets/Curtains-02 1.png');
 
 }
 
@@ -97,6 +98,9 @@ window.draw = function () {
   // Update game elements
   // May move out of this file into utils.js
   updateCheat()
+
+  // If gameover, show curtains 
+  if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
 }
 
 const syncGameState = async () => {

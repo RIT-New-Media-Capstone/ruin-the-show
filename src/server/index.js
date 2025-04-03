@@ -27,6 +27,7 @@ app.get('/getState', (req, res) => {
   const lights = game.getLights()
   const zoom = game.getZoom()
   const applauseX = game.getApplauseX()
+  const isGameOver = game.getGameOver()
 
   const state = { 
     ratings, 
@@ -34,6 +35,7 @@ app.get('/getState', (req, res) => {
     lights, 
     zoom,
     applauseX,
+    isGameOver,
   }
 
   res.json(state)
