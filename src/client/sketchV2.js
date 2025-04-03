@@ -148,7 +148,7 @@ function drawCheat(){
 
 function drawApplause(){
  if(assets.applause){
-    image(assets.applause,40, width/4, height/4)
+    image(assets.applause,70, 40, width/4, height/4)
  }
 }
 
