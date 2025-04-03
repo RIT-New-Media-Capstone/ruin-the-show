@@ -134,20 +134,21 @@ function drawApplause(){
     //image()
  }
 
- function displayTimer(){
-   if(assets.timer){
-    //}
-    let elaspedTime = (millis() - startTime/ 1000);
-    let remainingTime = max(timerDuration - elaspedTime, 0); // no neg vals
-    Fill(0);
-    textSize(30);
-    textAlign(CENTER, CENTER)
-    text(remainingTime.toFixed(1), -20 , -40);
-    if(remainingTime <= 0){
-         text("Time's up!", width/2, height/2 + 40);
-
-        }
-    }
- }
 
 }
+ 
+function displayTimer(){
+    if(assets.timer){
+     //}  
+     let elaspedTime = (millis() - startTime/ 1000);
+     let remainingTime = max(timerDuration - elaspedTime, 0); // no neg vals
+     Fill(0);
+     textSize(30);
+     textAlign(CENTER, CENTER)
+     text(remainingTime.toFixed(1), -20 , -40);
+     if(remainingTime <= 0){
+          text("Time's up!", width/2, height/2 + 40);
+ 
+         }
+     }
+  }
