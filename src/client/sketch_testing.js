@@ -54,7 +54,7 @@ window.preload = function () {
   assets.audience = loadImage('/assets/audience.png')
   /*assets.al = loadImage('/assets/FullBodyAL.png')*/
   assets.podium = loadImage('/assets/Podium.png');
-  assets.stars = loadImage('/assets/stars.png');
+//  assets.stars = loadImage('/assets/stars.png');
   assets.stage = loadImage('/assets/Stage_UnderPodiums.png');
   assets.background = loadImage('/assets/Background.png');
 
