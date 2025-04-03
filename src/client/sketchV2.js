@@ -143,10 +143,11 @@ function drawCheat(){
         image(assets.cheat, -20, -40, width/4, height/4);
     }
 }
-//function drawApplause(){
- //if(assets.applause){
-    //image()
- //}
+
+function drawApplause(){
+ if(assets.applause){
+    image(assets.applause,40, width/4, height/4)
+ }
 
 
 
