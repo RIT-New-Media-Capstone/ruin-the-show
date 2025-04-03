@@ -165,7 +165,7 @@ function drawHUD() {
         fill('#d9d9d9')
         rect(width - 325, 50, 250, 50)
         fill('#fff7c2')
-        let ratings = assets.ratings || 0
+        let ratings = state.ratings || 0
         if (ratings > 250) ratings = 250
         rect(width - 325, 50, ratings, 50)
         image(assets.stars, width - 350, -20, width/4, height/4);

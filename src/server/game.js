@@ -149,7 +149,7 @@ const startGame = () => {
             }
         }
 
-        if(state.timer.gameTime > 60000) return gameOver()
+        if(state.timer.gameTime > 600000) return gameOver()
 
         setImmediate(game)
     }
