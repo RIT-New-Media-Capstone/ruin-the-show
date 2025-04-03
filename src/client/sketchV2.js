@@ -60,12 +60,12 @@ window.preload = function () {
     //AL 
     al = loadImage('/assets/SpriteSheets/AL/AL_Talk_R.png'); // should be idle sprite but its not working
     
-    /*
+    
     //CONTESTANT ANIMATIONS
     p1idleSS = loadImage('/assets/SpriteSheets/p1/P1_Idle.png');
     p2idleSS = loadImage('/assets/SpriteSheets/p2/P2_Idle.png');
     p3idleSS = loadImage('/assets/SpriteSheets/p3/P3_Idle.png');
-    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png');*/
+    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png');
 
     assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
     assets.applause = loadImage('/assets/Interactions/applause/AudiencePopIn_OFF.png');
