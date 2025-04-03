@@ -181,7 +181,7 @@ function podiumLight2(){
 }
 function podiumLight3(){
     if(assets.podiumlit3){
-        image(assets.podium3, 120,40, width/4, height/4)
+        image(assets.podiumlit3, 120,40, width/4, height/4)
     }
     
 }
