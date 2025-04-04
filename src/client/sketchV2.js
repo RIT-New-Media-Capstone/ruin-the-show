@@ -197,7 +197,7 @@ function drawHUD() {
 function drawCheat(){
     if(state.cheatVis){
         if(assets.cheat) {
-            image(assets.cheat, 0, 100, width/4, height/4);
+            image(assets.cheat, 0, 100, width/5, height/2.5);
         }
     }
     
