@@ -47,7 +47,7 @@ const state = {
 }
 
 import { showCheat, resetVisuals, showApplause, hideCheat, hideApplause, lightUpPodium, hidePodiumLight } from "../client/utils.js"
-import { turnOffApplauseLED, turnOffCheatLED, turnOnApplauseLED, turnOnCheatLED, turnOnPodiumLED, turnOffPodiumLED, cheatButtonPressed } from "../arduino/panel.js"
+import { turnOffApplauseLED, turnOffCheatLED, turnOnApplauseLED, turnOnCheatLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
 const rfidScan = (userId, userScore) => {
     // store valid RFID input 
@@ -157,14 +157,16 @@ const startGame = () => {
     game()
 }
 
+/*
 const cheatButtonPress = () => {
 
     if(cheatButtonPressed){
-        console.log("cheat button pressed game")
+
+        console.log("cheat button pressed game", state.cheatOn.false)
         return true;
                 
     }
-}
+}*/
 
 const resetState = () => {
     state.lightPosition = lightStartingPos

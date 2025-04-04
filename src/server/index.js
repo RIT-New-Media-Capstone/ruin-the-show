@@ -28,6 +28,7 @@ app.get('/getState', (req, res) => {
   const zoom = game.getZoom()
   const applauseX = game.getApplauseX()
   const isGameOver = game.getGameOver()
+  
 
   const state = { 
     ratings, 
