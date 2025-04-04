@@ -42,7 +42,7 @@ import {
   updateLightPosition,
   showCheat,
   showApplause,
-} from "./utils.js";
+} from "../utils.js";
 
 window.preload = function () {
   alWalkingSS = loadImage("/assets/SpriteSheets/AlWalking.png");

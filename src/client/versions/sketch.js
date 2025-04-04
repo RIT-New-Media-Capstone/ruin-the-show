@@ -27,7 +27,7 @@ import {
   updateLightPosition,
   showCheat,
   showApplause,
-} from "./utils.js";
+} from "../utils.js";
 
 window.preload = function () {
   assets.contestants.push(loadImage('/assets/1contestant.png'))
