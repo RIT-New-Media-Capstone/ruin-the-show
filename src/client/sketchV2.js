@@ -18,17 +18,19 @@ let countdownTimer;
 const assets = {
     audience: "",
     background: "",
-    stage: "",
-    stagelights: "",
+    contestants: "",
+    cheat: "",
+    curtains: "",
     podium1: "",
     podium2: "",
     podium3: "",
     podium4: "",
+    spotlight: "",
+    stage: "",
+    stagelights: "",
     stars: "",
     timer: "",
-    contestants: "",
-    cheat: "",
-    curtains: "",
+    
 }
 
 import {
@@ -90,6 +92,7 @@ window.preload = function () {
     assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
     assets.podiumlit4 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
     assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
+    assets.spotlight = loadImage('/assets/Interactions/joystick/HostSpotlight.png');
 }
 
 window.setup = function () {
@@ -115,6 +118,7 @@ window.draw = function () {
     podiumLight2();
     podiumLight3();
     podiumLight4()
+    spotlight()
 
     drawHost();
     if(state.cheatVis) drawCheat();
@@ -299,6 +303,12 @@ function drawZoom() {
    if (state.lightPosX) image(assets.light, state.lightPosX, height / 4, lightWidth, lightHeight)
    else image(assets.light, -300, (height / 3) - 75, lightWidth, lightHeight)
   }*/
+
+function spotlight(){
+    if(assets.spotlight){
+        image(assets.spotlight, 655,400, width/4, height/4)
+    }
+}
 
 function podiumLight1(){
      if(assets.podiumlit1){
