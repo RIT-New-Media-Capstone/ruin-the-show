@@ -84,6 +84,7 @@ window.preload = function () {
         contestantFrames.push(frames);
     }
 
+    //CUE
     assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
     assets.applause = loadImage('/assets/Interactions/applause/applause_OFF.png');
     assets.applauseon = loadImage('/assets/Interactions/applause/applause_ON.png');
@@ -91,8 +92,14 @@ window.preload = function () {
     assets.podiumlit2 = loadImage('/assets/Interactions/podiums/2light_YellowPodium.png');
     assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
     assets.podiumlit4 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
-    assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
     assets.spotlight = loadImage('/assets/Interactions/joystick/HostSpotlight.png');
+
+    //FEEEDBACK
+    assets.rightLit = loadImage('/assets/Interactions/podiums/ContestantRight.png')
+    assets.wrongLit = loadImage('/assets/Interactions/podiums/ContestantWrong.png')
+
+    //GAMEOVER
+    assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
 }
 
 window.setup = function () {
@@ -234,6 +241,15 @@ function drawCountdown() {
     textSize(40);
     textAlign(CENTER, CENTER);
     text(timeString, 160, 67); 
+}
+
+
+//display right wrong light
+function displayRWLight(){
+    //if()
+    image(assets.rightLit, 0, 100, width/3, height/1.5);
+    image(assets.wrongLit, 0, 100, width/3, height/1.5);
+
 }
 
 function updateCountdown() {
@@ -379,3 +395,4 @@ for (let i = 0; i < 10; i++) {
 endShape(CLOSE);
 pop();
 }
+
