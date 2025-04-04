@@ -100,7 +100,7 @@ window.draw = function () {
     syncGameState();
 
     drawContestant();
-    drawHost()
+    //drawHost()
     drawHUD();
     if(state.cheatVis) drawCheat();
     drawApplause()
@@ -222,18 +222,24 @@ function updateCheat() {
   
 
 function drawHost(sx, sy){
-    const alY = height / 2.25
+    //if host is in idle then call idle positions and state
+    let x = 270;
+    const y = 240;
+    const spacing = 160;
+    let scaleFactor = 0.20;
+
+    //const alY = height / 2.25
     const alWidth = frameWidth * scaleFactor;
     const alHeight = frameHeight * scaleFactor;
 
-    image(al, hostXPos, alY, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
+    image(al, x, y, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
    
-    hostXPos += speed;
+    //hostXPos += speed;
   
     // Reverse direction 
-    if (hostXPos >= width + alWidth || hostXPos <= 0 - alWidth) {
-      speed *= -1;  // Flip the direction
-    }
+   //if (hostXPos >= width + alWidth || hostXPos <= 0 - alWidth) {
+     // speed *= -1;  // Flip the direction
+    //}
 
     //image(al, 180,500, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
 }
