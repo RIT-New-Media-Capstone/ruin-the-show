@@ -211,12 +211,12 @@ function drawPodiums() {
 function drawHUD() {
     if(assets.stars) {
         fill('#d9d9d9')
-        rect(width - 325, 50, 250, 50)
+        rect(width - 285, 60, 250 * 2/3 + 70, 50 * 2/3)
         fill('#fff7c2')
         let ratings = state.ratings || 0
         if (ratings > 250) ratings = 250
-        rect(width - 325, 50, ratings, 50)
-        image(assets.stars, width - 350, -20, width/4, height/4);
+        rect(width - 285, 60, ratings * 2/3, 50 * 2/3)
+        image(assets.stars, width - 300, -10, width/5, height/5);
     }
     if(assets.timer) {
         image(assets.timer, -20, -40, width/4, height/4);
@@ -255,13 +255,13 @@ function drawCheat(){
 
 function drawApplause(){
     if(assets.applause){
-        image(assets.applause,width/2, -50, width/4, height/4)
+        image(assets.applause,width/2 - 150, -55, width/4, height/4)
     }
 }
 
 function drawApplauseON(){
     if(assets.applauseon){
-        image(assets.applauseon, width/2,-50, width/4, height/4)
+        image(assets.applauseon, width/2 - 150, -55, width/4, height/4)
     }
 }
 
