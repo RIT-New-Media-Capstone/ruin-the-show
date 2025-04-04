@@ -10,7 +10,10 @@ const numCols = 4;
 const totalFrames = numRows * numCols;
 const frameWidth = 7688 / numCols;
 const frameHeight = 5410 / numRows;
-
+//Countdown Timer (Possibly Temporary)
+let countdownFont;
+let countdown = 60;
+let countdownTimer;
 
 const assets = {
     background: "",
@@ -51,6 +54,7 @@ window.preload = function () {
     //HUD (timer & score)
     assets.stars = loadImage('/assets/Background/StarRatings.png');
     assets.timer = loadImage('/assets/Background/Timer.png');
+    countdownFont = loadFont('/assets/Fonts/Poppins-ExtraLight.ttf');
 
     //AL 
     al = loadImage('/assets/SpriteSheets/AL/AL_idle.png'); // 
@@ -91,6 +95,8 @@ window.setup = function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     state = getState();
+
+    countdownTimer = countdown; // Initialize the countdown
 }
 
 window.draw = function () {
@@ -108,7 +114,7 @@ window.draw = function () {
     
     updateCheat()
 
-    text(`FPS: ${frameRate().toFixed(2)}`, 10, 30); //FPS ON SCREEN
+    text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
 }
 
@@ -120,6 +126,9 @@ const syncGameState = async () => {
     updateLightPosition()
     if (frameCount % 60 === 0) { // Every second
         state = await getState();
+    }
+    if (frameCount % 30 === 0 && countdownTimer > 0) { 
+        updateCountdown();
     }
 }
 
@@ -188,10 +197,30 @@ function drawHUD() {
         rect(width - 325, 50, ratings, 50)
         image(assets.stars, width - 350, -20, width/4, height/4);
     }
-    // if(assets.timer) {
-    //     image(assets.timer, -20, -40, width/4, height/4);
-    // }
+    if(assets.timer) {
+        image(assets.timer, -20, -40, width/4, height/4);
+        drawCountdown();
+    }
 }
+
+function drawCountdown() {
+    let minutes = Math.floor(countdownTimer / 60); // Get minutes
+    let seconds = countdownTimer % 60; // Get seconds
+    let timeString = nf(minutes, 2) + ':' + nf(seconds, 2); // Format as MM:SS
+
+    fill('black');
+    textFont(countdownFont);
+    textSize(40);
+    textAlign(CENTER, CENTER);
+    text(timeString, 160, 67); 
+}
+
+function updateCountdown() {
+    if (countdownTimer > 0) {
+        countdownTimer -= 1; // Decrease by one second
+    }
+}
+
 
 // displays cheat asset
 function drawCheat(){
@@ -296,40 +325,20 @@ function drawRatings(x, y) {
   
   }
   
-  //TODO check again
-  function drawStar(x, y, size, fillAmount) {
-    push();
-    translate(x, y);
-    stroke(0);
-    fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
-    beginShape();
-    for (let i = 0; i < 10; i++) {
-      let angle = PI / 5 * i;
-      let radius = (i % 2 === 0) ? size / 2 : size / 4;
-      let sx = cos(angle) * radius;
-      let sy = sin(angle) * radius;
-      vertex(sx, sy);
-    }
-    endShape(CLOSE);
-    pop();
-  }
- 
-/*
-function displayTimer(){
-   
-     //}  
-      elapsedTime = (millis() - startTime) / 1000;
-
-      remainingTime = max(timerDuration - elapsedTime, 0); // no neg vals
-     console.log(elapsedTime);
-     console.log(timerDuration);
-     console.log(remainingTime);
-     fill(0);
-     textSize(30);
-     textAlign(CENTER, CENTER)
-     text(remainingTime.toFixed(1), -20 , -40);
-     if(remainingTime <= 0){
-          text("Time's up!", -20, -40);
-         }
-     
-  }*/
+//TODO check again
+function drawStar(x, y, size, fillAmount) {
+push();
+translate(x, y);
+stroke(0);
+fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
+beginShape();
+for (let i = 0; i < 10; i++) {
+    let angle = PI / 5 * i;
+    let radius = (i % 2 === 0) ? size / 2 : size / 4;
+    let sx = cos(angle) * radius;
+    let sy = sin(angle) * radius;
+    vertex(sx, sy);
+}
+endShape(CLOSE);
+pop();
+}
