@@ -41,17 +41,19 @@ window.preload = function () {
     assets.background = loadImage('/assets/Background/MainBackground.png');
     assets.stage = loadImage('/assets/Background/Stage.png');
     assets.stagelights = loadImage('/assets/Background/StageLights.png');
+    
     //podiums are in front of animated contestants
     assets.podium1 = loadImage('/assets/Background/PodiumYellow Resized0.png');
     assets.podium2 = loadImage('/assets/Background/PodiumWhite Resized0.png');
     assets.podium3 = loadImage('/assets/Background/PodiumRed Resized0.png');
     assets.podium4 = loadImage('/assets/Background/PodiumBlue Resized0.png');
+    
     //HUD (timer & score)
     assets.stars = loadImage('/assets/Background/StarRatings.png');
     assets.timer = loadImage('/assets/Background/Timer.png');
 
     //AL 
-    al = loadImage('/assets/SpriteSheets/Al/AL_Talk_R.png'); // should be idle sprite but its not working
+    al = loadImage('/assets/SpriteSheets/AL/AL_idle.png'); // 
     
     //CONTESTANT ANIMATIONS
     assets.contestants = [];
@@ -98,6 +100,7 @@ window.draw = function () {
     syncGameState();
 
     drawContestant();
+    drawHost()
     drawHUD();
     if(state.cheatVis) drawCheat();
     drawApplause()
@@ -190,11 +193,11 @@ function drawHUD() {
     // }
 }
 
-
+// displays cheat asset
 function drawCheat(){
     if(state.cheatVis){
         if(assets.cheat) {
-            image(assets.cheat, 100, 100, width/4, height/4);
+            image(assets.cheat, 0, 100, width/4, height/4);
         }
     }
     
@@ -217,7 +220,7 @@ function updateCheat() {
 }
  
   
-/*
+
 function drawHost(sx, sy){
     const alY = height / 2.25
     const alWidth = frameWidth * scaleFactor;
@@ -233,7 +236,7 @@ function drawHost(sx, sy){
     }
 
     //image(al, 180,500, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
-}*/
+}
 
 function drawZoom() {
     textSize(48);
