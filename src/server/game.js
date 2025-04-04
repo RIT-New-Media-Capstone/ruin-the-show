@@ -189,8 +189,25 @@ const selectDifficulty = () => {
     return 1;
 }
 
+/*
+
+// function that limits the current interaction based of the users cureent score 
+const getAllowedInteractions = () => {
+    const score = user.score
+    if (score >= 0 && score < 20) {
+        return { applause: true, cheat: false, podium: false }
+    } else if (score >= 20 && score < 40) {
+        return { applause: true, cheat: true, podium: false }
+    } else if (score >= 40 && score < 60) {
+        return { applause: true, cheat: true, podium: true }
+    } else {
+        return { applause: false, cheat: false, podium: false, gameOver: true }
+    }
+}*/
+
+
 const triggerCheatButton = () => {
-    state.cheat.cheatOn = true
+    
     showCheat()
     turnOnCheatLED()
 }
@@ -227,6 +244,7 @@ const turnOffPodiumButton = (index) => {
     turnOffPodiumLED(index)
     console.log(`Podium ${index} light - off`)
 }
+
 
 const getRatings = () => { return state.ratings }
 const updateRatings = (value) => { state.ratings += value }
