@@ -299,7 +299,11 @@ function drawHands() {
 
 function updateCheat() {
     showCheat()
-    if(cheatBtnPress) hideCheat()
+
+    if (state.cheatVis){ showCheat()}
+   // if (!state.cheatVis ) { hideCheat()}
+   
+    //if(cheatBtnPress) hideCheat()
 }
  
   

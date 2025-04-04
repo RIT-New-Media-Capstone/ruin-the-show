@@ -11,6 +11,7 @@ const randomRange = (min, max) => Math.random() * (max - min) + min;
 const showCheat = () => {
     cheatX = 300
     cheatVis = true;
+    
 };
 
 const hideCheat = () => {
