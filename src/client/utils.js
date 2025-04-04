@@ -3,7 +3,6 @@ let cheatX = 0;
 let cheatVis = false;
 let applauseVis = false;
 let lightPosX = 0;
-let isGameOver = false
 
 // Utility to randomize values
 const randomRange = (min, max) => Math.random() * (max - min) + min;
@@ -49,6 +48,10 @@ const lightUpPodium = (index) => {
 const hidePodiumLight = (index) => {
     // fill out
 }
+
+/*const gameOver = () => {
+    state.isGameOver = true
+}*/
 
 // Get the current animation state (for sketch.js)
 const getState = async () => {
