@@ -127,6 +127,8 @@ window.draw = function () {
     
     updateCheat()
 
+    drawAudience();
+
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
 }
@@ -155,8 +157,11 @@ function drawBackground() {
     if (assets.stagelights) {
         image(assets.stagelights, 0, -45, width, height/3);
     }
+}
+
+function drawAudience() {
     if(assets.audience) {
-        image(assets.audience, width/15, height/1.65, width, height/2.55);
+        image(assets.audience, 0, 100, width, height);
     }
 }
 
