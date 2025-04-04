@@ -147,6 +147,7 @@ window.draw = function () {
     
     //updateCheat()
     //console.log("this is uupdate", updateCheat())
+    setInterval(promptCheat, 5000);
 
     drawHands();
     drawAudience();
@@ -284,6 +285,15 @@ function drawCheat(){
     }
     
 }
+function promptCheat() {
+    console.log("Prompting cheat...");
+    showCheat = true;
+  
+    // Turn off cheat prompt after 2 seconds
+    setTimeout(() => {
+      showCheat = false;
+    }, 2000);
+  }
 
 function drawApplause(){
     if(assets.applause){
