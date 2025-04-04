@@ -138,12 +138,15 @@ window.draw = function () {
     podiumLight4()
     spotlight();
 
+
+    state.cheatVis = true;
     drawHost();
     if(state.cheatVis) drawCheat();
     drawApplause()
     if(state.applauseVis) drawApplauseON()
     
-    updateCheat()
+    //updateCheat()
+    //console.log("this is uupdate", updateCheat())
 
     drawHands();
     drawAudience();
@@ -163,6 +166,9 @@ const syncGameState = async () => {
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
     }
+
+    updateCheat()
+    console.log("im in sync rn ")
 }
 
 function drawBackground() {
@@ -300,6 +306,7 @@ function drawHands() {
 function updateCheat() {
     if (state.cheatVis){ showCheat()}
     if (!state.cheatVis ) { hideCheat()}
+    console.log("vis" , state.cheatVis, "show", showCheat(), "hide", hideCheat())
 }
  
   

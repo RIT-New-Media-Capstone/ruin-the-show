@@ -10,12 +10,14 @@ const randomRange = (min, max) => Math.random() * (max - min) + min;
 // Cheat Visibility Handlers
 const showCheat = () => {
     cheatX = 300
-    cheatVis = true;
+  return cheatVis = true;
+    console.log("Hi its me cht")
     
 };
 
 const hideCheat = () => {
-    cheatVis = false;
+  return  cheatVis = false;
+    console.log("Hide its me ")
 };
 
 // Applause Visibility Handlers
