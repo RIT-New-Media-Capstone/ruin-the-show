@@ -195,13 +195,15 @@ const selectDifficulty = () => {
 const getAllowedInteractions = () => {
     const score = user.score
     if (score >= 0 && score < 20) {
-        return { applause: true, cheat: false, podium: false }
+        return { applause: true, lights: true, cheat: false, podium: false, lever: false}
     } else if (score >= 20 && score < 40) {
-        return { applause: true, cheat: true, podium: false }
+        return {applause: true, lights: true, cheat: false, podium: false, lever: false }
     } else if (score >= 40 && score < 60) {
-        return { applause: true, cheat: true, podium: true }
+        return { applause: true, lights: true, cheat: true, podium: true, lever: false}
+    } else if (score >= 60 && score < 100) {
+        return { applause: true, lights: true, cheat: true, podium: true, lever: false}
     } else {
-        return { applause: false, cheat: false, podium: false, gameOver: true }
+        return { applause: false, lights: false ,cheat: false, podium: false, gameOver: true }
     }
 }*/
 
