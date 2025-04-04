@@ -100,7 +100,7 @@ window.draw = function () {
     syncGameState();
 
     drawContestant();
-    //drawHost()
+    drawHost()
     drawHUD();
     if(state.cheatVis) drawCheat();
     drawApplause()
@@ -223,9 +223,9 @@ function updateCheat() {
 
 function drawHost(sx, sy){
     //if host is in idle then call idle positions and state
-    let x = 270;
-    const y = 240;
-    const spacing = 160;
+    let x = 100;
+    const y = height/4;
+   // const spacing = 160;
     let scaleFactor = 0.20;
 
     //const alY = height / 2.25
