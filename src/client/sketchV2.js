@@ -21,6 +21,7 @@ const assets = {
     contestants: "",
     cheat: "",
     curtains: "",
+    hands: "",
     podium1: "",
     podium2: "",
     podium3: "",
@@ -92,11 +93,12 @@ window.preload = function () {
     assets.podiumlit2 = loadImage('/assets/Interactions/podiums/2light_YellowPodium.png');
     assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
     assets.podiumlit4 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
-    assets.spotlight = loadImage('/assets/Interactions/joystick/HostSpotlight.png');
 
     //FEEEDBACK
-    assets.rightLit = loadImage('/assets/Interactions/podiums/ContestantRight.png')
-    assets.wrongLit = loadImage('/assets/Interactions/podiums/ContestantWrong.png')
+    assets.rightLit = loadImage('/assets/Interactions/podiums/ContestantRight.png');
+    assets.wrongLit = loadImage('/assets/Interactions/podiums/ContestantWrong.png');
+    assets.hands = loadImage('/assets/Interactions/applause/StaticApplause.png');
+    assets.spotlight = loadImage('/assets/Interactions/joystick/HostSpotlight.png');
 
     //GAMEOVER
     assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
@@ -118,6 +120,8 @@ window.draw = function () {
     syncGameState();
 
     drawContestant();
+    drawRWLight();
+    drawPodiums();
 
     drawHUD();
 
@@ -125,7 +129,7 @@ window.draw = function () {
     podiumLight2();
     podiumLight3();
     podiumLight4()
-    spotlight()
+    spotlight();
 
     drawHost();
     if(state.cheatVis) drawCheat();
@@ -134,6 +138,7 @@ window.draw = function () {
     
     updateCheat()
 
+    drawHands();
     drawAudience();
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
@@ -191,8 +196,6 @@ function drawContestant() {
         }
     });
 
-    drawPodiums();
-
     // Update frame only every few draw cycles
     if (frameCount % frameDelay === 0) {
         currentFrame = (currentFrame + 1) % totalFrames;
@@ -245,10 +248,10 @@ function drawCountdown() {
 
 
 //display right wrong light
-function displayRWLight(){
+function drawRWLight(){
     //if()
-    image(assets.rightLit, 0, 100, width/3, height/1.5);
-    image(assets.wrongLit, 0, 100, width/3, height/1.5);
+    image(assets.rightLit, 200, 100, width/3, height/1.5);
+    image(assets.wrongLit, 205, 123, width/3, height/1.5);
 
 }
 
@@ -271,13 +274,19 @@ function drawCheat(){
 
 function drawApplause(){
     if(assets.applause){
-        image(assets.applause,width/2 - 150, -55, width/4, height/4)
+        image(assets.applause, width/2 - 150, -55, width/4, height/4);
     }
 }
 
 function drawApplauseON(){
     if(assets.applauseon){
-        image(assets.applauseon, width/2 - 150, -55, width/4, height/4)
+        image(assets.applauseon, width/2 - 150, -55, width/4, height/4);
+    }
+}
+
+function drawHands() {
+    if(assets.hands) {
+        image(assets.hands, width/10 - 150, height/2 + 50, width, height/2);
     }
 }
 
@@ -340,28 +349,27 @@ function spotlight(){
 }
 
 function podiumLight1(){
-     if(assets.podiumlit1){
-         image(assets.podiumlit1, 345,-50, width/3, height)
-     }
- }
-
- function podiumLight2(){
-    if(assets.podiumlit2){
-       image(assets.podiumlit2, 241,-50, width/3, height)
-   }
-}
-    
-
- function podiumLight3(){
-     if(assets.podiumlit3){
-         image(assets.podiumlit3, 635,-50, width/3, height)
+    if(assets.podiumlit1){
+        image(assets.podiumlit1, 345,-50, width/3, height)
     }
- }
- function podiumLight4(){
-     if(assets.podiumlit4){
-        image(assets.podiumlit4, 565,-50, width/3, height)
-     }
- }
+}
+
+function podiumLight2(){
+    if(assets.podiumlit2){
+        image(assets.podiumlit2, 241,-50, width/3, height)
+    }
+}
+
+function podiumLight3(){
+    if(assets.podiumlit3){
+        image(assets.podiumlit3, 635,-50, width/3, height)
+    }
+}
+function podiumLight4(){
+    if(assets.podiumlit4){
+    image(assets.podiumlit4, 565,-50, width/3, height)
+    }
+}
 
 
 function drawRatings(x, y) {
