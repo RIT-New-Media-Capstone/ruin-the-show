@@ -212,7 +212,7 @@ function drawHUD() {
     if(assets.stars) {
         fill('#d9d9d9')
         rect(width - 285, 60, 250 * 2/3 + 70, 50 * 2/3)
-        fill('#fff7c2')
+        fill('#dc4042')
         let ratings = state.ratings || 0
         if (ratings > 250) ratings = 250
         rect(width - 285, 60, ratings * 2/3, 50 * 2/3)
