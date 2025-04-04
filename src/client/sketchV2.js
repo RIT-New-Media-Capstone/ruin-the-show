@@ -81,8 +81,8 @@ window.preload = function () {
     }
 
     assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
-    assets.applause = loadImage('/assets/Interactions/applause/AudiencePopIn_OFF.png');
-    assets.applauseon = loadImage('/assets/Interactions/applause/AudiencePopIn_ON.png');
+    assets.applause = loadImage('/assets/Interactions/applause/applause_OFF.png');
+    assets.applauseon = loadImage('/assets/Interactions/applause/applause_ON.png');
     assets.podiumlit1 = loadImage('/assets/Interactions/podiums/1light_WhitePodium.png');
     assets.podiumlit2 = loadImage('/assets/Interactions/podiums/2light_YellowPodium.png');
     assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
