@@ -272,13 +272,21 @@ function drawHost(sx, sy){
     const y = height/2.4;
    // const spacing = 160;
     let scaleFactor = 0.38;
-
+    let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidth * scaleFactor;
     const alHeight = frameHeight * scaleFactor;
 
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+     sx = (currentFrame % numCols) * frameWidth;
+     sy = Math.floor(currentFrame / numCols) * frameHeight;
+
+
     image(al, x, y, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
    
+    if (frameCount % frameDelay === 0) {
+        currentFrame = (currentFrame + 1) % totalFrames;
+    }
     //x += speed;
   
     // Reverse direction 
@@ -306,7 +314,7 @@ function drawZoom() {
 
 function spotlight(){
     if(assets.spotlight){
-        image(assets.spotlight, 655,400, width/4, height/4)
+        image(assets.spotlight, 120,100, width/2, height)
     }
 }
 
