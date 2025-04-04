@@ -36,9 +36,9 @@ const assets = {
     
 }
 
-//import{
-    //cheatButtonPressed,
-//} from "arduino/panel.js";
+import{
+    cheatButtonPress,
+} from "server/game.js";
 
 import {
     getState,
@@ -146,6 +146,8 @@ window.draw = function () {
 
     drawHands();
     drawAudience();
+
+    console.log("they pressed meeeee ", cheatButtonPress);
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
