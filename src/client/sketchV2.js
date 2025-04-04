@@ -16,6 +16,7 @@ let countdown = 60;
 let countdownTimer;
 
 const assets = {
+    audience: "",
     background: "",
     stage: "",
     stagelights: "",
@@ -44,6 +45,7 @@ window.preload = function () {
     assets.background = loadImage('/assets/Background/MainBackground.png');
     assets.stage = loadImage('/assets/Background/Stage.png');
     assets.stagelights = loadImage('/assets/Background/StageLights.png');
+    assets.audience = loadImage('/assets/Background/audience.png');
     
     //podiums are in front of animated contestants
     assets.podium1 = loadImage('/assets/Background/PodiumYellow Resized0.png');
@@ -106,8 +108,15 @@ window.draw = function () {
     syncGameState();
 
     drawContestant();
-    drawHost()
+
     drawHUD();
+
+    podiumLight1();
+    podiumLight2();
+    podiumLight3();
+    podiumLight4()
+
+    drawHost();
     if(state.cheatVis) drawCheat();
     drawApplause()
     if(state.applauseVis) drawApplauseON()
@@ -141,6 +150,9 @@ function drawBackground() {
     }
     if (assets.stagelights) {
         image(assets.stagelights, 0, -45, width, height/3);
+    }
+    if(assets.audience) {
+        image(assets.audience, width/15, height/1.65, width, height/2.55);
     }
 }
 
@@ -288,29 +300,31 @@ function drawZoom() {
    else image(assets.light, -300, (height / 3) - 75, lightWidth, lightHeight)
   }*/
 
-// function podiumLight1(){
-//     if(assets.podiumlit1){
-//         image(assets.podiumlit1, 80,40, width/4, height/4)
-//     }
-// }
-// function podiumLight2(){
-//     if(assets.podiumlit2){
-//         image(assets.podiumlit1, 100,40, width/4, height/4)
-//     }
+function podiumLight1(){
+     if(assets.podiumlit1){
+         image(assets.podiumlit1, 345,-50, width/3, height)
+     }
+ }
+
+ function podiumLight2(){
+    if(assets.podiumlit2){
+       image(assets.podiumlit2, 241,-50, width/3, height)
+   }
+}
     
-// }
-// function podiumLight3(){
-//     if(assets.podiumlit3){
-//         image(assets.podiumlit3, 120,40, width/4, height/4)
-//     }
-    
-// }
-// function podiumLight4(){
-//     if(assets.podiumlit4){
-//         image(assets.podiumlit4, 180,40, width/4, height/4)
-//     }
-    
-// }
+
+ function podiumLight3(){
+     if(assets.podiumlit3){
+         image(assets.podiumlit3, 635,-50, width/3, height)
+    }
+ }
+ function podiumLight4(){
+     if(assets.podiumlit4){
+        image(assets.podiumlit4, 565,-50, width/3, height)
+     }
+ }
+
+
 function drawRatings(x, y) {
     let ratingsFilled = state.rating || 10
     if (ratingsFilled > 200) ratingsFilled = 200
