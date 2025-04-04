@@ -160,9 +160,6 @@ const syncGameState = async () => {
         getState().then(newState => state = newState);
     }
     updateLightPosition()
-    if (frameCount % 60 === 0) { // Every second
-        state = await getState();
-    }
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
     }
@@ -301,12 +298,8 @@ function drawHands() {
 }
 
 function updateCheat() {
-    showCheat()
-
     if (state.cheatVis){ showCheat()}
-   // if (!state.cheatVis ) { hideCheat()}
-   
-    //if(cheatBtnPress) hideCheat()
+    if (!state.cheatVis ) { hideCheat()}
 }
  
   
