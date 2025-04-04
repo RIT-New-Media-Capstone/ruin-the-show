@@ -2,25 +2,17 @@ let state;
 
 //Sprite Sheet Animation Variables for Contestants
 let al;
-let hostXPos = 0;
-let p1idleSS;
-let p2idleSS;
-let p3idleSS;
-let p4idleSS;
-let frameWidth = 1922;
-let frameHeight = 1082;
-let cols = 5;
-let rows = 4;
-let totalFrames = cols * rows;
+let contestantFrames = [];
 let currentFrame = 0;
-let frameRateSpeed = 10;
-const scaleFactor = 0.25;
-let startTime;
-let timerDuration;
-let elaspedTime;
+let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
+const numRows = 5;
+const numCols = 4;
+const totalFrames = numRows * numCols;
+const frameWidth = 7688 / numCols;
+const frameHeight = 5410 / numRows;
+
 
 const assets = {
-
     background: "",
     stage: "",
     stagelights: "",
@@ -30,6 +22,7 @@ const assets = {
     podium4: "",
     stars: "",
     timer: "",
+    contestants: "",
     cheat: "",
     curtains: "",
 }
@@ -58,14 +51,28 @@ window.preload = function () {
     assets.timer = loadImage('/assets/Background/Timer.png');
 
     //AL 
-    al = loadImage('/assets/SpriteSheets/AL/AL_Talk_R.png'); // should be idle sprite but its not working
-    
+    al = loadImage('/assets/SpriteSheets/Al/AL_Talk_R.png'); // should be idle sprite but its not working
     
     //CONTESTANT ANIMATIONS
-    p1idleSS = loadImage('/assets/SpriteSheets/p1/P1_Idle.png');
-    p2idleSS = loadImage('/assets/SpriteSheets/p2/P2_Idle.png');
-    p3idleSS = loadImage('/assets/SpriteSheets/p3/P3_Idle.png');
-    p4idleSS = loadImage('/assets/SpriteSheets/p4/P4_Idle.png');
+    assets.contestants = [];
+    contestantFrames = [];
+    for (let i = 1; i <= 4; i++) {
+        let sheet = loadImage(`/assets/SpriteSheets/p${i}/P${i}_Idle.png`);
+        assets.contestants.push(sheet);
+
+        // Preload frames for smoother animation
+        let frames = [];
+        for (let frame = 0; frame < totalFrames; frame++) {
+            let row = Math.floor(frame / numCols);
+            let col = frame % numCols;
+            frames.push({
+                sx: col * frameWidth,
+                sy: row * frameHeight,
+                sheet,
+            });
+        }
+        contestantFrames.push(frames);
+    }
 
     assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
     assets.applause = loadImage('/assets/Interactions/applause/AudiencePopIn_OFF.png');
@@ -73,40 +80,24 @@ window.preload = function () {
     assets.podiumlit1 = loadImage('/assets/Interactions/podiums/1light_WhitePodium.png');
     assets.podiumlit2 = loadImage('/assets/Interactions/podiums/2light_YellowPodium.png');
     assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
-    assets.podiumlit3 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
+    assets.podiumlit4 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
     assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
 }
 
 window.setup = function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
-    frameRate(frameRateSpeed);
+    frameRate(30);
     state = getState();
-    let startTime = millis();
-    timerDuration = 60;
 }
 
 window.draw = function () {
     background(255);
     drawBackground();
 
-    let row = currentFrame % rows;
-    let col = Math.floor(currentFrame / rows);
-    let sx = col * frameWidth;
-    let sy = row * frameHeight;
-    let newWidth = frameWidth * scaleFactor;
-    let newHeight = frameHeight * scaleFactor;
-   
-    image(p1idleSS, 270, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-    image(p2idleSS, 400, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-    image(p3idleSS, 600, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-    image(p4idleSS, 750, 250, newWidth, newHeight, sx, sy, frameWidth, frameHeight);
-    currentFrame = (currentFrame + 1) % totalFrames; // Looping Animation
-
     syncGameState();
 
-    //draw rest of background here
-    drawPodiums();
+    drawContestant();
     drawHUD();
     if(state.cheatVis) drawCheat();
     drawApplause()
@@ -114,18 +105,15 @@ window.draw = function () {
     
     updateCheat()
 
-
-    //drawHost()
-    // podiumLight1()
-    // podiumLight2()
-    // podiumLight3()
-    // podiumLight4()
-    //displayTimer();
-    if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
+    text(`FPS: ${frameRate().toFixed(2)}`, 10, 30); //FPS ON SCREEN
+    //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
 }
 
 const syncGameState = async () => {
     // Sync variables with gamestate
+    if (frameCount % 30 === 0) { // Update twice per second
+        getState().then(newState => state = newState);
+    }
     updateLightPosition()
     if (frameCount % 60 === 0) { // Every second
         state = await getState();
@@ -144,18 +132,45 @@ function drawBackground() {
     }
 }
 
+function drawContestant() {
+    let x = 270;
+    const y = 240;
+    const spacing = 160;
+    let scaleFactor = 0.20;
+
+    assets.contestants.forEach((sheet, index) => {
+        let frame = contestantFrames[index][currentFrame];
+
+        if (frame && frame.sheet) {
+            image(
+                frame.sheet,
+                x + index * spacing, y, // Destination position
+                frameWidth * scaleFactor, frameHeight * scaleFactor, // Destination size
+                frame.sx, frame.sy, frameWidth, frameHeight // Source position & size from sprite sheet
+            );
+        }
+    });
+
+    drawPodiums();
+
+    // Update frame only every few draw cycles
+    if (frameCount % frameDelay === 0) {
+        currentFrame = (currentFrame + 1) % totalFrames;
+    }
+}
+
 function drawPodiums() {
     if (assets.podium1) {
         image(assets.podium1, width/4.5, height/2 + 20, width/4, height/4);
     }
     if (assets.podium2) {
-        image(assets.podium2, width/3, height/2 + 20, width/4, height/4);
+        image(assets.podium2, width/2.93, height/2 + 20, width/4, height/4);
     }
     if (assets.podium3) {
-        image(assets.podium3, width/2.2, height/2 + 20, width/4, height/4);
+        image(assets.podium3, width/2.16, height/2 + 20, width/4, height/4);
     }
     if (assets.podium4) {
-        image(assets.podium4, width/1.75, height/2 + 20, width/4, height/4);
+        image(assets.podium4, width/1.74, height/2 + 20, width/4, height/4);
     }
 }
 
@@ -186,9 +201,9 @@ function drawCheat(){
 }
 
 function drawApplause(){
- if(assets.applause){
-    image(assets.applause,width/2, -50, width/4, height/4)
- }
+    if(assets.applause){
+        image(assets.applause,width/2, -50, width/4, height/4)
+    }
 }
 
 function drawApplauseON(){
@@ -218,27 +233,6 @@ function drawHost(sx, sy){
     }
 
     //image(al, 180,500, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
-}*/
-
-/*
-function drawContestant(sx,sy){
-
-   let x = 275
-   const y = 250
-   const spacing = 150
-   const contestantWidth = frameWidth * scaleFactor * 0.75
-   const contestantHeight = frameHeight * scaleFactor * 0.75
-   
-   assets.contestants.forEach(contestant => {
-        image(contestant, x, y, contestantWidth, contestantHeight, sx, sy, frameWidth, frameHeight)
-    
-        const podiumWidth = assets.podium.width / 4
-        const podiumHeight = assets.podium.height / 4
-        const podiumX = x + contestantWidth / 3 + 10
-        const podiumY = y + contestantHeight - 25
-
-        image(assets.podium, podiumX, podiumY, podiumWidth, podiumHeight)
-   });
 }*/
 
 function drawZoom() {
