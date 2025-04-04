@@ -220,13 +220,13 @@ function updateCheat() {
 }
  
   
-
+//draw host sprite and calls animations based of state
 function drawHost(sx, sy){
     //if host is in idle then call idle positions and state
     let x = 100;
-    const y = height/4;
+    const y = height/2.4;
    // const spacing = 160;
-    let scaleFactor = 0.20;
+    let scaleFactor = 0.38;
 
     //const alY = height / 2.25
     const alWidth = frameWidth * scaleFactor;
@@ -234,7 +234,7 @@ function drawHost(sx, sy){
 
     image(al, x, y, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
    
-    //hostXPos += speed;
+    //x += speed;
   
     // Reverse direction 
    //if (hostXPos >= width + alWidth || hostXPos <= 0 - alWidth) {
