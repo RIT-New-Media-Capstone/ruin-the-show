@@ -248,10 +248,11 @@ function drawCountdown() {
 
 
 //display right wrong light
-function drawRWLight(){
-    //if()
-    image(assets.rightLit, 200, 100, width/3, height/1.5);
-    image(assets.wrongLit, 205, 123, width/3, height/1.5);
+function drawRWLight(x,y){
+    //if(assets.rightLit){ image(assets.rightLit, x, y, width/3, height/1.5);}
+    //if(assets.wrongLit){}
+    image(assets.rightLit, 393, 100, width/3, height/1.5);
+    image(assets.wrongLit, 243, 123, width/3, height/1.5);
 
 }
 
