@@ -15,6 +15,8 @@ let countdownFont;
 let countdown = 60;
 let countdownTimer;
 
+let cheatBtnPress
+
 const assets = {
     audience: "",
     background: "",
@@ -33,6 +35,10 @@ const assets = {
     timer: "",
     
 }
+
+//import{
+    //cheatButtonPressed,
+//} from "arduino/panel.js";
 
 import {
     getState,
@@ -293,6 +299,7 @@ function drawHands() {
 
 function updateCheat() {
     showCheat()
+    if(cheatBtnPress) hideCheat()
 }
  
   

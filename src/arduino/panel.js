@@ -184,5 +184,5 @@ const turnOffApplauseLED = () => {
 }
 
 export { turnOnCheatLED, turnOnApplauseLED, turnOffCheatLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED, }
-
+//export { cheatButtonPressed }
 serialSetup();
