@@ -15,8 +15,6 @@ let countdownFont;
 let countdown = 60;
 let countdownTimer;
 
-let cheatBtnPress
-
 const assets = {
     audience: "",
     background: "",
@@ -35,11 +33,6 @@ const assets = {
     timer: "",
     
 }
-/*
-import{
-    cheatButtonPress,
-} from "server/game.js";
-*/ 
 
 import {
     getState,
@@ -123,16 +116,11 @@ window.setup = function () {
 window.draw = function () {
     background(255);
     drawBackground();
-
-
-    setInterval(promptCheat, 10000);
-
     syncGameState();
 
     drawContestant();
     drawRWLight();
     drawPodiums();
-
     drawHUD();
 
     podiumLight1();
@@ -141,21 +129,13 @@ window.draw = function () {
     podiumLight4()
     spotlight();
 
-   
-    
     drawHost();
     if(state.cheatVis) drawCheat();
     drawApplause()
     if(state.applauseVis) drawApplauseON()
-    
-    //updateCheat()
-    //console.log("this is uupdate", updateCheat())
-   
 
     drawHands();
     drawAudience();
-
-    //console.log("they pressed meeeee ", cheatButtonPress);
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
@@ -170,9 +150,7 @@ const syncGameState = async () => {
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
     }
-
     updateCheat()
-    console.log("im in sync rn ")
 }
 
 function drawBackground() {
@@ -198,7 +176,6 @@ function drawContestant() {
     const y = 240;
     const spacing = 160;
     let scaleFactor = 0.20;
-
     assets.contestants.forEach((sheet, index) => {
         let frame = contestantFrames[index][currentFrame];
 
@@ -265,8 +242,6 @@ function drawCountdown() {
 
 //display right wrong light
 function drawRWLight(x,y){
-    //if(assets.rightLit){ image(assets.rightLit, x, y, width/3, height/1.5);}
-    //if(assets.wrongLit){}
     image(assets.rightLit, 393, 100, width/3, height/1.5);
     image(assets.wrongLit, 243, 123, width/3, height/1.5);
 
@@ -288,15 +263,6 @@ function drawCheat(){
     }
     
 }
-function promptCheat() {
-    console.log("Prompting cheat...");
-    state.cheatVis  = true
-  
-    // Turn off cheat prompt after 5 seconds
-    setTimeout(() => {
-      state.cheatVis = false;
-    }, 10000);
-  }
 
 function drawApplause(){
     if(assets.applause){
@@ -319,7 +285,6 @@ function drawHands() {
 function updateCheat() {
     if (state.cheatVis){ showCheat()}
     if (!state.cheatVis ) { hideCheat()}
-    console.log("vis" , state.cheatVis, "show", showCheat(), "hide", hideCheat())
 }
  
   
@@ -328,7 +293,7 @@ function drawHost(sx, sy){
     //if host is in idle then call idle positions and state
     let x = 100;
     const y = height/2.4;
-   // const spacing = 160;
+    //const spacing = 160;
     let scaleFactor = 0.38;
     let frameSpeed = 2
     //const alY = height / 2.25
@@ -345,30 +310,13 @@ function drawHost(sx, sy){
     if (frameCount % frameDelay === 0) {
         currentFrame = (currentFrame + 1) % totalFrames;
     }
-    //x += speed;
-  
-    // Reverse direction 
-   //if (hostXPos >= width + alWidth || hostXPos <= 0 - alWidth) {
-     // speed *= -1;  // Flip the direction
-    //}
-
-    //image(al, 180,500, newWidth, newHeight, sx, sy, frameWidth, frameHeight)
 }
 
 function drawZoom() {
     textSize(48);
     fill("black");
     if (state.zoom) text(`Zoom: ${state.zoom}`, windowWidth - 350, 75);
-  }
-
-  /*
-  function drawLights(){
-
-   const lightWidth = assets.light.width / 4
-   const lightHeight = assets.light.height / 4
-   if (state.lightPosX) image(assets.light, state.lightPosX, height / 4, lightWidth, lightHeight)
-   else image(assets.light, -300, (height / 3) - 75, lightWidth, lightHeight)
-  }*/
+}
 
 function spotlight(){
     if(assets.spotlight){
@@ -381,13 +329,11 @@ function podiumLight1(){
         image(assets.podiumlit1, 345,-50, width/3, height)
     }
 }
-
 function podiumLight2(){
     if(assets.podiumlit2){
         image(assets.podiumlit2, 241,-50, width/3, height)
     }
 }
-
 function podiumLight3(){
     if(assets.podiumlit3){
         image(assets.podiumlit3, 635,-50, width/3, height)
@@ -399,7 +345,7 @@ function podiumLight4(){
     }
 }
 
-
+/*
 function drawRatings(x, y) {
     let ratingsFilled = state.rating || 10
     if (ratingsFilled > 200) ratingsFilled = 200
@@ -412,23 +358,4 @@ function drawRatings(x, y) {
     rect(x - 20, y - 25, ratingsFilled, 50)
     image(assets.stars, x - 30, y - 25, 220, 50)
   
-  }
-  
-//TODO check again
-function drawStar(x, y, size, fillAmount) {
-push();
-translate(x, y);
-stroke(0);
-fill(fillAmount > 0 ? color(255, 204, 0) : 255); // Fill yellow if filled
-beginShape();
-for (let i = 0; i < 10; i++) {
-    let angle = PI / 5 * i;
-    let radius = (i % 2 === 0) ? size / 2 : size / 4;
-    let sx = cos(angle) * radius;
-    let sy = sin(angle) * radius;
-    vertex(sx, sy);
-}
-endShape(CLOSE);
-pop();
-}
-
+} */
