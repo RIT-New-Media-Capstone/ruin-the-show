@@ -40,7 +40,6 @@ const serialSetup = () => {
 
         if (data.startsWith("Game Controller")) game.rfidScan()
 
-
         // Get which input
         // logic to change based on how we send serial data 
         if (data == "CHEAT_PRESSED") cheatButtonPressed();
@@ -53,8 +52,7 @@ const serialSetup = () => {
         else if (data == "JOYSTICK_RIGHT") lightsMoved(1);
         else if (data.startsWith("LEVER_VALUE:")) leverRotated(data.substring(15))
         else if (data.lastIndexOf("ACK") === -1) console.log(data) // if it isn't ack 
-    })
-
+    });
 }
 
 const cheatIncrement = 5;
@@ -65,7 +63,6 @@ const cheatButtonPressed = () => {
     let prompted = game.getCheatState()
     if(prompted) game.updateRatings(cheatIncrement)
     else game.updateRatings(-cheatIncrement)
-
     hideCheat()
 }
 
@@ -127,62 +124,25 @@ const turnOffPodiumLED = (podiumNum) => {
     }
 }
 
-const turnOnCheatLED = () => {
+const setLEDState = (type, action) => {
     if (port && port.isOpen) {
-        port.write('CHEAT_LED_ON\r\n', (err) => {
+        const command = `${type}_LED_${action}`;
+        port.write(`${command}\r\n`, (err) => {
             if (err) {
                 console.error('Error sending data:', err);
             } else {
-                console.log('Sent "CHEAT_LED_ON" to Arduino');
+                console.log(`Sent "${command}" to Arduino`);
             }
         });
     } else {
-        console.error('Serial port not open. Cannot send CHEAT_LED_ON');
+        console.error('Serial port not open. Cannot send LED state');
     }
-}
+};
 
-const turnOffCheatLED = () => {
-    if (port && port.isOpen) {
-        port.write('CHEAT_LED_OFF\r\n', (err) => {
-            if (err) {
-                console.error('Error sending data:', err);
-            } else {
-                console.log('Sent "CHEAT_LED_OFF" to Arduino');
-            }
-        });
-    } else {
-        console.error('Serial port not open. Cannot send CHEAT_LED_OFF');
-    }
-}
-
-const turnOnApplauseLED = () => {
-    if (port && port.isOpen) {
-        port.write('APPLAUSE_LED_ON\r\n', (err) => {
-            if (err) {
-                console.error('Error sending data:', err);
-            } else {
-                console.log('Sent "APPLAUSE_LED_ON" to Arduino');
-            }
-        });
-    } else {
-        console.error('Serial port not open. Cannot send APPLAUSE_LED_ON');
-    }
-}
-
-const turnOffApplauseLED = () => {
-    if (port && port.isOpen) {
-        port.write('APPLAUSE_LED_OFF\r\n', (err) => {
-            if (err) {
-                console.error('Error sending data:', err);
-            } else {
-                console.log('Sent "APPLAUSE_LED_OFF" to Arduino');
-            }
-        });
-    } else {
-        console.error('Serial port not open. Cannot send APPLAUSE_LED_OFF');
-    }
-}
+const turnOnCheatLED = () => setLEDState('CHEAT', 'ON');
+const turnOffCheatLED = () => setLEDState('CHEAT', 'OFF');
+const turnOnApplauseLED = () => setLEDState('APPLAUSE', 'ON');
+const turnOffApplauseLED = () => setLEDState('APPLAUSE', 'OFF');
 
 export { turnOnCheatLED, turnOnApplauseLED, turnOffCheatLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED, }
-//export { cheatButtonPressed }
 serialSetup();

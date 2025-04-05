@@ -220,7 +220,7 @@ const getAllowedInteractions = () => {
 
 
 const triggerCheatButton = () => {
-    
+    state.cheat.cheatOn = true
     showCheat()
     turnOnCheatLED()
 }

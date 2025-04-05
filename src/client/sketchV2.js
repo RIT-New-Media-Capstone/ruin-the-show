@@ -1,4 +1,12 @@
-let state;
+let state = {
+    cheat: {
+        cheatOn: false
+    },
+    cheatVis: false,
+    applauseVis: false,
+    ratings: 0,
+    // ... add anything else your UI checks
+};
 
 //Sprite Sheet Animation Variables for Contestants
 let al;
@@ -104,13 +112,12 @@ window.preload = function () {
     assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
 }
 
-window.setup = function () {
+window.setup = async function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
-    state = getState();
-
-    countdownTimer = countdown; // Initialize the countdown
+    state = await getState(); // <- WAIT for the promise to resolve
+    countdownTimer = countdown;
 }
 
 window.draw = function () {
@@ -130,7 +137,7 @@ window.draw = function () {
     spotlight();
 
     drawHost();
-    if(state.cheatVis) drawCheat();
+    //if(state.cheatVis) drawCheat();
     drawApplause();
     if(state.applauseVis) drawApplauseON();
 
@@ -147,7 +154,16 @@ window.draw = function () {
 const syncGameState = async () => {
     // Sync variables with gamestate
     if (frameCount % 30 === 0) { // Update twice per second
-        getState().then(newState => state = newState);
+        getState().then(newState => {
+            state = {
+                ...state,
+                ...newState,
+                cheat: {
+                    ...state.cheat,
+                    ...newState.cheat
+                }
+            };
+        });
     }
     updateLightPosition()
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
@@ -231,9 +247,10 @@ function drawHUD() {
 }
 
 function drawCountdown() {
-    let minutes = Math.floor(countdownTimer / 60); // Get minutes
-    let seconds = countdownTimer % 60; // Get seconds
-    let timeString = nf(minutes, 2) + ':' + nf(seconds, 2); // Format as MM:SS
+    let safeCountdown = countdownTimer || 0;
+    let minutes = Math.floor(safeCountdown / 60);
+    let seconds = safeCountdown % 60;
+    let timeString = nf(minutes, 2) + ':' + nf(seconds, 2);
 
     fill('black');
     textFont(countdownFont);
@@ -259,7 +276,8 @@ function drawRWLight(x,y){
 
 // displays cheat asset
 function drawCheat(){
-    if(assets.cheat) {
+    if (assets.cheat && state?.cheat?.cheatOn) {
+        console.log("Test");
         image(assets.cheat, 0, 100, width/3, height/1.5);
     }
 }
