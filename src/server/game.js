@@ -7,18 +7,23 @@ const baseCheat = {
         threshold: 0.50, 
         delayMaxTime: 10000, 
         maxTime: 2500, 
-    }
+    },
+    '2': {
+        threshold: 0.60,
+        delayMaxTime: 8000,
+        maxTime: 2500
+    },
 }
 
 const user = { id: "DEFAULT", score: 0 } // from the RFID band
 const state = {
-    difficulty: 1, ratings: baseRatings['1'], lightPosition: lightStartingPos, zoom: zoomStart, isGameOver: false,
+    difficulty: 2, ratings: baseRatings['2'], lightPosition: lightStartingPos, zoom: zoomStart, isGameOver: false, lastInputTime: Date.now(),
     cheat: {
         cheatTimer: 0,
-        threshold: baseCheat['1'].threshold,
-        delayMaxTime: 10000,
+        threshold: baseCheat['2'].threshold,
+        delayMaxTime: 8000,
         onTimer: 0,
-        maxTime: 2500,
+        maxTime: 5000,
         cheatOn: false,
     },
     applause: {
@@ -26,7 +31,7 @@ const state = {
         threshold: 0.75,
         delayMaxTime: 3000,
         onTimer: 0,
-        maxTime: 10000,
+        maxTime: 5000,
         x: -1,
         applauseOn: false,
     },
@@ -37,7 +42,7 @@ const state = {
         threshold: 0.5,
         delayMaxTime: 10000, 
         onTimer: 0, 
-        maxTime: 2000,
+        maxTime: 5000,
         lightOn: false,
     },
     timer: {
@@ -62,7 +67,7 @@ const rfidScan = (userId, userScore) => {
 
 const newGame = () => {
     // reset all variables & state
-    state.difficulty = selectDifficulty()
+    state.difficulty = 2
     state.ratings = baseRatings[state.difficulty]
 
     console.log("Difficulty: " + state.difficulty)
@@ -75,85 +80,63 @@ const newGame = () => {
 
 const startGame = () => {
     state.timer.lastTime = Date.now()
-
     const game = () => {
         const currentTime = Date.now()
         const deltaTime = currentTime - state.timer.lastTime
         state.timer.lastTime = currentTime
         state.timer.gameTime += deltaTime
 
-        // Every 5 seconds, 50% chance cheat button triggers
+        // Inactivity check
+        if (currentTime - state.lastInputTime > 30000) return gameOver()
+        if (currentTime - state.lastInputTime > 15000 && (state.timer.gameTime - deltaTime) < 15000) {
+            console.log("Warning: No input detected")
+        }
+
+        // CHEAT logic
         if (!state.cheat.cheatOn) {
             state.cheat.cheatTimer += deltaTime
-
-            if (state.cheat.cheatTimer > state.cheat.delayMaxTime) {
-                const chance = Math.random()
-                if (chance < state.cheat.threshold) {
-                    state.cheat.cheatTimer = 0
-                    triggerCheatButton()
-                    console.log("CHEAT!")
-                }
+            if (state.cheat.cheatTimer > state.cheat.delayMaxTime && Math.random() < state.cheat.threshold) {
+                state.cheat.cheatTimer = 0
+                triggerCheatButton()
+                console.log("CHEAT!")
             }
-        }
-        // If the cheat button is on for 2.5 seconds, turn it off 
-        else {
+        } else {
             state.cheat.onTimer += deltaTime
-            if (state.cheat.onTimer > state.cheat.maxTime) {
-                state.cheat.onTimer = 0
-                turnOffCheatButton()
-            }
+            if (state.cheat.onTimer > state.cheat.maxTime) turnOffCheatButton()
         }
 
-        // Every 3 seconds, 75% chance applause button triggers
-        if(!state.applause.applauseOn) {
+        // APPLAUSE logic
+        if (!state.applause.applauseOn) {
             state.applause.applauseTimer += deltaTime
-            if (state.applause.applauseTimer > state.applause.delayMaxTime) {
-                const chance = Math.random()
-                if (chance < state.applause.threshold) {
-                    state.applause.applauseTimer = 0
-                    state.applause.x = Math.random()
-                    triggerApplauseButton()
-                    console.log("Applause!")
-                }
+            if (state.applause.applauseTimer > state.applause.delayMaxTime && Math.random() < state.applause.threshold) {
+                state.applause.applauseTimer = 0
+                state.applause.x = Math.random()
+                triggerApplauseButton()
+                console.log("Applause!")
             }
-        }
-        // If the applause button is on for 10 seconds, turn it off
-        else {
+        } else {
             state.applause.onTimer += deltaTime
-            if (state.applause.onTimer > state.applause.maxTime) {
-                state.applause.onTimer = 0
-                turnOffApplauseButton()
-            }
+            if (state.applause.onTimer > state.applause.maxTime) turnOffApplauseButton()
         }
 
-        // Every 10 seconds, 50% chance a podium button triggers
-        if(!state.podium.lightOn) {
+        // PODIUM logic
+        if (!state.podium.lightOn) {
             state.podium.lightTimer += deltaTime
-            if (state.podium.lightTimer > state.podium.delayMaxTime) {
-                const chance = Math.random()
-                if (chance < state.podium.threshold) {
-                    state.podium.lightTimer = 0
-                    triggerPodiumButton(state.podium.index)
-                    console.log(`Podium ${state.podium.index} lit up!`)
-                    state.podium.index++
-                    if (state.podium.index > state.podium.totalPodiums) state.podium.index = 1;
-                }
+            if (state.podium.lightTimer > state.podium.delayMaxTime && Math.random() < state.podium.threshold) {
+                state.podium.lightTimer = 0
+                triggerPodiumButton(state.podium.index)
+                console.log(`Podium ${state.podium.index} lit up!`)
+                state.podium.index = (state.podium.index % state.podium.totalPodiums) + 1
             }
-        }
-        // If the podium button is on for 2 seconds, turn it off
-        else {
+        } else {
             state.podium.onTimer += deltaTime
-            if (state.podium.onTimer > state.podium.maxTime) {
-                state.podium.onTimer = 0
-                turnOffPodiumButton(state.podium.index)
-            }
+            if (state.podium.onTimer > state.podium.maxTime) turnOffPodiumButton(state.podium.index)
         }
 
-        if(state.timer.gameTime > 600000) return gameOver()
+        if (state.timer.gameTime > 60000) return gameOver() // 1 min
 
         setImmediate(game)
     }
-
     game()
 }
 
@@ -161,51 +144,23 @@ const resetState = () => {
     state.lightPosition = lightStartingPos
     state.zoom = zoomStart
 
-    // reset cheat params based on difficulty
-    state.cheat.cheatTimer = 0
-    state.cheat.cheatOn = false
-    state.cheat.delayMaxTime = 10000
-    state.cheat.maxTime = 2500
-    state.cheat.onTimer = 0
-    state.cheat.threshold =  baseCheat[state.difficulty].threshold
-
-    // reset applause params based on difficulty
-    state.applause.applauseOn = false
-    state.applause.applauseTimer = 0
-    state.applause.delayMaxTime = 3000
-    state.applause.maxTime = 10000
-    state.applause.onTimer = 0
-    state.applause.threshold = 0.75
-    state.applause.x = -1
+    state.cheat = { ...state.cheat, cheatTimer: 0, cheatOn: false, delayMaxTime: 8000, maxTime: 5000, onTimer: 0, threshold: baseCheat[state.difficulty].threshold }
+    state.applause = { ...state.applause, applauseOn: false, applauseTimer: 0, delayMaxTime: 3000, maxTime: 5000, onTimer: 0, threshold: 0.75, x: -1 }
+    state.podium = { ...state.podium, lightOn: false, lightTimer: 0, delayMaxTime: 10000, maxTime: 5000, onTimer: 0, index: 1 }
+    state.timer = { lastTime: 0, gameTime: 0 }
+    state.lastInputTime = Date.now()
 }
 
 const gameOver = () => {
-    state.isGameOver = true
+    //state.isGameOver = true
+    console.log("Game Over")
 }
 
 const selectDifficulty = () => {
     // this should prompt the user for which level they want 
-    // for now, we only have 1 difficulty, so return 1
-    return 1;
+    // for now, we only have 1 difficulty, so return 2
+    return 2;
 }
-
-/*
-
-// function that limits the current interaction based of the users cureent score 
-const getAllowedInteractions = () => {
-    const score = user.score
-    if (score >= 0 && score < 20) {
-        return { applause: true, lights: true, cheat: false, podium: false, lever: false}
-    } else if (score >= 20 && score < 40) {
-        return {applause: true, lights: true, cheat: false, podium: false, lever: false }
-    } else if (score >= 40 && score < 60) {
-        return { applause: true, lights: true, cheat: true, podium: true, lever: false}
-    } else if (score >= 60 && score < 100) {
-        return { applause: true, lights: true, cheat: true, podium: true, lever: false}
-    } else {
-        return { applause: false, lights: false ,cheat: false, podium: false, gameOver: true }
-    }
-}*/
 
 
 const triggerCheatButton = () => {
@@ -247,16 +202,37 @@ const turnOffPodiumButton = (index) => {
     console.log(`Podium ${index} light - off`)
 }
 
+const registerInput = (type) => {
+    state.lastInputTime = Date.now()
+    switch(type) {
+        case 'applause':
+            if (state.applause.applauseOn) user.score += 10
+            else user.score -= 5
+            break
+        case 'cheat':
+            if (state.cheat.cheatOn) user.score += 10
+            else user.score -= 5
+            break
+        case 'podium':
+            if (state.podium.lightOn) user.score += 10
+            else user.score -= 5
+            break
+        default:
+            break
+    }
+    console.log(`Score: ${user.score}`)
+}
 
-const getRatings = () => { return state.ratings }
+
+const getRatings = () => state.ratings
 const updateRatings = (value) => { state.ratings += value }
-const getDifficulty = () => { return state.difficulty }
+const getDifficulty = () => state.difficulty
 const changeLights = (value) => { state.lightPosition += value }
-const getLights = () => { return state.lightPosition }
-const getZoom = () => { return state.zoom }
+const getLights = () => state.lightPosition
+const getZoom = () => state.zoom
 const updateZoom = (value) => { state.zoom = value }
-const getApplauseX = () => { return state.applause.x }
-const getCheatState = () => { return state.cheat.cheatOn }
-const getGameOver = () => { return state.isGameOver }
+const getApplauseX = () => state.applause.x
+const getCheatState = () => state.cheat.cheatOn
+const getGameOver = () => state.isGameOver
 
-export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState,  getGameOver, };
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState, getGameOver, registerInput }

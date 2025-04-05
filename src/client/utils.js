@@ -40,23 +40,13 @@ const updateLightPosition = async () => {
     lightPosX = state.lights;
 };
 
-const promptCheat = async () => {
-    const response = await fetch('/triggerCheatButton');
-    const trigcheat = await response.json();
-    console.log("prompting")
-    return trigcheat.cheatVis = true;
-    
-    
-}
-
 const updateCheat = async () => {
     const response = await fetch('/getState');
     const state = await response.json();
-    if (state.cheatVis){
+    if ( showCheat()){
         hideCheat()
     } 
 }
-
 
 const lightUpPodium = (index) => {
     // fill out 
@@ -98,6 +88,5 @@ export {
     getState,
     lightUpPodium,
     hidePodiumLight,
-    promptCheat,
     updateCheat,
 };
