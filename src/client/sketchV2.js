@@ -124,6 +124,9 @@ window.draw = function () {
     background(255);
     drawBackground();
 
+
+    setInterval(promptCheat, 10000);
+
     syncGameState();
 
     drawContestant();
@@ -138,8 +141,8 @@ window.draw = function () {
     podiumLight4()
     spotlight();
 
-
-    state.cheatVis = true;
+   
+    
     drawHost();
     if(state.cheatVis) drawCheat();
     drawApplause()
@@ -147,7 +150,7 @@ window.draw = function () {
     
     //updateCheat()
     //console.log("this is uupdate", updateCheat())
-    setInterval(promptCheat, 5000);
+   
 
     drawHands();
     drawAudience();
@@ -287,12 +290,12 @@ function drawCheat(){
 }
 function promptCheat() {
     console.log("Prompting cheat...");
-    showCheat = true;
+    state.cheatVis  = true
   
-    // Turn off cheat prompt after 2 seconds
+    // Turn off cheat prompt after 5 seconds
     setTimeout(() => {
-      showCheat = false;
-    }, 2000);
+      state.cheatVis = false;
+    }, 10000);
   }
 
 function drawApplause(){
