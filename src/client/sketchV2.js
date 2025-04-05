@@ -62,7 +62,7 @@ window.preload = function () {
     countdownFont = loadFont('/assets/Fonts/Poppins-ExtraLight.ttf');
 
     //AL 
-    al = loadImage('/assets/SpriteSheets/AL/AL_idle.png'); // 
+    al = loadImage('/assets/SpriteSheets/AL/AL_idle.png'); 
     
     //CONTESTANT ANIMATIONS
     assets.contestants = [];
@@ -131,8 +131,11 @@ window.draw = function () {
 
     drawHost();
     if(state.cheatVis) drawCheat();
-    drawApplause()
-    if(state.applauseVis) drawApplauseON()
+    drawApplause();
+    if(state.applauseVis) drawApplauseON();
+
+    //CUE CARD FOR CHEAT
+    drawCheat();
 
     drawHands();
     drawAudience();
@@ -239,29 +242,26 @@ function drawCountdown() {
     text(timeString, 160, 67); 
 }
 
-
-//display right wrong light
-function drawRWLight(x,y){
-    image(assets.rightLit, 393, 100, width/3, height/1.5);
-    image(assets.wrongLit, 243, 123, width/3, height/1.5);
-
-}
-
 function updateCountdown() {
     if (countdownTimer > 0) {
         countdownTimer -= 1; // Decrease by one second
     }
 }
 
+//display right wrong light
+function drawRWLight(x,y){
+    //X-Coordinates for each podium
+    //(243), (393), (563), (707)
+    image(assets.rightLit, 393, 100, width/3, height/1.5);
+    image(assets.wrongLit, 243, 123, width/3, height/1.5);
+
+}
 
 // displays cheat asset
 function drawCheat(){
-    if(state.cheatVis){
-        if(assets.cheat) {
-            image(assets.cheat, 0, 100, width/3, height/1.5);
-        }
+    if(assets.cheat) {
+        image(assets.cheat, 0, 100, width/3, height/1.5);
     }
-    
 }
 
 function drawApplause(){
@@ -283,7 +283,7 @@ function drawHands() {
 }
 
 function updateCheat() {
-    if (state.cheatVis){ showCheat()}
+    if (state.cheatVis) { showCheat()}
     if (!state.cheatVis ) { hideCheat()}
 }
  
