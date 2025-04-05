@@ -37,6 +37,8 @@ const assets = {
 import {
     getState,
     updateLightPosition,
+    promptCheat,
+    updateCheat,
 } from "./utils.js";
   
 window.preload = function () {
@@ -112,6 +114,7 @@ window.draw = function () {
     background(255);
     drawBackground();
     syncGameState();
+    console.log(state);
 
     drawContestant();
     drawRWLight();
@@ -140,6 +143,8 @@ const syncGameState = async () => {
     // Sync variables with gamestate
     state = await getState();
     updateLightPosition()
+    promptCheat();
+    updateCheat();
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
     }
