@@ -277,7 +277,6 @@ function drawRWLight(x,y){
 // displays cheat asset
 function drawCheat(){
     if (assets.cheat && state?.cheat?.cheatOn) {
-        console.log("Test");
         image(assets.cheat, 0, 100, width/3, height/1.5);
     }
 }

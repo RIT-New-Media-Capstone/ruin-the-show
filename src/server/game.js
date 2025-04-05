@@ -157,17 +157,6 @@ const startGame = () => {
     game()
 }
 
-/*
-const cheatButtonPress = () => {
-
-    if(cheatButtonPressed){
-
-        console.log("cheat button pressed game", state.cheatOn.false)
-        return true;
-                
-    }
-}*/
-
 const resetState = () => {
     state.lightPosition = lightStartingPos
     state.zoom = zoomStart
