@@ -1,12 +1,4 @@
-let state = {
-    cheat: {
-        cheatOn: false
-    },
-    cheatVis: false,
-    applauseVis: false,
-    ratings: 0,
-    // ... add anything else your UI checks
-};
+let state = {};
 
 //Sprite Sheet Animation Variables for Contestants
 let al;
@@ -44,11 +36,7 @@ const assets = {
 
 import {
     getState,
-    hideCheat,
-    hideApplause,
     updateLightPosition,
-    showCheat,
-    showApplause,
 } from "./utils.js";
   
 window.preload = function () {
@@ -133,16 +121,13 @@ window.draw = function () {
     podiumLight1();
     podiumLight2();
     podiumLight3();
-    podiumLight4()
+    podiumLight4();
     spotlight();
 
     drawHost();
-    //if(state.cheatVis) drawCheat();
+    if(state.cheatVis) drawCheat();
     drawApplause();
     if(state.applauseVis) drawApplauseON();
-
-    //CUE CARD FOR CHEAT
-    drawCheat();
 
     drawHands();
     drawAudience();
@@ -153,23 +138,11 @@ window.draw = function () {
 
 const syncGameState = async () => {
     // Sync variables with gamestate
-    if (frameCount % 30 === 0) { // Update twice per second
-        getState().then(newState => {
-            state = {
-                ...state,
-                ...newState,
-                cheat: {
-                    ...state.cheat,
-                    ...newState.cheat
-                }
-            };
-        });
-    }
+    state = await getState();
     updateLightPosition()
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
     }
-    updateCheat()
 }
 
 function drawBackground() {
@@ -298,12 +271,6 @@ function drawHands() {
         image(assets.hands, width/10 - 150, height/2 + 50, width, height/2);
     }
 }
-
-function updateCheat() {
-    if (state.cheatVis) { showCheat()}
-    if (!state.cheatVis ) { hideCheat()}
-}
- 
   
 //draw host sprite and calls animations based of state
 function drawHost(sx, sy){

@@ -5,11 +5,6 @@ import { ReadlineParser } from '@serialport/parser-readline';
 
 import * as game from '../server/game.js';
 
-import {
-    hideCheat,
-    hideApplause,
-} from "../client/utils.js"
-
 let port;
 
 // find a better way to do this
@@ -63,7 +58,7 @@ const cheatButtonPressed = () => {
     let prompted = game.getCheatState()
     if(prompted) game.updateRatings(cheatIncrement)
     else game.updateRatings(-cheatIncrement)
-    hideCheat()
+    turnOffCheatLED()
 }
 
 const applauseButtonPressed = () => {
