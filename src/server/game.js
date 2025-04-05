@@ -45,6 +45,12 @@ const state = {
         maxTime: 5000,
         lightOn: false,
     },
+    joystick: {
+        joystickTimer: 0,
+        onTimer: 0,
+        maxTime: 5000,
+        moved: false,
+    },
     timer: {
         lastTime: 0,
         gameTime: 0,
@@ -203,26 +209,33 @@ const turnOffPodiumButton = (index) => {
 }
 
 const registerInput = (type) => {
-    state.lastInputTime = Date.now()
+    state.lastInputTime = Date.now();
+    if (user.score < 60 && (type === 'cheat' || type === 'podium')) {
+        return;
+    }
     switch(type) {
         case 'applause':
-            if (state.applause.applauseOn) user.score += 10
-            else user.score -= 5
+            if (state.applause.applauseOn) user.score += 5
+            else user.score -= 5;
             break
         case 'cheat':
-            if (state.cheat.cheatOn) user.score += 10
-            else user.score -= 5
+            if (state.cheat.cheatOn) user.score += 15
+            else user.score -= 15
             break
         case 'podium':
-            if (state.podium.lightOn) user.score += 10
-            else user.score -= 5
+            if (state.podium.lightOn) user.score += 8
+            else user.score -= 8
+            break
+        case 'joystick':
+            if (state.joystick.moved) user.score += 10
+            else user.score -= 10
             break
         default:
             break
     }
     console.log(`Score: ${user.score}`)
+    console.log("register input")
 }
-
 
 const getRatings = () => state.ratings
 const updateRatings = (value) => { state.ratings += value }

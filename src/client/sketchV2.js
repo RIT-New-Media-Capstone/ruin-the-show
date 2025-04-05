@@ -126,6 +126,7 @@ window.draw = function () {
 
     drawHost();
     if(state.cheatVis) drawCheat();
+
     drawApplause();
     if(state.applauseVis) drawApplauseON();
 
@@ -134,11 +135,14 @@ window.draw = function () {
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
+
+
 }
 
 const syncGameState = async () => {
     // Sync variables with gamestate
     state = await getState();
+    console.log(state);
     updateLightPosition()
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
