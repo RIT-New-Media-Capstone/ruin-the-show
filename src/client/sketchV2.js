@@ -36,6 +36,8 @@ const assets = {
 
 import {
     getState,
+    showCheat,
+    updateCheat,
     updateLightPosition,
 } from "./utils.js";
   
@@ -100,28 +102,36 @@ window.preload = function () {
     assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
 }
 
+async function syncStateLoop() {
+    await syncGameState();
+
+    setTimeout(syncStateLoop, 30);
+}
+
 window.setup = async function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     state = await getState(); // <- WAIT for the promise to resolve
     countdownTimer = countdown;
+
+    await syncStateLoop();
+    showCheat();
 }
 
 window.draw = function () {
     background(255);
     drawBackground();
-    syncGameState();
 
     drawContestant();
-    drawRWLight();
+    //drawRWLight();
     drawPodiums();
     drawHUD();
 
-    podiumLight1();
-    podiumLight2();
-    podiumLight3();
-    podiumLight4();
+    //podiumLight1();
+    //podiumLight2();
+    //podiumLight3();
+    //podiumLight4();
     spotlight();
 
     drawHost();
@@ -133,7 +143,7 @@ window.draw = function () {
     drawHands();
     drawAudience();
 
-    text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
+    //text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
 
 
@@ -142,11 +152,12 @@ window.draw = function () {
 const syncGameState = async () => {
     // Sync variables with gamestate
     state = await getState();
-    console.log(state);
+    console.log(JSON.stringify(state, null, 2));
     updateLightPosition()
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
     }
+    updateCheat(state);
 }
 
 function drawBackground() {

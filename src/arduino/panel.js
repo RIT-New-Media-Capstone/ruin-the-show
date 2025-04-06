@@ -64,7 +64,7 @@ const cheatButtonPressed = () => {
 const applauseButtonPressed = () => {
     console.log("applause")
     game.updateRatings(otherIncrement)
-    hideApplause()
+    //hideApplause()
 }
 
 //function for all 4 small podium buttons

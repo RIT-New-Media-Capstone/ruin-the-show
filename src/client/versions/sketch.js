@@ -53,6 +53,7 @@ window.setup = function () {
   // 16:9 aspect ratio with slight padding
   createCanvas(assets.background.width / 6, assets.background.height / 6);
   state = getState()
+  showCheat();
 }
 
 window.draw = function () {

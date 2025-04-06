@@ -37,9 +37,9 @@ const updateLightPosition = async () => {
     lightPosX = state.lights;
 };
 
-const updateCheat = async () => {
-    const response = await fetch('/getState');
-    const state = await response.json();
+const updateCheat = async (state) => {
+    // const response = await fetch('/getState');
+    // const state = await response.json();
     if (state.cheat && state.cheat.cheatOn) {
         showCheat();
     } else {

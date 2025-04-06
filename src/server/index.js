@@ -37,6 +37,9 @@ app.get('/getState', (req, res) => {
     zoom,
     applauseX,
     isGameOver,
+    cheat: {
+      cheatOn: game.getCheatState()
+    }
   }
 
   res.json(state)
