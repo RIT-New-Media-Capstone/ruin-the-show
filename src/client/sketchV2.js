@@ -332,18 +332,3 @@ function podiumLight4(){
     image(assets.podiumlit4, 565,-50, width/3, height)
     }
 }
-
-/*
-function drawRatings(x, y) {
-    let ratingsFilled = state.rating || 10
-    if (ratingsFilled > 200) ratingsFilled = 200
-  
-    noStroke()
-    fill('#d9d9d9')
-    rect(x - 20, y - 25, 200, 50)
-  
-    fill('#fff7c2')
-    rect(x - 20, y - 25, ratingsFilled, 50)
-    image(assets.stars, x - 30, y - 25, 220, 50)
-  
-} */
