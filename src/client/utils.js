@@ -4,9 +4,6 @@ let cheatVis = false;
 let applauseVis = false;
 let lightPosX = 0;
 
-// Utility to randomize values
-const randomRange = (min, max) => Math.random() * (max - min) + min;
-
 // Cheat Visibility Handlers
 const showCheat = () => {
     cheatX = 300;
@@ -43,10 +40,13 @@ const updateLightPosition = async () => {
 const updateCheat = async () => {
     const response = await fetch('/getState');
     const state = await response.json();
-    if ( showCheat()){
-        hideCheat()
-    } 
-}
+    if (state.cheat && state.cheat.cheatOn) {
+        showCheat();
+    } else {
+        hideCheat();
+    }
+};
+
 
 const lightUpPodium = (index) => {
     // fill out 
@@ -55,10 +55,6 @@ const lightUpPodium = (index) => {
 const hidePodiumLight = (index) => {
     // fill out
 }
-
-/*const gameOver = () => {
-    state.isGameOver = true
-}*/
 
 // Get the current animation state (for sketch.js)
 const getState = async () => {

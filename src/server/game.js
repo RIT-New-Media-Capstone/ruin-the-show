@@ -98,6 +98,11 @@ const startGame = () => {
             console.log("Warning: No input detected")
         }
 
+        if (user.score < 60) {
+            if (state.cheat.cheatOn) return;  // Prevent cheat if score is below 60
+            if (state.podium.lightOn) return;  // Prevent podium light if score is below 60
+        }
+
         // CHEAT logic
         if (!state.cheat.cheatOn) {
             state.cheat.cheatTimer += deltaTime
@@ -130,16 +135,16 @@ const startGame = () => {
             state.podium.lightTimer += deltaTime
             if (state.podium.lightTimer > state.podium.delayMaxTime && Math.random() < state.podium.threshold) {
                 state.podium.lightTimer = 0
+                state.podium.index = (state.podium.index % state.podium.totalPodiums) + 1
                 triggerPodiumButton(state.podium.index)
                 console.log(`Podium ${state.podium.index} lit up!`)
-                state.podium.index = (state.podium.index % state.podium.totalPodiums) + 1
             }
         } else {
             state.podium.onTimer += deltaTime
             if (state.podium.onTimer > state.podium.maxTime) turnOffPodiumButton(state.podium.index)
         }
 
-        if (state.timer.gameTime > 60000) return gameOver() // 1 min
+        //if (state.timer.gameTime > 60000) return gameOver() // 1 min
 
         setImmediate(game)
     }
@@ -150,7 +155,14 @@ const resetState = () => {
     state.lightPosition = lightStartingPos
     state.zoom = zoomStart
 
-    state.cheat = { ...state.cheat, cheatTimer: 0, cheatOn: false, delayMaxTime: 8000, maxTime: 5000, onTimer: 0, threshold: baseCheat[state.difficulty].threshold }
+    state.cheat = {
+        cheatTimer: 0,
+        threshold: baseCheat[state.difficulty].threshold,
+        delayMaxTime: baseCheat[state.difficulty].delayMaxTime,
+        onTimer: 0,
+        maxTime: baseCheat[state.difficulty].maxTime,
+        cheatOn: false
+    }
     state.applause = { ...state.applause, applauseOn: false, applauseTimer: 0, delayMaxTime: 3000, maxTime: 5000, onTimer: 0, threshold: 0.75, x: -1 }
     state.podium = { ...state.podium, lightOn: false, lightTimer: 0, delayMaxTime: 10000, maxTime: 5000, onTimer: 0, index: 1 }
     state.timer = { lastTime: 0, gameTime: 0 }
@@ -159,7 +171,7 @@ const resetState = () => {
 
 const gameOver = () => {
     //state.isGameOver = true
-    console.log("Game Over")
+    console.log("Game Over");
 }
 
 const selectDifficulty = () => {
@@ -173,6 +185,7 @@ const triggerCheatButton = () => {
     state.cheat.cheatOn = true
     showCheat()
     turnOnCheatLED()
+    console.log("Cheat - on")
 }
 
 const turnOffCheatButton = () => {
@@ -210,32 +223,30 @@ const turnOffPodiumButton = (index) => {
 
 const registerInput = (type) => {
     state.lastInputTime = Date.now();
-    if (user.score < 60 && (type === 'cheat' || type === 'podium')) {
-        return;
-    }
+    let scoreChange = 0;
+    // Determine the score change based on input type and whether it's valid
     switch(type) {
         case 'applause':
-            if (state.applause.applauseOn) user.score += 5
-            else user.score -= 5;
-            break
+            scoreChange = state.applause.applauseOn ? 5 : -5;
+            break;
         case 'cheat':
-            if (state.cheat.cheatOn) user.score += 15
-            else user.score -= 15
-            break
+            scoreChange = state.cheat.cheatOn ? 15 : -15;
+            break;
         case 'podium':
-            if (state.podium.lightOn) user.score += 8
-            else user.score -= 8
-            break
+            scoreChange = state.podium.lightOn ? 8 : -8;
+            break;
         case 'joystick':
-            if (state.joystick.moved) user.score += 10
-            else user.score -= 10
-            break
+            scoreChange = state.joystick.moved ? 10 : -10;
+            break;
         default:
-            break
+            break;
     }
-    console.log(`Score: ${user.score}`)
-    console.log("register input")
+    // Update the score, ensuring it doesn't go below zero
+    user.score = Math.max(user.score + scoreChange, 0);
+    console.log(`Score: ${user.score}`);
+    console.log("register input");
 }
+
 
 const getRatings = () => state.ratings
 const updateRatings = (value) => { state.ratings += value }
