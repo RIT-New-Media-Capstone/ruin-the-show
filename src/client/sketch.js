@@ -1,4 +1,4 @@
-let state = {};
+//let state = {};
 
 //Sprite Sheet Animation Variables for Contestants
 let al;
@@ -33,13 +33,6 @@ const assets = {
     timer: "",
     
 }
-
-import {
-    getState,
-    showCheat,
-    updateCheat,
-    updateLightPosition,
-} from "./utils.js";
   
 window.preload = function () {
     //BACKGROUND
@@ -112,11 +105,9 @@ window.setup = async function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
-    state = await getState(); // <- WAIT for the promise to resolve
     countdownTimer = countdown;
 
     await syncStateLoop();
-    showCheat();
 }
 
 window.draw = function () {
@@ -135,29 +126,24 @@ window.draw = function () {
     spotlight();
 
     drawHost();
-    if(state.cheat.cheatOn) drawCheat();
+    drawCheat();
 
     drawApplause();
-    if(state.applause.applauseOn) drawApplauseON();
+    drawApplauseON();
 
     drawHands();
     drawAudience();
 
-    //text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
-    //if(state.isGameOver) image(assets.curtains, 0, 0, width, height)
+    text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
+    //image(assets.curtains, 0, 0, width, height)
 
 
 }
 
 const syncGameState = async () => {
-    // Sync variables with gamestate
-    state = await getState();
-    console.log(JSON.stringify(state, null, 2));
-    updateLightPosition()
     if (frameCount % 30 === 0 && countdownTimer > 0) { 
         updateCountdown();
     }
-    updateCheat(state);
 }
 
 function drawBackground() {
@@ -223,7 +209,7 @@ function drawHUD() {
         fill('#d9d9d9')
         rect(width - 285, 60, 250 * 2/3 + 70, 50 * 2/3)
         fill('#dc4042')
-        let ratings = state.ratings || 0
+        let ratings = 0
         if (ratings > 250) ratings = 250
         rect(width - 285, 60, ratings * 2/3, 50 * 2/3)
         image(assets.stars, width - 300, -10, width/5, height/5);
@@ -309,12 +295,6 @@ function drawHost(sx, sy){
     if (frameCount % frameDelay === 0) {
         currentFrame = (currentFrame + 1) % totalFrames;
     }
-}
-
-function drawZoom() {
-    textSize(48);
-    fill("black");
-    if (state.zoom) text(`Zoom: ${state.zoom}`, windowWidth - 350, 75);
 }
 
 function spotlight(){

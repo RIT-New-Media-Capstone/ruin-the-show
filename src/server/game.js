@@ -1,3 +1,9 @@
+// OUTER LOOP / GAME MACHINE (Idle, Onboard, Playing, Score Screen)
+
+// INNER LOOP / ACTUAL GAMEPLAY
+
+//Kaiden's Code Down Here
+/*
 // Holds game state, logic, variables
 const baseRatings = { '1': 10, '2': 5, '3': 0 }
 const lightStartingPos = -300
@@ -254,3 +260,4 @@ const getCheatState = () => state.cheat.cheatOn
 const getGameOver = () => state.isGameOver
 
 export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState, getGameOver, registerInput, state }
+*/
