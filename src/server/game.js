@@ -212,6 +212,7 @@ const turnOffPodiumButton = (index) => {
     hidePodiumLight(index)
     turnOffPodiumLED(index)
     console.log(`Podium ${index} light - off`)
+    console.log("THIS IS A GITHUB BRANCH TEST")
 }
 
 const registerInput = (type) => {
