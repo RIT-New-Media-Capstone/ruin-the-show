@@ -22,28 +22,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/getState', (req, res) => {
-  const ratings = game.getRatings()
-  const difficulty = game.getDifficulty()
-  const lights = game.getLights()
-  const zoom = game.getZoom()
-  const applauseX = game.getApplauseX()
-  const isGameOver = game.getGameOver()
-  
-
-  const state = { 
-    ratings, 
-    difficulty, 
-    lights, 
-    zoom,
-    applauseX,
-    isGameOver,
-    cheat: {
-      cheatOn: game.getCheatState()
-    }
-  }
-
-  res.json(state)
-})
+  res.json(game.state);
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

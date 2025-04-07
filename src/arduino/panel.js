@@ -55,7 +55,7 @@ const otherIncrement = 1;
 
 const cheatButtonPressed = () => {
     console.log("cheat")
-    let prompted = game.getCheatState()
+    let prompted = game.state.cheat.cheatOn;
     if(prompted) game.updateRatings(cheatIncrement)
     else game.updateRatings(-cheatIncrement)
     turnOffCheatLED()

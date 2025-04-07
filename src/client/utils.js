@@ -60,17 +60,7 @@ const hidePodiumLight = (index) => {
 const getState = async () => {
     const response = await fetch('/getState');
     const state = await response.json();
-    return ({
-        cheatX,
-        cheatVis,
-        applauseX: (state.applauseX) * (windowWidth - 100) + 100,
-        applauseVis,
-        lightPosX: state.lights,
-        ratings: state.ratings,
-        difficulty: state.difficulty,
-        zoom: state.zoom,
-        isGameOver: state.isGameOver
-    })
+    return state;
 };
 
 // Export functions

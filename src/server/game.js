@@ -68,10 +68,6 @@ const rfidScan = (userId, userScore) => {
     if (userScore) user.score = userScore
     else user.score = 0
 
-    newGame()
-}
-
-const newGame = () => {
     // reset all variables & state
     state.difficulty = 2
     state.ratings = baseRatings[state.difficulty]
@@ -81,13 +77,12 @@ const newGame = () => {
     resetState()
     resetVisuals()
 
-    startGame()
+    state.timer.lastTime = Date.now()
+    gameLoop()
 }
 
-const startGame = () => {
-    state.timer.lastTime = Date.now()
-    const game = () => {
-        const currentTime = Date.now()
+const gameLoop = () => {
+    const currentTime = Date.now()
         const deltaTime = currentTime - state.timer.lastTime
         state.timer.lastTime = currentTime
         state.timer.gameTime += deltaTime
@@ -146,9 +141,7 @@ const startGame = () => {
 
         //if (state.timer.gameTime > 60000) return gameOver() // 1 min
 
-        setImmediate(game)
-    }
-    game()
+        setImmediate(gameLoop)
 }
 
 const resetState = () => {
@@ -259,4 +252,4 @@ const getApplauseX = () => state.applause.x
 const getCheatState = () => state.cheat.cheatOn
 const getGameOver = () => state.isGameOver
 
-export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState, getGameOver, registerInput }
+export { updateRatings, getRatings, getDifficulty, changeLights, rfidScan, getLights, getZoom, updateZoom, triggerCheatButton, triggerApplauseButton, getApplauseX, getCheatState, getGameOver, registerInput, state }

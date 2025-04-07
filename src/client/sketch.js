@@ -135,10 +135,10 @@ window.draw = function () {
     spotlight();
 
     drawHost();
-    if(state.cheatVis) drawCheat();
+    if(state.cheat.cheatOn) drawCheat();
 
     drawApplause();
-    if(state.applauseVis) drawApplauseON();
+    if(state.applause.applauseOn) drawApplauseON();
 
     drawHands();
     drawAudience();
