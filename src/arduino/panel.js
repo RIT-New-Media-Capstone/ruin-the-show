@@ -45,7 +45,7 @@ const serialSetup = () => {
         else if (data == "PODIUM_4_PRESSED") podiumButtonPressed(4);
         else if (data == "JOYSTICK_LEFT") joystickMoved(-1);
         else if (data == "JOYSTICK_RIGHT") joystickMoved(1);
-        else if (data.startsWith("LEVER_VALUE:")) leverRotated(data.substring(15))
+        else if (data.startsWith("LEVER_VALUE:")) leverRotated(data)
         else if (data.lastIndexOf("ACK") === -1) console.log(data) // if it isn't ack 
     });
 
@@ -95,7 +95,7 @@ const joystickMoved = (direction) => {
     eventBus.emit('joystickMoved', direction);
 }
 const leverRotated = (value) => {
-    eventBus.emit('leverMoved', Number(value));
+    eventBus.emit('leverMoved', parseInt(value.split(':')[1], 10));
 }
 
 //General Function for controlling all button LEDs

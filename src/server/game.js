@@ -1,42 +1,26 @@
 import panel, { turnOnCheatLED, turnOffCheatLED, turnOnApplauseLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
-const machine = new GameMachine('IDLE');
-
-// Gets all 5 Inputs from Panel.js
-panel.on('cheatPressed', () => {
-    console.log("Game logic: handling cheat press");
-    machine.addEvent('cheat-button-pressed', {})
-});
-panel.on('applausePressed', () => {
-    console.log("Game logic: handling applause press");
-    turnOffApplauseLED();
-});
-panel.on('podiumPressed', (num) => {
-    console.log(`Game logic: handling podium ${num} press`);
-    turnOffPodiumLED(num);
-});
-panel.on('joystickMoved', (dir) => {
-    console.log(`Game logic: joystick moved ${dir}`);
-});
-panel.on('leverMoved', (value) => {
-    console.log(`Game logic: lever at position ${value}`);
-});
-
-//On Start Up, Light Up All LEDs Now (TEST)
-const awake = () => {
-    turnOnCheatLED();
-    turnOnApplauseLED();
-    turnOnPodiumLED(1);
-    turnOnPodiumLED(2);
-    turnOnPodiumLED(3);
-    turnOnPodiumLED(4);
-    runExample();
-};
 // OUTER LOOP / GAME MACHINE (Idle, Onboard, Playing)
 class GameMachine {
     eventQueue = []
     isRunning = false
     loopHandle = null
+    states = {
+        IDLE: 'IDLE',
+        ONBOARDING: 'ONBOARDING',
+        PLAYING: 'PLAYING'
+    }
+    events = {
+        //Inputs Given
+        CHEAT_BUTTON_PRESSED: 'cheat-button-pressed',
+        APPLAUSE_BUTTON_PRESSED: 'applause-button-pressed',
+        PODIUM_1_BUTTON_PRESSED: 'podium-1-button-pressed',
+        PODIUM_2_BUTTON_PRESSED: 'podium-2-button-pressed',
+        PODIUM_3_BUTTON_PRESSED: 'podium-3-button-pressed',
+        PODIUM_4_BUTTON_PRESSED: 'podium-4-button-pressed',
+        JOYSTICK_MOVED: 'joystick-moved',
+        GAME_OVER: 'game-over'
+    }
 
     constructor(initialState) {
         this.state = initialState;
@@ -50,8 +34,8 @@ class GameMachine {
 
         console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
-        if (this.state === 'IDLE') {
-            if (event.name === 'cheat-button-pressed') {
+        if (this.state === this.states.IDLE) {
+            if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 // do nothing
                 return;
             }
@@ -61,7 +45,7 @@ class GameMachine {
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 // set 60 second timer
                 setTimeout(() => {
-                    this.addEvent.push('onboarding-complete', {});
+                    this.addEvent('onboarding-complete', {});
                 }, 60 * 1000);
             }
         } else if (this.state === 'ONBOARDING') {
@@ -134,6 +118,28 @@ class GameMachine {
     }
 }
 
+const machine = new GameMachine('IDLE');
+
+// Gets all 5 Inputs from Panel.js
+panel.on('cheatPressed', () => {
+    console.log("Game logic: handling cheat press");
+    machine.addEvent('cheat-button-pressed', {})
+});
+panel.on('applausePressed', () => {
+    console.log("Game logic: handling applause press");
+    machine.add
+});
+panel.on('podiumPressed', (num) => {
+    console.log(`Game logic: handling podium ${num} press`);
+
+});
+panel.on('joystickMoved', (dir) => {
+    console.log(`Game logic: joystick moved ${dir}`);
+});
+panel.on('leverMoved', (value) => {
+    console.log(`Game logic: lever at position ${value}`);
+});
+
 // Example usage
 const runExample = () => {
     // Create a new game machine in IDLE state
@@ -172,5 +178,16 @@ const switchPage = (page) => {
 
 // INNER LOOP / ACTUAL GAMEPLAY
 
+
+//On Start Up, Light Up All LEDs Now (TEST)
+const awake = () => {
+    turnOnCheatLED();
+    turnOnApplauseLED();
+    turnOnPodiumLED(1);
+    turnOnPodiumLED(2);
+    turnOnPodiumLED(3);
+    turnOnPodiumLED(4);
+    runExample();
+};
 
 export { awake }
