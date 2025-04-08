@@ -28,6 +28,7 @@ const awake = () => {
     turnOnPodiumLED(2);
     turnOnPodiumLED(3);
     turnOnPodiumLED(4);
+    runExample();
 };
 // OUTER LOOP / GAME MACHINE (Idle, Onboard, Playing, Score Screen)
 class GameMachine {
@@ -156,7 +157,6 @@ const runExample = () => {
     }, 60000);
 };
 
-runExample();
 
 // INNER LOOP / ACTUAL GAMEPLAY
 
