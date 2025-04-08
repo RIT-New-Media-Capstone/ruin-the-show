@@ -1,5 +1,7 @@
 import panel, { turnOnCheatLED, turnOffCheatLED, turnOnApplauseLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
+
+
 // Gets all 5 Inputs from Panel.js
 panel.on('cheatPressed', () => {
     console.log("Game logic: handling cheat press");
@@ -157,6 +159,15 @@ const runExample = () => {
     }, 60000);
 };
 
+const switchPage = (page) => {
+    if (page == 'idle') {
+        console.log(page);
+    } else if (page == 'onboarding') {
+        console.log(page);
+    } else if (page == 'sketch') {
+        console.log(page);
+    }
+};
 
 // INNER LOOP / ACTUAL GAMEPLAY
 
