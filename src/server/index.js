@@ -22,7 +22,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/getState', (req, res) => {
-  res.json(game.state);
+  res.json({
+    state: machine.state,
+    page: machine.currentPage,
+  });
 });
 
 app.listen(PORT, () => {

@@ -1,5 +1,5 @@
 window.setup = async function () {
-    createCanvas(assets.background.width / 6, assets.background.height / 6);
+    createCanvas(windowWidth, windowHeight);
     background(0);
     fill(255);
     textSize(32);
