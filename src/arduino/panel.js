@@ -47,6 +47,37 @@ const serialSetup = () => {
         else if (data.startsWith("LEVER_VALUE:")) leverRotated(data.substring(15))
         else if (data.lastIndexOf("ACK") === -1) console.log(data) // if it isn't ack 
     });
+
+    process.on('SIGINT', () => {
+        console.log('\nGracefully shutting down...');
+        // Check if port is open before sending LED off commands
+        if (port && port.isOpen) {
+            turnOffCheatLED();
+            turnOffApplauseLED();
+            for (let i = 1; i <= 4; i++) {
+                turnOffPodiumLED(i);
+            }
+            // Attempt to close the port after turning off LEDs
+            setTimeout(() => {
+                if (port && port.isOpen) {
+                    port.close((err) => {
+                        if (err) {
+                            console.error('Error closing port:', err);
+                        } else {
+                            console.log('Serial port closed.');
+                        }
+                        process.exit();
+                    });
+                } else {
+                    console.log('Serial port already closed.');
+                    process.exit();
+                }
+            }, 200); // Delay to ensure LEDs are turned off first
+        } else {
+            console.log('Serial port not open, skipping LED turn off.');
+            process.exit();
+        }
+    });
 }
 
 //THESE FUNCTIONS ARE WHEN THE USER PRESSES THE BUTTON
