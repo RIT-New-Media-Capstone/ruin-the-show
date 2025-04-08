@@ -2,9 +2,10 @@
 
 import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
-
+import { EventEmitter } from 'events';
 import * as game from '../server/game.js';
 
+const eventBus = new EventEmitter();
 let port;
 
 // find a better way to do this
@@ -32,10 +33,9 @@ const serialSetup = () => {
     serial.on('data', (data) => {
         data = data.trim()
 
-        if (data.startsWith("Game Controller")) //game.rfidScan() GAME.JS SERVER STARTS HERE WHEN CONTROLLER IS CONNECTED
+        if (data.startsWith("Game Controller")) game.start();
 
         // Get which input
-        // logic to change based on how we send serial data 
         if (data == "CHEAT_PRESSED") cheatButtonPressed();
         else if (data == "APPLAUSE_PRESSED") applauseButtonPressed();
         else if (data == "PODIUM_1_PRESSED") podiumButtonPressed(1);
@@ -51,108 +51,47 @@ const serialSetup = () => {
 
 //THESE FUNCTIONS ARE WHEN THE USER PRESSES THE BUTTON
 const cheatButtonPressed = () => {
-    console.log("cheat pressed")
+    eventBus.emit('cheatPressed');
 }
 const applauseButtonPressed = () => {
-    console.log("applause pressed")
+    eventBus.emit('applausePressed');
 }
-//Function for all 4 small podium buttons
 const podiumButtonPressed = (podiumNum) => {
-    console.log("podium " + podiumNum + " pressed")
+    eventBus.emit('podiumPressed', podiumNum);
 }
 const joystickMoved = (direction) => {
-    console.log("joystick direction: " + direction)
+    eventBus.emit('joystickMoved', direction);
 }
-const leverRotated = (newPosition) => {
-    console.log("level position: " + Number(newPosition))
-    let pos = Number(newPosition)
-    let oldPos = game.getZoom()
+const leverRotated = (value) => {
+    eventBus.emit('leverMoved', Number(value));
+}
 
-    // Tolerance - if sent again, don't count it again, +/- 1
-    if(pos === oldPos || pos + 1 === oldPos || pos - 1 === oldPos) return 
-}
+//General Function for controlling all button LEDs
+const sendLEDCommand = (component, state, extra = '') => {
+    if (port && port.isOpen) {
+        const cmd = `${component.toUpperCase()}${extra}_LED_${state.toUpperCase()}\r\n`;
+        port.write(cmd, (err) => {
+            if (err) {
+                console.error('Error sending LED command:', err);
+            } else {
+                console.log(`Sent "${cmd.trim()}" to Arduino`);
+            }
+        });
+    } else {
+        console.error(`Serial port not open. Cannot send ${component}_LED_${state}`);
+    }
+};
 
 //TURNING ON/OFF LEDS FOR BUTTONS (CHEAT, APPLAUSE, PODIUMS 1-4)
-const turnOnCheatLED = () => {
-    if (port && port.isOpen) {
-        port.write('CHEAT_LED_ON\r\n', (err) => {
-            if (err) {
-                console.error('Error sending data:', err);
-            } else {
-                console.log('Sent "CHEAT_LED_ON" to Arduino');
-            }
-        });
-    } else {
-        console.error('Serial port not open. Cannot send CHEAT_LED_ON');
-    }
-}
-const turnOffCheatLED = () => {
-    if (port && port.isOpen) {
-        port.write('CHEAT_LED_OFF\r\n', (err) => {
-            if (err) {
-                console.error('Error sending data:', err);
-            } else {
-                console.log('Sent "CHEAT_LED_OFF" to Arduino');
-            }
-        });
-    } else {
-        console.error('Serial port not open. Cannot send CHEAT_LED_OFF');
-    }
-}
+const turnOnCheatLED = () => sendLEDCommand('cheat', 'on');
+const turnOffCheatLED = () => sendLEDCommand('cheat', 'off');
 
-const turnOnApplauseLED = () => {
-    if (port && port.isOpen) {
-        port.write('APPLAUSE_LED_ON\r\n', (err) => {
-            if (err) {
-                console.error('Error sending data:', err);
-            } else {
-                console.log('Sent "APPLAUSE_LED_ON" to Arduino');
-            }
-        });
-    } else {
-        console.error('Serial port not open. Cannot send APPLAUSE_LED_ON');
-    }
-}
-const turnOffApplauseLED = () => {
-    if (port && port.isOpen) {
-        port.write('APPLAUSE_LED_OFF\r\n', (err) => {
-            if (err) {
-                console.error('Error sending data:', err);
-            } else {
-                console.log('Sent "APPLAUSE_LED_OFF" to Arduino');
-            }
-        });
-    } else {
-        console.error('Serial port not open. Cannot send APPLAUSE_LED_OFF');
-    }
-}
+const turnOnApplauseLED = () => sendLEDCommand('applause', 'on');
+const turnOffApplauseLED = () => sendLEDCommand('applause', 'off');
 
-const turnOnPodiumLED = (podiumNum) => {
-    if (port && port.isOpen) {
-        port.write('PODIUM_'+podiumNum+'_LED_ON\r\n', (err) => {
-            if (err) {
-                console.log('Error sending data:', err);
-            } else {
-                console.log('Sent "PODIUM_'+podiumNum+'_LED_ON" to Arduino');
-            }
-        });
-    } else {
-        console.log('Serial port not open. Cannot send PODIUM'+podiumNum+'LED_ON" to Arduino');
-    }
-}
-const turnOffPodiumLED = (podiumNum) => {
-    if (port && port.isOpen) {
-        port.write('PODIUM_'+podiumNum+'_LED_OFF\r\n', (err) => {
-            if (err) {
-                console.log('Error sending data:', err);
-            } else {
-                console.log('Sent "PODIUM_'+podiumNum+'_LED_OFF" to Arduino');
-            }
-        });
-    } else {
-        console.log('Serial port not open. Cannot send PODIUM_'+podiumNum+'LED_OFF" to Arduino');
-    }
-}
+const turnOnPodiumLED = (podiumNum) => sendLEDCommand('podium', 'on', `_${podiumNum}`);
+const turnOffPodiumLED = (podiumNum) => sendLEDCommand('podium', 'off', `_${podiumNum}`);
 
-export { turnOnCheatLED, turnOnApplauseLED, turnOffCheatLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED, }
+export { turnOnCheatLED, turnOnApplauseLED, turnOffCheatLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED }
+export default eventBus;
 serialSetup();

@@ -1,7 +1,41 @@
+// DATA HANDLING
+import panel, { turnOnCheatLED, turnOffCheatLED, turnOnApplauseLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
+
+// Gets all 5 Inputs from Panel.js
+panel.on('cheatPressed', () => {
+    console.log("Game logic: handling cheat press");
+    turnOffCheatLED();
+});
+panel.on('applausePressed', () => {
+    console.log("Game logic: handling applause press");
+    turnOffApplauseLED();
+});
+panel.on('podiumPressed', (num) => {
+    console.log(`Game logic: handling podium ${num} press`);
+    turnOffPodiumLED(num);
+});
+panel.on('joystickMoved', (dir) => {
+    console.log(`Game logic: joystick moved ${dir}`);
+});
+panel.on('leverMoved', (value) => {
+    console.log(`Game logic: lever at position ${value}`);
+});
+
+//On Start Up, Light Up All LEDs Now (TEST)
+const start = () => {
+    turnOnCheatLED();
+    turnOnApplauseLED();
+    turnOnPodiumLED(1);
+    turnOnPodiumLED(2);
+    turnOnPodiumLED(3);
+    turnOnPodiumLED(4);
+};
 // OUTER LOOP / GAME MACHINE (Idle, Onboard, Playing, Score Screen)
 
 // INNER LOOP / ACTUAL GAMEPLAY
 
+
+export { start }
 //Kaiden's Code Down Here
 /*
 // Holds game state, logic, variables
