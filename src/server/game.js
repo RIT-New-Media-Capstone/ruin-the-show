@@ -5,11 +5,13 @@ class GameMachine {
     eventQueue = []
     isRunning = false
     loopHandle = null
+    
     states = {
         IDLE: 'IDLE',
         ONBOARDING: 'ONBOARDING',
         PLAYING: 'PLAYING'
     }
+    
     events = {
         //Inputs Received
         RFID_SCAN: 'rfid-scan',
@@ -56,7 +58,7 @@ class GameMachine {
                 // do nothing
                 return;
             }
-            if (event.name === 'rfid-scan') {
+            if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
                 this.state = 'ONBOARDING';
                 console.log(`State transition: IDLE -> ONBOARDING`);
@@ -65,8 +67,8 @@ class GameMachine {
                     this.addEvent('onboarding-complete', {});
                 }, 60 * 1000);
             }
-        } else if (this.state === 'ONBOARDING') {                   //ONBOARDING STATE
-            if (event.name === 'onboarding-complete') {
+        } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
+            if (event.name === this.events.ONBOARDING_COMPLETE) {
                 this.state = 'PLAYING';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
                 // Start the game timer
@@ -74,7 +76,7 @@ class GameMachine {
                     this.addEvent('game-over', {});
                 }, 60 * 1000);
             }
-            if (event.name === 'cheat-button-pressed') {
+            if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.state = 'PLAYING';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
                 // Start the game timer
@@ -83,11 +85,11 @@ class GameMachine {
                 }, 60 * 1000);
             }
         } else if (this.state === 'PLAYING') {                      //PLAYING STATE
-            if (event.name === 'game-over') {
+            if (event.name === this.events.GAME_OVER) {
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE`);
             }
-            if (event.name === 'button-pushed-red') {
+            if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE (canceled by user)`);
             }
@@ -96,17 +98,13 @@ class GameMachine {
 
     run() {
         if (this.isRunning) return;
-        
         this.isRunning = true;
-        
         const loop = () => {
             this.step();
-            
             if (this.isRunning) {
                 this.loopHandle = setImmediate(loop);
             }
         };
-        
         this.loopHandle = setImmediate(loop);
         console.log('State machine started');
     }
@@ -114,14 +112,11 @@ class GameMachine {
     stop() {
         // stop the infinite loop started by run()
         if (!this.isRunning) return;
-        
         this.isRunning = false;
-        
         if (this.loopHandle) {
             clearImmediate(this.loopHandle);
             this.loopHandle = null;
         }
-        
         console.log('State machine stopped');
     }
     
