@@ -28,6 +28,7 @@ const serialSetup = () => {
     port.on('error', (err) => {
         console.log('Error: ', err.message);
         console.log("Running in developer mode")
+        game.awake();
     });
 
     serial.on('data', (data) => {
