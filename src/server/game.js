@@ -41,7 +41,7 @@ class GameMachine {
     }
 
     // This is your (state, event) => state function
-    step() {
+    async step() {
         const event = this.eventQueue.shift();
         
         if (!event) return;
@@ -49,14 +49,53 @@ class GameMachine {
         console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
         if (this.state === 'IDLE') {
-            if (event.name === 'button-pushed-green') {
+            //if any of these buttons or componens are pushed in the idle state do nothing
+            if (event.name === 'button-pushed-applause') {
                 // do nothing
                 return;
             }
+
+            if (event.name === 'button-pushed-cheat') {
+                // do nothing
+                return;
+            }
+
+            if (event.name === 'button-pushed-yellow') {
+                // do nothing
+                return;
+            }
+
+            if (event.name === 'button-pushed-white') {
+                // do nothing
+                return;
+            }
+            if (event.name === 'button-pushed-red') {
+                // do nothing
+                return;
+            }
+            if (event.name === 'button-pushed-blue') {
+                // do nothing
+                return;
+            }
+            // TODO: add condition for lever 
+            // TODO: add condition for joystick
+            // if the rfid band is scanned the start the onboarding
             if (event.name === 'rfid-scan') {
                 // switch to onboarding
                 this.state = 'ONBOARDING';
+                // grab the file to call...
+                
                 console.log(`State transition: IDLE -> ONBOARDING`);
+                const stateModule = await import(`./states/${this.state.toLowerCase()}.js`);
+                try{
+                if (stateModule && typeof stateModule.handleEvent === 'function') {
+                    await stateModule.handleEvent(event, this);
+                } else {
+                    console.warn(`No handleEvent function in ${this.state}.js`);
+                }
+            } catch (err) {
+                console.error(`Could not load state module for ${this.state}:`, err);
+            }
                 // set 60 second timer
                 setTimeout(() => {
                     this.eventQueue.push({
