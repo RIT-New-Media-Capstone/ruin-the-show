@@ -30,7 +30,7 @@ const awake = () => {
     turnOnPodiumLED(4);
     runExample();
 };
-// OUTER LOOP / GAME MACHINE (Idle, Onboard, Playing, Score Screen)
+// OUTER LOOP / GAME MACHINE (Idle, Onboard, Playing)
 class GameMachine {
     eventQueue = []
     isRunning = false
