@@ -33,7 +33,7 @@ const serialSetup = () => {
     serial.on('data', (data) => {
         data = data.trim()
 
-        if (data.startsWith("Game Controller")) game.start();
+        if (data.startsWith("Game Controller")) game.awake();
 
         // Get which input
         if (data == "CHEAT_PRESSED") cheatButtonPressed();
