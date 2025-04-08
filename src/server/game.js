@@ -48,24 +48,35 @@ class GameMachine {
     // This is your (state, event) => state function
     step() {
         const event = this.eventQueue.shift();
-        
         if (!event) return;
-
         console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
         if (this.state === this.states.IDLE) {                      //IDLE STATE
+            turnOnCheatLED();
+            turnOnApplauseLED();
+            turnOnPodiumLED(1);
+            turnOnPodiumLED(2);
+            turnOnPodiumLED(3);
+            turnOnPodiumLED(4);
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
-                // do nothing
-                return;
+                // DEBUG Purposes, goes to onboarding
+                this.state = 'ONBOARDING';
+                console.log(`State transition: IDLE -> ONBOARDING`);
+                setTimeout(() => {
+                    this.addEvent('onboarding-complete', {});
+                }, 60 * 1000);
             }
             if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
                 this.state = 'ONBOARDING';
                 console.log(`State transition: IDLE -> ONBOARDING`);
-                // set 60 second timer
+                // set 60 second timer, change length depending on how long onboarding is
                 setTimeout(() => {
                     this.addEvent('onboarding-complete', {});
                 }, 60 * 1000);
+            }
+            else {
+                return;
             }
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
             if (event.name === this.events.ONBOARDING_COMPLETE) {
@@ -79,12 +90,15 @@ class GameMachine {
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.state = 'PLAYING';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
-                // Start the game timer
+                // Start the game timer (Game Time / 1min AND how long score screen)
                 setTimeout(() => { 
                     this.addEvent('game-over', {});
                 }, 60 * 1000);
             }
-        } else if (this.state === 'PLAYING') {                      //PLAYING STATE
+            else {
+                return;
+            }
+        } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE
             if (event.name === this.events.GAME_OVER) {
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE`);
@@ -134,24 +148,19 @@ const machine = new GameMachine('IDLE');
 
 // Gets all 5 Inputs from Panel.js
 panel.on('cheatPressed', () => {
-    //console.log("Game logic: handling cheat press");
     machine.addEvent('cheat-button-pressed', {})
 });
 panel.on('applausePressed', () => {
-    //console.log("Game logic: handling applause press");
     machine.addEvent('applause-button-pressed', {});
 });
 panel.on('podiumPressed', (num) => {
-    //console.log(`Game logic: handling podium ${num} press`);
     machine.addEvent(`podium-${num}-button-pressed`, {});
 });
 panel.on('joystickMoved', (dir) => {
-    //console.log(`Game logic: joystick moved ${dir}`);
-    machine.addEvent('joystick-moved', {});
+    machine.addEvent('joystick-moved', {dir});
 });
 panel.on('leverMoved', (value) => {
-    //console.log(`Game logic: lever at position ${value}`);
-    machine.addEvent('lever-moved', {});
+    machine.addEvent('lever-moved', {value});
 });
 
 // Example usage
@@ -173,32 +182,25 @@ const runExample = () => {
         machine.addEvent('button-pushed-red');
     }, 30000);
     
-    // Stop the state machine after 1 minute
+    // Stop the state machine after 3 minute
     setTimeout(() => {
         machine.stop();
         console.log('Example complete. Final state:', machine.state);
-    }, 60000);
+    }, 60000 * 3);
 };
 
 const switchPage = (page) => {
-    if (page == 'idle') {
-        console.log(page);
-    } else if (page == 'onboarding') {
-        console.log(page);
-    } else if (page == 'sketch') {
-        console.log(page);
+    if (page === 'IDLE') {
+        console.log("IDLE SWITCH")
+    } else if (page === 'ONBOARDING') {
+        console.log("ONBOARD SWITCH")
+    } else if (page === 'SKETCH') {
+        console.log("SKETCH SWITCH")
     }
-};
-
+}
 
 //On Start Up, Light Up All LEDs Now (TEST)
 const awake = () => {
-    turnOnCheatLED();
-    turnOnApplauseLED();
-    turnOnPodiumLED(1);
-    turnOnPodiumLED(2);
-    turnOnPodiumLED(3);
-    turnOnPodiumLED(4);
     runExample();
 };
 
