@@ -1,11 +1,11 @@
 import panel, { turnOnCheatLED, turnOffCheatLED, turnOnApplauseLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
-
+const machine = new GameMachine('IDLE');
 
 // Gets all 5 Inputs from Panel.js
 panel.on('cheatPressed', () => {
     console.log("Game logic: handling cheat press");
-    turnOffCheatLED();
+    machine.addEvent('cheat-button-pressed', {})
 });
 panel.on('applausePressed', () => {
     console.log("Game logic: handling applause press");
@@ -51,7 +51,7 @@ class GameMachine {
         console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
         if (this.state === 'IDLE') {
-            if (event.name === 'button-pushed-green') {
+            if (event.name === 'cheat-button-pressed') {
                 // do nothing
                 return;
             }
@@ -61,10 +61,7 @@ class GameMachine {
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 // set 60 second timer
                 setTimeout(() => {
-                    this.eventQueue.push({
-                        name: 'onboarding-complete',
-                        data: {}
-                    });
+                    this.addEvent.push('onboarding-complete', {});
                 }, 60 * 1000);
             }
         } else if (this.state === 'ONBOARDING') {
@@ -73,10 +70,15 @@ class GameMachine {
                 console.log(`State transition: ONBOARDING -> PLAYING`);
                 // Start the game timer
                 setTimeout(() => {
-                    this.eventQueue.push({
-                        name: 'game-over',
-                        data: {}
-                    });
+                    this.addEvent('game-over', {});
+                }, 60 * 1000);
+            }
+            if (event.name === 'cheat-button-pressed') {
+                this.state = 'PLAYING';
+                console.log(`State transition: ONBOARDING -> PLAYING`);
+                // Start the game timer
+                setTimeout(() => { 
+                    this.addEvent('game-over', {});
                 }, 60 * 1000);
             }
         } else if (this.state === 'PLAYING') {
@@ -135,7 +137,6 @@ class GameMachine {
 // Example usage
 const runExample = () => {
     // Create a new game machine in IDLE state
-    const machine = new GameMachine('IDLE');
     
     // Start the state machine
     machine.run();
