@@ -11,7 +11,8 @@ class GameMachine {
         PLAYING: 'PLAYING'
     }
     events = {
-        //Inputs Given
+        //Inputs Received
+        RFID_SCAN: 'rfid-scan',
         CHEAT_BUTTON_PRESSED: 'cheat-button-pressed',
         APPLAUSE_BUTTON_PRESSED: 'applause-button-pressed',
         PODIUM_1_BUTTON_PRESSED: 'podium-1-button-pressed',
@@ -19,6 +20,22 @@ class GameMachine {
         PODIUM_3_BUTTON_PRESSED: 'podium-3-button-pressed',
         PODIUM_4_BUTTON_PRESSED: 'podium-4-button-pressed',
         JOYSTICK_MOVED: 'joystick-moved',
+        LEVER_MOVED: 'lever-moved',
+        //Inputs Given (LEDs)
+        TURN_ON_CHEAT_LED: 'turn-on-cheat-led',
+        TURN_OFF_CHEAT_LED: 'turn-off-cheat-led',
+        TURN_ON_APPLAUSE_LED: 'turn-on-applause-led',
+        TURN_OFF_APPLAUSE_LED: 'turn-off-applause-led',
+        TURN_ON_PODIUM_1_LED: 'turn-on-podium-1-led',
+        TURN_OFF_PODIUM_1_LED: 'turn-on-podium-1-led',
+        TURN_ON_PODIUM_2_LED: 'turn-on-podium-2-led',
+        TURN_OFF_PODIUM_2_LED: 'turn-on-podium-2-led',
+        TURN_ON_PODIUM_3_LED: 'turn-on-podium-3-led',
+        TURN_OFF_PODIUM_3_LED: 'turn-on-podium-3-led',
+        TURN_ON_PODIUM_4_LED: 'turn-on-podium-4-led',
+        TURN_OFF_PODIUM_4_LED: 'turn-on-podium-4-led',
+        //Possible Time (Auto) Events
+        ONBOARDING_COMPLETE: 'onboarding-complete',
         GAME_OVER: 'game-over'
     }
 
@@ -34,7 +51,7 @@ class GameMachine {
 
         console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
-        if (this.state === this.states.IDLE) {
+        if (this.state === this.states.IDLE) {                      //IDLE STATE
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 // do nothing
                 return;
@@ -48,7 +65,7 @@ class GameMachine {
                     this.addEvent('onboarding-complete', {});
                 }, 60 * 1000);
             }
-        } else if (this.state === 'ONBOARDING') {
+        } else if (this.state === 'ONBOARDING') {                   //ONBOARDING STATE
             if (event.name === 'onboarding-complete') {
                 this.state = 'PLAYING';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
@@ -65,7 +82,7 @@ class GameMachine {
                     this.addEvent('game-over', {});
                 }, 60 * 1000);
             }
-        } else if (this.state === 'PLAYING') {
+        } else if (this.state === 'PLAYING') {                      //PLAYING STATE
             if (event.name === 'game-over') {
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE`);
@@ -122,22 +139,24 @@ const machine = new GameMachine('IDLE');
 
 // Gets all 5 Inputs from Panel.js
 panel.on('cheatPressed', () => {
-    console.log("Game logic: handling cheat press");
+    //console.log("Game logic: handling cheat press");
     machine.addEvent('cheat-button-pressed', {})
 });
 panel.on('applausePressed', () => {
-    console.log("Game logic: handling applause press");
-    machine.add
+    //console.log("Game logic: handling applause press");
+    machine.addEvent('applause-button-pressed', {});
 });
 panel.on('podiumPressed', (num) => {
-    console.log(`Game logic: handling podium ${num} press`);
-
+    //console.log(`Game logic: handling podium ${num} press`);
+    machine.addEvent(`podium-${num}-button-pressed`, {});
 });
 panel.on('joystickMoved', (dir) => {
-    console.log(`Game logic: joystick moved ${dir}`);
+    //console.log(`Game logic: joystick moved ${dir}`);
+    machine.addEvent('joystick-moved', {});
 });
 panel.on('leverMoved', (value) => {
-    console.log(`Game logic: lever at position ${value}`);
+    //console.log(`Game logic: lever at position ${value}`);
+    machine.addEvent('lever-moved', {});
 });
 
 // Example usage
@@ -175,8 +194,6 @@ const switchPage = (page) => {
         console.log(page);
     }
 };
-
-// INNER LOOP / ACTUAL GAMEPLAY
 
 
 //On Start Up, Light Up All LEDs Now (TEST)
