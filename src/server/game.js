@@ -79,15 +79,15 @@ class GameMachine {
                 // Start the game timer
                 setTimeout(() => {
                     this.addEvent('game-over', {});
-                }, 60 * 1000);
+                }, 75 * 1000);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.state = 'PLAYING';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
-                // Start the game timer (Game Time / 1min AND how long score screen)
+                // Start the game timer (Game Time / 1 min AND 15 sec (for score screen)
                 setTimeout(() => { 
                     this.addEvent('game-over', {});
-                }, 60 * 1000);
+                }, 75 * 1000);
             }
             else {
                 return;
