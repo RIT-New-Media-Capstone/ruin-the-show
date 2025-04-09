@@ -29,13 +29,13 @@ class GameMachine {
         TURN_ON_APPLAUSE_LED: 'turn-on-applause-led',
         TURN_OFF_APPLAUSE_LED: 'turn-off-applause-led',
         TURN_ON_PODIUM_1_LED: 'turn-on-podium-1-led',
-        TURN_OFF_PODIUM_1_LED: 'turn-on-podium-1-led',
+        TURN_OFF_PODIUM_1_LED: 'turn-off-podium-1-led',
         TURN_ON_PODIUM_2_LED: 'turn-on-podium-2-led',
-        TURN_OFF_PODIUM_2_LED: 'turn-on-podium-2-led',
+        TURN_OFF_PODIUM_2_LED: 'turn-off-podium-2-led',
         TURN_ON_PODIUM_3_LED: 'turn-on-podium-3-led',
-        TURN_OFF_PODIUM_3_LED: 'turn-on-podium-3-led',
+        TURN_OFF_PODIUM_3_LED: 'turn-off-podium-3-led',
         TURN_ON_PODIUM_4_LED: 'turn-on-podium-4-led',
-        TURN_OFF_PODIUM_4_LED: 'turn-on-podium-4-led',
+        TURN_OFF_PODIUM_4_LED: 'turn-off-podium-4-led',
         //Possible Time (Auto) Events
         ONBOARDING_COMPLETE: 'onboarding-complete',
         GAME_OVER: 'game-over'
@@ -197,6 +197,8 @@ const switchPage = (page) => {
         console.log("ONBOARD SWITCH")
     } else if (page === 'SKETCH') {
         console.log("SKETCH SWITCH")
+    } else if (page == 'GAME OVER'){
+        console.log("Sc SWITCH")
     }
 }
 
