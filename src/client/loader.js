@@ -75,6 +75,8 @@ function unloadPage() {
     script.remove();
     console.log("Script element removed");
   }
+
+  window.location.reload();
   
   p5Instance = null;
 }

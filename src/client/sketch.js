@@ -1,5 +1,5 @@
 //let state = {};
-console.log("Loaded SKETCH/PLAYING");
+
 //Sprite Sheet Animation Variables for Contestants
 let al;
 let contestantFrames = [];
@@ -136,10 +136,6 @@ window.draw = function () {
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //image(assets.curtains, 0, 0, width, height)
-}
-
-window.stopSketch = function() {
-    console.log("Stopping sketch...");
 }
 
 const syncGameState = async () => {
