@@ -23,8 +23,7 @@ app.get('/', (req, res) => {
 
 app.get('/getState', (req, res) => {
   res.json({
-    state: machine.state,
-    page: machine.currentPage,
+    state: game.machine.state
   });
 });
 

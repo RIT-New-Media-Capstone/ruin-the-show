@@ -43,7 +43,6 @@ class GameMachine {
 
     constructor(initialState) {
         this.state = initialState;
-        this.currentPage = 'idle';
     }
 
     // This is your (state, event) => state function
@@ -56,7 +55,6 @@ class GameMachine {
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 // DEBUG Purposes, goes to onboarding
                 this.state = 'ONBOARDING';
-                this.currentPage = 'onboarding';
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 setTimeout(() => {
                     this.addEvent('onboarding-complete', {});
@@ -65,7 +63,6 @@ class GameMachine {
             if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
                 this.state = 'ONBOARDING';
-                this.currentPage = 'onboarding';
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 // set 60 second timer, change length depending on how long onboarding is
                 setTimeout(() => {
@@ -78,7 +75,6 @@ class GameMachine {
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
             if (event.name === this.events.ONBOARDING_COMPLETE) {
                 this.state = 'PLAYING';
-                this.currentPage = 'sketch';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
                 // Start the game timer
                 setTimeout(() => {
@@ -87,7 +83,6 @@ class GameMachine {
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.state = 'PLAYING';
-                this.currentPage = 'sketch';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
                 // Start the game timer (Game Time / 1min AND how long score screen)
                 setTimeout(() => { 
@@ -100,12 +95,10 @@ class GameMachine {
         } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE
             if (event.name === this.events.GAME_OVER) {
                 this.state = 'IDLE';
-                this.currentPage = 'idle';
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.state = 'IDLE';
-                this.currentPage = 'idle';
                 console.log(`State transition: PLAYING -> IDLE (canceled by user)`);
             }
         }
@@ -190,21 +183,9 @@ const runExample = () => {
     }, 60000 * 3);
 };
 
-const switchPage = (page) => {
-    if (page === 'IDLE') {
-        console.log("IDLE SWITCH")
-    } else if (page === 'ONBOARDING') {
-        console.log("ONBOARD SWITCH")
-    } else if (page === 'SKETCH') {
-        console.log("SKETCH SWITCH")
-    } else if (page == 'GAME OVER'){
-        console.log("Sc SWITCH")
-    }
-}
-
 //On Start Up, Light Up All LEDs Now (TEST)
 const awake = () => {
     runExample();
 };
 
-export { awake }
+export { awake, machine }
