@@ -36,30 +36,31 @@ const assets = {
   
 window.preload = function () {
     //BACKGROUND
-    assets.background = loadImage('/assets/Background/MainBackground.png');
-    assets.stage = loadImage('/assets/Background/Stage.png');
-    assets.stagelights = loadImage('/assets/Background/StageLights.png');
-    assets.audience = loadImage('/assets/Background/audience.png');
+    assets.background = loadImage('/Assets/Background/MainBackground.png');
+    assets.stage = loadImage('/Assets/Background/Stage.png');
+    assets.stagelights = loadImage('/Assets/Background/StageLights.png');
+    assets.audience = loadImage('/Assets/Background/Audience.png');
+    assets.applause = loadImage('/Assets/Background/Applause_OFF.png');
     
     //podiums are in front of animated contestants
-    assets.podium1 = loadImage('/assets/Background/PodiumYellow Resized0.png');
-    assets.podium2 = loadImage('/assets/Background/PodiumWhite Resized0.png');
-    assets.podium3 = loadImage('/assets/Background/PodiumRed Resized0.png');
-    assets.podium4 = loadImage('/assets/Background/PodiumBlue Resized0.png');
+    assets.podium1 = loadImage('/Assets/Background/PodiumYellow_Resized0.png');
+    assets.podium2 = loadImage('/Assets/Background/PodiumWhite_Resized0.png');
+    assets.podium3 = loadImage('/Assets/Background/PodiumRed_Resized0.png');
+    assets.podium4 = loadImage('/Assets/Background/PodiumBlue_Resized0.png');
     
     //HUD (timer & score)
-    assets.stars = loadImage('/assets/Background/StarRatings.png');
-    assets.timer = loadImage('/assets/Background/Timer.png');
-    countdownFont = loadFont('/assets/Fonts/Poppins-ExtraLight.ttf');
+    assets.stars = loadImage('/Assets/Background/StarRatings.png');
+    assets.timer = loadImage('/Assets/Background/Timer.png');
+    countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
 
     //AL 
-    al = loadImage('/assets/SpriteSheets/AL/AL_idle.png'); 
+    al = loadImage('/Assets/SpriteSheets/Host/AL_idle.png'); 
     
     //CONTESTANT ANIMATIONS
     assets.contestants = [];
     contestantFrames = [];
     for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/assets/SpriteSheets/p${i}/P${i}_Idle.png`);
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
         assets.contestants.push(sheet);
 
         // Preload frames for smoother animation
@@ -77,22 +78,21 @@ window.preload = function () {
     }
 
     //CUE
-    assets.cheat = loadImage('/assets/Interactions/cheat/CheatingHand-01.png');
-    assets.applause = loadImage('/assets/Interactions/applause/applause_OFF.png');
-    assets.applauseon = loadImage('/assets/Interactions/applause/applause_ON.png');
-    assets.podiumlit1 = loadImage('/assets/Interactions/podiums/1light_WhitePodium.png');
-    assets.podiumlit2 = loadImage('/assets/Interactions/podiums/2light_YellowPodium.png');
-    assets.podiumlit3 = loadImage('/assets/Interactions/podiums/3light_BluePodium.png');
-    assets.podiumlit4 = loadImage('/assets/Interactions/podiums/4light_RedPodium.png');
+    assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
+    assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
+    assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
+    assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
+    assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
+    assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
 
     //FEEEDBACK
-    assets.rightLit = loadImage('/assets/Interactions/podiums/ContestantRight.png');
-    assets.wrongLit = loadImage('/assets/Interactions/podiums/ContestantWrong.png');
-    assets.hands = loadImage('/assets/Interactions/applause/StaticApplause.png');
-    assets.spotlight = loadImage('/assets/Interactions/joystick/HostSpotlight.png');
+    assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
+    assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
+    assets.hands = loadImage('/Assets/Interactions/Applause/StaticApplause.png');
+    assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
 
     //GAMEOVER
-    assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
+   // assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
 }
 
 async function syncStateLoop() {
