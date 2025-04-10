@@ -38,6 +38,17 @@ class GameMachine {
         GAME_OVER: 'game-over'
     }
 
+    interactionState = {
+        APPLAUSE_BTN: 'off',
+        CHEAT_BTN: 'off',
+        PODIUM_1_BTN: 'off',
+        PODIUM_2_BTN: 'off',
+        PODIUM_3_BTN: 'off',
+        PODIUM_4_BTN: 'off',
+        LEVER_POS: '-1',
+        JOYSTICK_DIR: '0',     // whatever default state should be
+    }
+
     constructor(initialState) {
         this.state = initialState;
     }
@@ -95,30 +106,40 @@ class GameMachine {
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                this.interactionState.APPLAUSE_BTN = 'off'
                 turnOffApplauseLED()
                 // trigger client side applause off 
+                // change ratings
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE (canceled by user)`);
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
+                this.interactionState.CHEAT_BTN = 'off'
                 turnOffCheatLED()
                 // trigger client side cheat off 
+                // change ratings
                 console.log('Cheat pressed')
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
                 const direction = event.data
+                this.interactionState.JOYSTICK_DIR = direction
                 // trigger client side joystick move 
+                // change ratings
                 console.log(`joystick moved in: ${direction}`)
             }
             if (event.name === this.events.LEVER_MOVED) {
                 const position = event.data
+                this.interactionState.LEVER_POS = position
                 // trigger client side lever movement
+                // change ratings
                 console.log(`lever moved: ${position}`)
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data
+                this.interactionState[`PODIUM_${podiumNum}_BTN`] = 'off'
                 turnOffPodiumLED(podiumNum)
                 // trigger client side podium change 
+                // change ratings
                 console.log(`podium ${podiumNum} pressed`)
             }
         }
