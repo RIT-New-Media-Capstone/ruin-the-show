@@ -44,8 +44,8 @@ class GameMachine {
         PODIUM_2_BTN: 'off',
         PODIUM_3_BTN: 'off',
         PODIUM_4_BTN: 'off',
-        LEVER_POS: '-1',
-        JOYSTICK_DIR: '0',     // whatever default state should be
+        LEVER_POS: -1,
+        JOYSTICK_DIR: 0,     // whatever default state should be
     }
 
     constructor(initialState) {
@@ -108,8 +108,7 @@ class GameMachine {
                 this.interactionState.APPLAUSE_BTN = 'off'
                 turnOffApplauseLED()
                 // change ratings
-                this.state = 'IDLE';
-                console.log(`State transition: PLAYING -> IDLE (canceled by user)`);
+                console.log('Applause pressed');
 
                 // Trigger on state after downtime
                 setTimeout(() => {
@@ -125,10 +124,10 @@ class GameMachine {
                 // Trigger on state after downtime
                 setTimeout(() => {
                     this.addEvent('turn-on-cheat', {});
-                }, 10 * 1000);
+                }, 2 * 1000);
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
-                const direction = event.data
+                const direction = event.data.dir
                 this.interactionState.JOYSTICK_DIR = direction
                 // change ratings
                 console.log(`joystick moved in: ${direction}`)
@@ -136,21 +135,21 @@ class GameMachine {
                 // Trigger on state after downtime
                 setTimeout(() => {
                     this.addEvent('turn-on-joystick', {});
-                }, 7 * 1000);
+                }, 2 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
-                const position = event.data
+                const position = event.data.value
                 this.interactionState.LEVER_POS = position
                 // change ratings
                 console.log(`lever moved: ${position}`)
 
                 // Trigger on state after downtime
                 setTimeout(() => {
-                    this.addEvent('turn-on-lever', {});
-                }, 15 * 1000);
+                    this.addEvent('turn-on-lever', {position});
+                }, 2 * 1000);
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
-                const podiumNum = event.data
+                const podiumNum = event.data.num
                 this.interactionState[`PODIUM_${podiumNum}_BTN`] = 'off'
                 turnOffPodiumLED(podiumNum)
                 // change ratings
@@ -160,24 +159,37 @@ class GameMachine {
                 setTimeout(() => {
                     const podiumToTrigger = Math.floor(Math.random() * 4) + 1
                     this.addEvent('turn-on-podium', {podiumToTrigger});
-                }, 4 * 1000);
+                }, 2 * 1000);
             }
 
             // Set on-states
             if (event.name === this.events.TURN_ON_APPLAUSE) {
-
+                this.interactionState.APPLAUSE_BTN = 'on'
+                turnOnApplauseLED();
             }
             if (event.name === this.events.TURN_ON_CHEAT) {
-
+                this.interactionState.CHEAT_BTN = 'on'
+                turnOnCheatLED();
             }
             if (event.name === this.events.TURN_ON_JOYSTICK) {
-
+                this.interactionState.JOYSTICK_DIR = event.data.dir
+                console.log("JOYSTICK IS ON AT " + this.interactionState.JOYSTICK_DIR);
             }
             if (event.name === this.events.TURN_ON_LEVER) {
-
+                this.interactionState.LEVER_POS = event.data.value
+                console.log("LEVEL IS ON AT " + this.interactionState.LEVER_POS);
             }
             if (event.name === this.events.TURN_ON_PODIUM) {
-
+                if(event.data.podiumToTrigger === 1) {
+                    this.interactionState.PODIUM_1_BTN = 'on'
+                } else if (event.data.podiumToTrigger === 2) {
+                    this.interactionState.PODIUM_2_BTN = 'on'
+                } else if (event.data.podiumToTrigger === 3) {
+                    this.interactionState.PODIUM_3_BTN = 'on'
+                } else if (event.data.podiumToTrigger === 4) {
+                    this.interactionState.PODIUM_4_BTN = 'on'
+                }
+                turnOnPodiumLED(event.data.podiumToTrigger);
             }
         }
     }
@@ -244,6 +256,10 @@ const runExample = () => {
 
     console.log('Current state:', machine.state);
 
+    //DEBUG PURPOSES: START AT PLAYING STATE
+    machine.state = "PLAYING";
+
+    /*
     // Simulate an RFID scan after 5 seconds
     setTimeout(() => {
         machine.addEvent('rfid-scan');
@@ -259,6 +275,7 @@ const runExample = () => {
         machine.stop();
         console.log('Example complete. Final state:', machine.state);
     }, 60000 * 3);
+    */
 };
 
 //On Start Up, Light Up All LEDs Now (TEST)
