@@ -5,11 +5,11 @@ let al;
 let contestantFrames = [];
 let currentFrame = 0;
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
-const numRows = 4;
+const numRows = 8;
 const numCols = 5;
 const totalFrames = numRows * numCols;
 const frameWidth =  4802  / numCols; // 7688/ 4 = 1920/2 = 960  7126
-const frameHeight =  2162 / numRows; // 5410/5 = 1080/2 = 540
+const frameHeight =  4324/ numRows;//2162 / numRows; // 5410/5 = 1080/2 = 540
 const alFrameWidth = 7688 / numRows;
 const alFrameHeight = 5410 / numCols;
 
@@ -59,11 +59,13 @@ window.preload = function () {
     //AL 
     al = loadImage('/Assets/SpriteSheets/Host/AL_idle.png'); 
     
-    //CONTESTANT ANIMATIONS
+    //CONTESTANT ANIMATIONS IDLE
     assets.contestants = [];
     contestantFrames = [];
+
+
     for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
         assets.contestants.push(sheet);
 
         // Preload frames for smoother animation
@@ -79,6 +81,26 @@ window.preload = function () {
         }
         contestantFrames.push(frames);
     }
+
+    /*
+    //IDLE 
+    for (let i = 1; i <= numRows; i++) {
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
+        assets.contestants.push(sheet);
+
+        // Preload frames for smoother animation
+        let frames = [];
+        for (let frame = 0; frame < totalFrames; frame++) {
+            let row = Math.floor(frame / numCols);
+            let col = frame % numCols;
+            frames.push({
+                sx: col * frameWidth,
+                sy: row * frameHeight,
+                sheet,
+            });
+        }
+        contestantFrames.push(frames);
+    }*/
 
     //CUE
     assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
