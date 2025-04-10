@@ -5,13 +5,13 @@ class GameMachine {
     eventQueue = []
     isRunning = false
     loopHandle = null
-    
+
     states = {
         IDLE: 'IDLE',
         ONBOARDING: 'ONBOARDING',
         PLAYING: 'PLAYING'
     }
-    
+
     events = {
         //Inputs Received
         RFID_SCAN: 'rfid-scan',
@@ -21,18 +21,17 @@ class GameMachine {
         JOYSTICK_MOVED: 'joystick-moved',
         LEVER_MOVED: 'lever-moved',
         //Inputs Given (LEDs)
-        TURN_ON_CHEAT_LED: 'turn-on-cheat-led',
+        TURN_ON_CHEAT: 'turn-on-cheat',
         TURN_OFF_CHEAT_LED: 'turn-off-cheat-led',
-        TURN_ON_APPLAUSE_LED: 'turn-on-applause-led',
+        TURN_ON_APPLAUSE: 'turn-on-applause',
         TURN_OFF_APPLAUSE_LED: 'turn-off-applause-led',
-        TURN_ON_PODIUM_1_LED: 'turn-on-podium-1-led',
+        TURN_ON_PODIUM: 'turn-on-podium',
         TURN_OFF_PODIUM_1_LED: 'turn-off-podium-1-led',
-        TURN_ON_PODIUM_2_LED: 'turn-on-podium-2-led',
         TURN_OFF_PODIUM_2_LED: 'turn-off-podium-2-led',
-        TURN_ON_PODIUM_3_LED: 'turn-on-podium-3-led',
         TURN_OFF_PODIUM_3_LED: 'turn-off-podium-3-led',
-        TURN_ON_PODIUM_4_LED: 'turn-on-podium-4-led',
         TURN_OFF_PODIUM_4_LED: 'turn-off-podium-4-led',
+        TURN_ON_JOYSTICK: 'turn-on-joystick',
+        TURN_ON_LEVER: 'turn-on-lever',
         //Possible Time (Auto) Events
         ONBOARDING_COMPLETE: 'onboarding-complete',
         GAME_OVER: 'game-over'
@@ -93,14 +92,14 @@ class GameMachine {
                 this.state = 'PLAYING';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
                 // Start the game timer (Game Time / 1 min AND 15 sec (for score screen)
-                setTimeout(() => { 
+                setTimeout(() => {
                     this.addEvent('game-over', {});
                 }, 75 * 1000);
             }
             else {
                 return;
             }
-        } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE
+        } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE           
             if (event.name === this.events.GAME_OVER) {
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE`);
@@ -108,39 +107,77 @@ class GameMachine {
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.interactionState.APPLAUSE_BTN = 'off'
                 turnOffApplauseLED()
-                // trigger client side applause off 
                 // change ratings
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE (canceled by user)`);
+
+                // Trigger on state after downtime
+                setTimeout(() => {
+                    this.addEvent('turn-on-applause', {});
+                }, 2 * 1000);
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 this.interactionState.CHEAT_BTN = 'off'
                 turnOffCheatLED()
-                // trigger client side cheat off 
                 // change ratings
                 console.log('Cheat pressed')
+
+                // Trigger on state after downtime
+                setTimeout(() => {
+                    this.addEvent('turn-on-cheat', {});
+                }, 10 * 1000);
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
                 const direction = event.data
                 this.interactionState.JOYSTICK_DIR = direction
-                // trigger client side joystick move 
                 // change ratings
                 console.log(`joystick moved in: ${direction}`)
+
+                // Trigger on state after downtime
+                setTimeout(() => {
+                    this.addEvent('turn-on-joystick', {});
+                }, 7 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
                 const position = event.data
                 this.interactionState.LEVER_POS = position
-                // trigger client side lever movement
                 // change ratings
                 console.log(`lever moved: ${position}`)
+
+                // Trigger on state after downtime
+                setTimeout(() => {
+                    this.addEvent('turn-on-lever', {});
+                }, 15 * 1000);
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data
                 this.interactionState[`PODIUM_${podiumNum}_BTN`] = 'off'
                 turnOffPodiumLED(podiumNum)
-                // trigger client side podium change 
                 // change ratings
                 console.log(`podium ${podiumNum} pressed`)
+
+                // Trigger on state after downtime
+                setTimeout(() => {
+                    const podiumToTrigger = Math.floor(Math.random() * 4) + 1
+                    this.addEvent('turn-on-podium', {podiumToTrigger});
+                }, 4 * 1000);
+            }
+
+            // Set on-states
+            if (event.name === this.events.TURN_ON_APPLAUSE) {
+
+            }
+            if (event.name === this.events.TURN_ON_CHEAT) {
+
+            }
+            if (event.name === this.events.TURN_ON_JOYSTICK) {
+
+            }
+            if (event.name === this.events.TURN_ON_LEVER) {
+
+            }
+            if (event.name === this.events.TURN_ON_PODIUM) {
+
             }
         }
     }
@@ -168,7 +205,7 @@ class GameMachine {
         }
         console.log('State machine stopped');
     }
-    
+
     // Helper method to add events to the queue
     addEvent(eventName, eventData = {}) {
         this.eventQueue.push({
@@ -189,34 +226,34 @@ panel.on('applausePressed', () => {
     machine.addEvent('applause-button-pressed', {});
 });
 panel.on('podiumPressed', (num) => {
-    machine.addEvent(`podium-button-pressed`, {num});
+    machine.addEvent(`podium-button-pressed`, { num });
 });
 panel.on('joystickMoved', (dir) => {
-    machine.addEvent('joystick-moved', {dir});
+    machine.addEvent('joystick-moved', { dir });
 });
 panel.on('leverMoved', (value) => {
-    machine.addEvent('lever-moved', {value});
+    machine.addEvent('lever-moved', { value });
 });
 
 // Example usage
 const runExample = () => {
     // Create a new game machine in IDLE state
-    
+
     // Start the state machine
     machine.run();
-    
+
     console.log('Current state:', machine.state);
-    
+
     // Simulate an RFID scan after 5 seconds
     setTimeout(() => {
         machine.addEvent('rfid-scan');
     }, 5000);
-    
+
     // Simulate the game ending early after 30 seconds (user presses red button)
     setTimeout(() => {
         machine.addEvent('button-pushed-red');
     }, 30000);
-    
+
     // Stop the state machine after 3 minute
     setTimeout(() => {
         machine.stop();
