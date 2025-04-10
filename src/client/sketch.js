@@ -5,13 +5,17 @@ let al;
 let contestantFrames = [];
 let currentFrame = 0;
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
-const numRows = 8;
+const numRows = 8;//4; // idle + al
+const numRowsRW = 8; // number of rows for right + wrong
 const numCols = 5;
 const totalFrames = numRows * numCols;
-const frameWidth =  4802  / numCols; // 7688/ 4 = 1920/2 = 960  7126
-const frameHeight =  4324/ numRows;//2162 / numRows; // 5410/5 = 1080/2 = 540
-const alFrameWidth = 7688 / numRows;
-const alFrameHeight = 5410 / numCols;
+const frameWidth =  4802  / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
+const frameHeight =  4324/ numRows; // idle-> 2162 / numRows; // (al) 5410/5 = 1080/2 = 540
+const frameHeightRW =  4324/ numRows;
+const frameWidthAL = 7688 / numRows;
+const frameHeightAL = 5410 / numCols;
+
+
 
 //Countdown Timer (Possibly Temporary)
 let countdownFont;
@@ -63,9 +67,17 @@ window.preload = function () {
     assets.contestants = [];
     contestantFrames = [];
 
+    // if the current state of the animation is idle then pass in 
+    //if ( animation = 'Idle'){
+        
+    //}
+    //'Right'
+    //'Wrong'
 
+    //CONTESTANT ANIMATIONS WRONG
     for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
+        
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Wrong.png`);
         assets.contestants.push(sheet);
 
         // Preload frames for smoother animation
@@ -84,7 +96,7 @@ window.preload = function () {
 
     /*
     //IDLE 
-    for (let i = 1; i <= numRows; i++) {
+    for (let i = 1; i <= 4; i++) {
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
         assets.contestants.push(sheet);
 
@@ -305,15 +317,15 @@ function drawHost(sx, sy){
     let scaleFactor = 0.38;
     let frameSpeed = 2
     //const alY = height / 2.25
-    const alWidth = alFrameWidth * scaleFactor;
-    const alHeight = alFrameHeight * scaleFactor;
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightAL * scaleFactor;
 
     ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
      sx = (currentFrame % numCols) * alFrameWidth;//frameWidth;
-     sy = Math.floor(currentFrame / numCols) * alFrameHeight;//frameHeight;
+     sy = Math.floor(currentFrame / numCols) * frameHeightAL;//frameHeight;
 
 
-    image(al, x, y, alWidth, alHeight, sx, sy, alFrameWidth, alFrameHeight);
+    image(al, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
    
     if (frameCount % frameDelay === 0) {
         currentFrame = (currentFrame + 1) % totalFrames;
