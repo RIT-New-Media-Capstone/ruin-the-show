@@ -17,10 +17,7 @@ class GameMachine {
         RFID_SCAN: 'rfid-scan',
         CHEAT_BUTTON_PRESSED: 'cheat-button-pressed',
         APPLAUSE_BUTTON_PRESSED: 'applause-button-pressed',
-        PODIUM_1_BUTTON_PRESSED: 'podium-1-button-pressed',
-        PODIUM_2_BUTTON_PRESSED: 'podium-2-button-pressed',
-        PODIUM_3_BUTTON_PRESSED: 'podium-3-button-pressed',
-        PODIUM_4_BUTTON_PRESSED: 'podium-4-button-pressed',
+        PODIUM_BUTTON_PRESSED: 'podium-button-pressed',
         JOYSTICK_MOVED: 'joystick-moved',
         LEVER_MOVED: 'lever-moved',
         //Inputs Given (LEDs)
@@ -98,8 +95,31 @@ class GameMachine {
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                turnOffApplauseLED()
+                // trigger client side applause off 
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE (canceled by user)`);
+            }
+            if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
+                turnOffCheatLED()
+                // trigger client side cheat off 
+                console.log('Cheat pressed')
+            }
+            if (event.name === this.events.JOYSTICK_MOVED) {
+                const direction = event.data
+                // trigger client side joystick move 
+                console.log(`joystick moved in: ${direction}`)
+            }
+            if (event.name === this.events.LEVER_MOVED) {
+                const position = event.data
+                // trigger client side lever movement
+                console.log(`lever moved: ${position}`)
+            }
+            if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
+                const podiumNum = event.data
+                turnOffPodiumLED(podiumNum)
+                // trigger client side podium change 
+                console.log(`podium ${podiumNum} pressed`)
             }
         }
     }
@@ -148,7 +168,7 @@ panel.on('applausePressed', () => {
     machine.addEvent('applause-button-pressed', {});
 });
 panel.on('podiumPressed', (num) => {
-    machine.addEvent(`podium-${num}-button-pressed`, {});
+    machine.addEvent(`podium-button-pressed`, {num});
 });
 panel.on('joystickMoved', (dir) => {
     machine.addEvent('joystick-moved', {dir});
