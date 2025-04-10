@@ -5,11 +5,14 @@ let al;
 let contestantFrames = [];
 let currentFrame = 0;
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
-const numRows = 5;
-const numCols = 4;
+const numRows = 4;
+const numCols = 5;
 const totalFrames = numRows * numCols;
-const frameWidth = 2162 / numCols;
-const frameHeight =  4802 / numRows;
+const frameWidth =  4802  / numCols; // 7688/ 4 = 1920/2 = 960  7126
+const frameHeight =  2162 / numRows; // 5410/5 = 1080/2 = 540
+const alFrameWidth = 7688 / numRows;
+const alFrameHeight = 5410 / numCols;
+
 //Countdown Timer (Possibly Temporary)
 let countdownFont;
 let countdown = 60;
@@ -163,9 +166,9 @@ function drawAudience() {
 }
 
 function drawContestant() {
-    let x = 280;
-    const y = 260;
-    const spacing = 160;
+    let x = 309;
+    const y = 290;
+    const spacing = 158;
     let scaleFactor = 0.32;
     assets.contestants.forEach((sheet, index) => {
         let frame = contestantFrames[index][currentFrame];
@@ -280,15 +283,15 @@ function drawHost(sx, sy){
     let scaleFactor = 0.38;
     let frameSpeed = 2
     //const alY = height / 2.25
-    const alWidth = frameWidth * scaleFactor;
-    const alHeight = frameHeight * scaleFactor;
+    const alWidth = alFrameWidth * scaleFactor;
+    const alHeight = alFrameHeight * scaleFactor;
 
     ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-     sx = (currentFrame % numCols) * frameWidth;
-     sy = Math.floor(currentFrame / numCols) * frameHeight;
+     sx = (currentFrame % numCols) * alFrameWidth;//frameWidth;
+     sy = Math.floor(currentFrame / numCols) * alFrameHeight;//frameHeight;
 
 
-    image(al, x, y, alWidth, alHeight, sx, sy, frameWidth, frameHeight);
+    image(al, x, y, alWidth, alHeight, sx, sy, alFrameWidth, alFrameHeight);
    
     if (frameCount % frameDelay === 0) {
         currentFrame = (currentFrame + 1) % totalFrames;
