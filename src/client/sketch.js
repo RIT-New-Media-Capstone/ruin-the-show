@@ -95,6 +95,27 @@ window.preload = function () {
     }
 
     /*
+    //CONTESTANT ANIMATIONS RIGHT
+    for (let i = 1; i <= 4; i++) {
+        
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
+        assets.contestants.push(sheet);
+
+        // Preload frames for smoother animation
+        let frames = [];
+        for (let frame = 0; frame < totalFrames; frame++) {
+            let row = Math.floor(frame / numCols);
+            let col = frame % numCols;
+            frames.push({
+                sx: col * frameWidth,
+                sy: row * frameHeight,
+                sheet,
+            });
+        }
+        contestantFrames.push(frames);
+    }*/
+
+    /*
     //IDLE 
     for (let i = 1; i <= 4; i++) {
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
@@ -204,6 +225,7 @@ function drawContestant() {
     const y = 290;
     const spacing = 158;
     let scaleFactor = 0.32;
+    
     assets.contestants.forEach((sheet, index) => {
         let frame = contestantFrames[index][currentFrame];
 
