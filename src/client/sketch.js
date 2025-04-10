@@ -8,8 +8,8 @@ let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
 const numRows = 5;
 const numCols = 4;
 const totalFrames = numRows * numCols;
-const frameWidth = 4802 / numCols;
-const frameHeight = 2162 / numRows;
+const frameWidth = 2162 / numCols;
+const frameHeight =  4802 / numRows;
 //Countdown Timer (Possibly Temporary)
 let countdownFont;
 let countdown = 60;
