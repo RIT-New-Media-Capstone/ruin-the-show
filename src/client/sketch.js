@@ -8,8 +8,8 @@ let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
 const numRows = 5;
 const numCols = 4;
 const totalFrames = numRows * numCols;
-const frameWidth = 7688 / numCols;
-const frameHeight = 5410 / numRows;
+const frameWidth = 4802 / numCols;
+const frameHeight = 2162 / numRows;
 //Countdown Timer (Possibly Temporary)
 let countdownFont;
 let countdown = 60;
@@ -163,10 +163,10 @@ function drawAudience() {
 }
 
 function drawContestant() {
-    let x = 270;
-    const y = 240;
+    let x = 280;
+    const y = 260;
     const spacing = 160;
-    let scaleFactor = 0.20;
+    let scaleFactor = 0.32;
     assets.contestants.forEach((sheet, index) => {
         let frame = contestantFrames[index][currentFrame];
 
