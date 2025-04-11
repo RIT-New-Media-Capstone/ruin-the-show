@@ -24,16 +24,15 @@ class GameMachine {
         LEVER_MOVED: 'lever-moved',
         //Inputs Given (LEDs)
         TURN_ON_CHEAT: 'turn-on-cheat',
-        TURN_OFF_CHEAT_LED: 'turn-off-cheat-led',
+        TURN_OFF_CHEAT: 'turn-off-cheat',
         TURN_ON_APPLAUSE: 'turn-on-applause',
-        TURN_OFF_APPLAUSE_LED: 'turn-off-applause-led',
+        TURN_OFF_APPLAUSE: 'turn-off-applause',
         TURN_ON_PODIUM: 'turn-on-podium',
-        TURN_OFF_PODIUM_1_LED: 'turn-off-podium-1-led',
-        TURN_OFF_PODIUM_2_LED: 'turn-off-podium-2-led',
-        TURN_OFF_PODIUM_3_LED: 'turn-off-podium-3-led',
-        TURN_OFF_PODIUM_4_LED: 'turn-off-podium-4-led',
+        TURN_OFF_PODIUM: 'turn-off-podium',
         TURN_ON_JOYSTICK: 'turn-on-joystick',
+        TURN_OFF_JOYSTICK: 'turn-off-joystick',
         TURN_ON_LEVER: 'turn-on-lever',
+        TURN_OFF_LEVER: 'turn-off-lever',
         //Possible Time (Auto) Events
         ONBOARDING_COMPLETE: 'onboarding-complete',
         GAME_OVER: 'game-over',
@@ -47,7 +46,8 @@ class GameMachine {
         PODIUM_3_BTN: 'off',
         PODIUM_4_BTN: 'off',
         LEVER_DESIRED: 'off', //Lever's on/off state for turning on and off lever
-        LEVER_POS: -1,
+        LEVER_POS: null,
+        LEVER_TARGET: null,
         JOYSTICK_DESIRED: 'off', //Joystick same ^
         JOYSTICK_DIR: 0,     // whatever default state should be
     }
@@ -121,10 +121,6 @@ class GameMachine {
                     this.addEvent('turn-on-joystick', { direction });
                 }, 3 * 1000);
                 setTimeout(() => {
-                    const position = this.interactionState.LEVER_POS
-                    this.addEvent('turn-on-lever', { position });
-                }, 2 * 1000);
-                setTimeout(() => {
                     const podiumToTrigger = Math.floor(Math.random() * 4) + 1
                     this.addEvent('turn-on-podium', { podiumToTrigger });
                 }, 3 * 1000);
@@ -196,19 +192,24 @@ class GameMachine {
                 }, 5 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
-                if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
+                if (this.interactionState.LEVER_DESIRED === 'on') {
                     this.score += 7
                     if (this.score >= 100) {
                         this.score = 100
                     }
-                } else if (this.interactionState.APPLAUSE_BTN === 'off') {
+                } else if (this.interactionState.LEVER_DESIRED === 'off') {
                     this.score -= 7
                     if (this.score <= 0) {
                         this.score = 0
                     }
                 }
                 this.interactionState.LEVER_DESIRED = 'off'
-                const position = event.data.value
+                let position = event.data.value
+                if(position > 100) {
+                    position = 100
+                } else if (position < 1) {
+                    position = 1
+                }
                 this.interactionState.LEVER_POS = position
                 console.log(`lever moved: ${position}`)
                 console.log(this.score)
@@ -261,6 +262,11 @@ class GameMachine {
             if (event.name === this.events.TURN_ON_LEVER) {
                 this.interactionState.LEVER_DESIRED = 'on'
                 this.interactionState.LEVER_POS = event.data.position
+                if (this.interactionState.LEVER_POS <= 50) {
+                    this.interactionState.LEVER_TARGET = 90
+                } else {
+                    this.interactionState.LEVER_TARGET = 10
+                }
                 console.log("LEVER IS ON AT " + this.interactionState.LEVER_POS);
             }
             if (event.name === this.events.TURN_ON_PODIUM) {
@@ -275,6 +281,35 @@ class GameMachine {
                 }
                 turnOnPodiumLED(event.data.podiumToTrigger);
             }
+
+            // Set off-states
+            if (event.name == this.events.TURN_OFF_APPLAUSE) {
+                this.interactionState.APPLAUSE_BTN = 'off'
+                turnOffApplauseLED();
+            }
+            if (event.name == this.events.TURN_OFF_CHEAT) {
+                this.interactionState.CHEAT_BTN = 'off'
+                turnOffCheatLED();
+            }
+            if (event.name == this.events.TURN_OFF_JOYSTICK) {
+                this.interactionState.JOYSTICK_DESIRED = 'off'
+            }
+            if (event.name == this.events.TURN_OFF_LEVER) {
+                this.interactionState.LEVER_DESIRED = 'off'
+            }
+            if (event.name == this.events.TURN_OFF_PODIUM) {
+                if (event.data.podiumToTrigger === 1) {
+                    this.interactionState.PODIUM_1_BTN = 'off'
+                } else if (event.data.podiumToTrigger === 2) {
+                    this.interactionState.PODIUM_2_BTN = 'off'
+                } else if (event.data.podiumToTrigger === 3) {
+                    this.interactionState.PODIUM_3_BTN = 'off'
+                } else if (event.data.podiumToTrigger === 4) {
+                    this.interactionState.PODIUM_4_BTN = 'off'
+                }
+                turnOffPodiumLED(event.data.podiumToTrigger);
+            }
+            
         }
     }
 
