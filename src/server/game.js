@@ -5,6 +5,7 @@ class GameMachine {
     eventQueue = []
     isRunning = false
     loopHandle = null
+    score
 
     states = {
         IDLE: 'IDLE',
@@ -44,7 +45,9 @@ class GameMachine {
         PODIUM_2_BTN: 'off',
         PODIUM_3_BTN: 'off',
         PODIUM_4_BTN: 'off',
+        LEVER_DESIRED: 'off', //Lever's on/off state for turning on and off lever
         LEVER_POS: -1,
+        JOYSTICK_DESIRED: 'off', //Joystick same ^
         JOYSTICK_DIR: 0,     // whatever default state should be
     }
 
@@ -105,10 +108,13 @@ class GameMachine {
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                if (this.interactionState.APPLAUSE_BTN === 'on') {
+                    score += 5
+                } else if (this.interactionState.APPLAUSE_BTN === 'off') {
+                    score -= 5
+                }
                 this.interactionState.APPLAUSE_BTN = 'off'
                 turnOffApplauseLED()
-                // change ratings
-                console.log('Applause pressed');
 
                 // Trigger on state after downtime
                 setTimeout(() => {
@@ -116,10 +122,13 @@ class GameMachine {
                 }, 2 * 1000);
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
+                if (this.interactionState.CHEAT_BTN === 'on') {
+                    score += 15
+                } else if (this.interactionState.CHEAT_BTN === 'off') {
+                    score -= 15
+                }
                 this.interactionState.CHEAT_BTN = 'off'
                 turnOffCheatLED()
-                // change ratings
-                console.log('Cheat pressed')
 
                 // Trigger on state after downtime
                 setTimeout(() => {
@@ -127,20 +136,30 @@ class GameMachine {
                 }, 2 * 1000);
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
+                if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
+                    score += 5
+                } else if (this.interactionState.APPLAUSE_BTN === 'off') {
+                    score -= 5
+                }
+                this.interactionState.JOYSTICK_DESIRED = 'off'
                 const direction = event.data.dir
                 this.interactionState.JOYSTICK_DIR = direction
-                // change ratings
                 console.log(`joystick moved in: ${direction}`)
 
                 // Trigger on state after downtime
                 setTimeout(() => {
-                    this.addEvent('turn-on-joystick', {});
+                    this.addEvent(`turn-on-joystick', ${direction}`);
                 }, 2 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
+                if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
+                    score += 7
+                } else if (this.interactionState.APPLAUSE_BTN === 'off') {
+                    score -= 7
+                }
+                this.interactionState.LEVER_DESIRED = 'off'
                 const position = event.data.value
                 this.interactionState.LEVER_POS = position
-                // change ratings
                 console.log(`lever moved: ${position}`)
 
                 // Trigger on state after downtime
@@ -150,10 +169,13 @@ class GameMachine {
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data.num
+                if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'on') {
+                    score += 8
+                } else if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'off') {
+                    score -= 8
+                }
                 this.interactionState[`PODIUM_${podiumNum}_BTN`] = 'off'
                 turnOffPodiumLED(podiumNum)
-                // change ratings
-                console.log(`podium ${podiumNum} pressed`)
 
                 // Trigger on state after downtime
                 setTimeout(() => {
@@ -172,11 +194,13 @@ class GameMachine {
                 turnOnCheatLED();
             }
             if (event.name === this.events.TURN_ON_JOYSTICK) {
+                this.interactionState.JOYSTICK_DESIRED = 'on'
                 this.interactionState.JOYSTICK_DIR = event.data.dir
                 console.log("JOYSTICK IS ON AT " + this.interactionState.JOYSTICK_DIR);
             }
             if (event.name === this.events.TURN_ON_LEVER) {
-                this.interactionState.LEVER_POS = event.data.value
+                this.interactionState.LEVER_DESIRED = 'on'
+                this.interactionState.LEVER_POS = event.data.position
                 console.log("LEVEL IS ON AT " + this.interactionState.LEVER_POS);
             }
             if (event.name === this.events.TURN_ON_PODIUM) {
