@@ -6,6 +6,7 @@ class GameMachine {
     isRunning = false
     loopHandle = null
     score = 0
+    initialStep = true //Add this to Onboarding State since its before Playing State
 
     states = {
         IDLE: 'IDLE',
@@ -107,11 +108,38 @@ class GameMachine {
                 this.state = 'IDLE';
                 console.log(`State transition: PLAYING -> IDLE`);
             }
+            if (this.initialStep) {
+                setTimeout(() => {
+                    this.addEvent('turn-on-applause', {});
+                }, 3 * 1000);
+                setTimeout(() => {
+                    this.addEvent('turn-on-cheat', {});
+                }, 2 * 1000);
+                setTimeout(() => {
+                    const direction = this.interactionState.JOYSTICK_DIR
+                    this.addEvent('turn-on-joystick', { direction });
+                }, 3 * 1000);
+                setTimeout(() => {
+                    const position = this.interactionState.LEVER_POS
+                    this.addEvent('turn-on-lever', { position });
+                }, 2 * 1000);
+                setTimeout(() => {
+                    const podiumToTrigger = Math.floor(Math.random() * 4) + 1
+                    this.addEvent('turn-on-podium', { podiumToTrigger });
+                }, 3 * 1000);
+                this.initialStep = false
+            }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 if (this.interactionState.APPLAUSE_BTN === 'on') {
                     this.score += 5
+                    if (this.score >= 100) {
+                        this.score = 100
+                    }
                 } else if (this.interactionState.APPLAUSE_BTN === 'off') {
                     this.score -= 5
+                    if (this.score <= 0) {
+                        this.score = 0
+                    }
                 }
                 this.interactionState.APPLAUSE_BTN = 'off'
                 turnOffApplauseLED()
@@ -125,8 +153,14 @@ class GameMachine {
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 if (this.interactionState.CHEAT_BTN === 'on') {
                     this.score += 15
+                    if (this.score >= 100) {
+                        this.score = 100
+                    }
                 } else if (this.interactionState.CHEAT_BTN === 'off') {
                     this.score -= 15
+                    if (this.score <= 0) {
+                        this.score = 0
+                    }
                 }
                 this.interactionState.CHEAT_BTN = 'off'
                 turnOffCheatLED()
@@ -140,8 +174,14 @@ class GameMachine {
             if (event.name === this.events.JOYSTICK_MOVED) {
                 if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
                     this.score += 10
+                    if (this.score >= 100) {
+                        this.score = 100
+                    }
                 } else if (this.interactionState.APPLAUSE_BTN === 'off') {
                     this.score -= 10
+                    if (this.score <= 0) {
+                        this.score = 0
+                    }
                 }
                 this.interactionState.JOYSTICK_DESIRED = 'off'
                 const direction = event.data.dir
@@ -157,8 +197,14 @@ class GameMachine {
             if (event.name === this.events.LEVER_MOVED) {
                 if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
                     this.score += 7
+                    if (this.score >= 100) {
+                        this.score = 100
+                    }
                 } else if (this.interactionState.APPLAUSE_BTN === 'off') {
                     this.score -= 7
+                    if (this.score <= 0) {
+                        this.score = 0
+                    }
                 }
                 this.interactionState.LEVER_DESIRED = 'off'
                 const position = event.data.value
@@ -176,8 +222,14 @@ class GameMachine {
                 const podiumNum = event.data.num
                 if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'on') {
                     this.score += 8
+                    if (this.score >= 100) {
+                        this.score = 100
+                    }
                 } else if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'off') {
                     this.score -= 8
+                    if (this.score <= 0) {
+                        this.score = 0
+                    }
                 }
                 this.interactionState[`PODIUM_${podiumNum}_BTN`] = 'off'
                 turnOffPodiumLED(podiumNum)
@@ -208,7 +260,7 @@ class GameMachine {
             if (event.name === this.events.TURN_ON_LEVER) {
                 this.interactionState.LEVER_DESIRED = 'on'
                 this.interactionState.LEVER_POS = event.data.position
-                console.log("LEVEL IS ON AT " + this.interactionState.LEVER_POS);
+                console.log("LEVER IS ON AT " + this.interactionState.LEVER_POS);
             }
             if (event.name === this.events.TURN_ON_PODIUM) {
                 if(event.data.podiumToTrigger === 1) {
