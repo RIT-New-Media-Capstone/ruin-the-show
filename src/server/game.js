@@ -36,7 +36,7 @@ class GameMachine {
         TURN_ON_LEVER: 'turn-on-lever',
         //Possible Time (Auto) Events
         ONBOARDING_COMPLETE: 'onboarding-complete',
-        GAME_OVER: 'game-over'
+        GAME_OVER: 'game-over',
     }
 
     interactionState = {
@@ -109,6 +109,7 @@ class GameMachine {
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (this.initialStep) {
+                this.score = 0
                 setTimeout(() => {
                     this.addEvent('turn-on-applause', {});
                 }, 3 * 1000);
