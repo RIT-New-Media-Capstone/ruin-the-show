@@ -13,8 +13,8 @@ const totalFrames = numRows * numCols;
 const frameWidth =  4802  / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
 const frameHeight =  4324/ numRows; // idle-> 2162 / numRows; // (al) 5410/5 = 1080/2 = 540
 const frameHeightRW =  4324/ numRows;
-const frameWidthAL = 7688 / numCols;
-const frameHeightAL = 5410 / numRows;
+const frameWidthAL = 4802 / numCols;
+const frameHeightAL = 4324 / numRows;
 
 
 
@@ -62,7 +62,7 @@ window.preload = function () {
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
 
     //AL 
-    al = loadImage('/Assets/SpriteSheets/Host/AL_idle.png'); 
+    al = loadImage('/Assets/SpriteSheets/Host/AL_Idle.png'); 
     
     //CONTESTANT ANIMATIONS IDLE
     assets.contestants = [];
@@ -335,9 +335,9 @@ function drawHands() {
 function drawHost(sx, sy){
     //if host is in idle then call idle positions and state
     let x = 100;
-    const y = height/2.4;
+    const y = height/2;
     //const spacing = 160;
-    let scaleFactor = 0.38;
+    let scaleFactor = 0.7;
     let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidthAL * scaleFactor;

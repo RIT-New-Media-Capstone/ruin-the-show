@@ -22,7 +22,7 @@ class GameMachine {
         PODIUM_BUTTON_PRESSED: 'podium-button-pressed',
         JOYSTICK_MOVED: 'joystick-moved',
         LEVER_MOVED: 'lever-moved',
-        //Inputs Given (LEDs)
+        //Inputs Given
         TURN_ON_CHEAT: 'turn-on-cheat',
         TURN_OFF_CHEAT: 'turn-off-cheat',
         TURN_ON_APPLAUSE: 'turn-on-applause',
