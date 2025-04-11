@@ -5,7 +5,7 @@ class GameMachine {
     eventQueue = []
     isRunning = false
     loopHandle = null
-    score
+    score = 0
 
     states = {
         IDLE: 'IDLE',
@@ -94,7 +94,7 @@ class GameMachine {
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 this.state = 'PLAYING';
                 console.log(`State transition: ONBOARDING -> PLAYING`);
-                // Start the game timer (Game Time / 1 min AND 15 sec (for score screen)
+                // Start the game timer (Game Time / 1 min AND 15 sec (for this.score screen)
                 setTimeout(() => {
                     this.addEvent('game-over', {});
                 }, 75 * 1000);
@@ -109,79 +109,86 @@ class GameMachine {
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 if (this.interactionState.APPLAUSE_BTN === 'on') {
-                    score += 5
+                    this.score += 5
                 } else if (this.interactionState.APPLAUSE_BTN === 'off') {
-                    score -= 5
+                    this.score -= 5
                 }
                 this.interactionState.APPLAUSE_BTN = 'off'
                 turnOffApplauseLED()
+                console.log(this.score)
 
                 // Trigger on state after downtime
                 setTimeout(() => {
                     this.addEvent('turn-on-applause', {});
-                }, 2 * 1000);
+                }, 5 * 1000);
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 if (this.interactionState.CHEAT_BTN === 'on') {
-                    score += 15
+                    this.score += 15
                 } else if (this.interactionState.CHEAT_BTN === 'off') {
-                    score -= 15
+                    this.score -= 15
                 }
                 this.interactionState.CHEAT_BTN = 'off'
                 turnOffCheatLED()
+                console.log(this.score)
 
                 // Trigger on state after downtime
                 setTimeout(() => {
                     this.addEvent('turn-on-cheat', {});
-                }, 2 * 1000);
+                }, 5 * 1000);
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
                 if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
-                    score += 5
+                    this.score += 10
                 } else if (this.interactionState.APPLAUSE_BTN === 'off') {
-                    score -= 5
+                    this.score -= 10
                 }
                 this.interactionState.JOYSTICK_DESIRED = 'off'
                 const direction = event.data.dir
                 this.interactionState.JOYSTICK_DIR = direction
                 console.log(`joystick moved in: ${direction}`)
+                console.log(this.score)
 
                 // Trigger on state after downtime
                 setTimeout(() => {
                     this.addEvent(`turn-on-joystick', ${direction}`);
-                }, 2 * 1000);
+                }, 5 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
                 if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
-                    score += 7
+                    this.score += 7
                 } else if (this.interactionState.APPLAUSE_BTN === 'off') {
-                    score -= 7
+                    this.score -= 7
                 }
                 this.interactionState.LEVER_DESIRED = 'off'
                 const position = event.data.value
                 this.interactionState.LEVER_POS = position
                 console.log(`lever moved: ${position}`)
+                console.log(this.score)
+
 
                 // Trigger on state after downtime
                 setTimeout(() => {
                     this.addEvent('turn-on-lever', {position});
-                }, 2 * 1000);
+                }, 5 * 1000);
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data.num
                 if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'on') {
-                    score += 8
+                    this.score += 8
                 } else if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'off') {
-                    score -= 8
+                    this.score -= 8
                 }
                 this.interactionState[`PODIUM_${podiumNum}_BTN`] = 'off'
                 turnOffPodiumLED(podiumNum)
+                console.log(this.score)
+
 
                 // Trigger on state after downtime
                 setTimeout(() => {
                     const podiumToTrigger = Math.floor(Math.random() * 4) + 1
                     this.addEvent('turn-on-podium', {podiumToTrigger});
-                }, 2 * 1000);
+                }, 5 * 1000);
             }
 
             // Set on-states
