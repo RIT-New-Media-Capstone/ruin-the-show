@@ -3,7 +3,8 @@
 //Sprite Sheet Animation Variables for Contestants
 let al;
 let contestantFrames = [];
-let currentFrame = 0;
+let currentFrameHost = 0;
+let currentFrameContestants = 0;
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
 const numRows = 8;//4; // idle + al
 const numRowsRW = 8; // number of rows for right + wrong
@@ -12,8 +13,8 @@ const totalFrames = numRows * numCols;
 const frameWidth =  4802  / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
 const frameHeight =  4324/ numRows; // idle-> 2162 / numRows; // (al) 5410/5 = 1080/2 = 540
 const frameHeightRW =  4324/ numRows;
-const frameWidthAL = 7688 / numRows;
-const frameHeightAL = 5410 / numCols;
+const frameWidthAL = 7688 / numCols;
+const frameHeightAL = 5410 / numRows;
 
 
 
@@ -227,7 +228,7 @@ function drawContestant() {
     let scaleFactor = 0.32;
     
     assets.contestants.forEach((sheet, index) => {
-        let frame = contestantFrames[index][currentFrame];
+        let frame = contestantFrames[index][currentFrameContestants];
 
         if (frame && frame.sheet) {
             image(
@@ -241,7 +242,7 @@ function drawContestant() {
 
     // Update frame only every few draw cycles
     if (frameCount % frameDelay === 0) {
-        currentFrame = (currentFrame + 1) % totalFrames;
+        currentFrameContestants = (currentFrameContestants + 1) % totalFrames;
     }
 }
 
@@ -343,14 +344,14 @@ function drawHost(sx, sy){
     const alHeight = frameHeightAL * scaleFactor;
 
     ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-     sx = (currentFrame % numCols) * alFrameWidth;//frameWidth;
-     sy = Math.floor(currentFrame / numCols) * frameHeightAL;//frameHeight;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;//frameHeight;
 
 
     image(al, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
    
     if (frameCount % frameDelay === 0) {
-        currentFrame = (currentFrame + 1) % totalFrames;
+        currentFrameHost = (currentFrameHost + 1) % totalFrames;
     }
 }
 
