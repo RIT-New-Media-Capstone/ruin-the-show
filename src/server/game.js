@@ -35,7 +35,7 @@ const moveToPlaying = (machine) => {
     }, 3 * 1000);
     setTimeout(() => {
         const podiumToTrigger = Math.floor(Math.random() * 4) + 1
-        machine.addEvent(machine.events.TURN_ON_PODIUM, { podiumToTrigger });
+        machine.addEvent(machine.events.TURN_ON_PODIUM, { num: podiumToTrigger });
     }, 3 * 1000);
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_LEVER, {position: Math.random() * 100});
@@ -255,14 +255,14 @@ class GameMachine {
                     if (this.score >= 100) {
                         this.score = 100
                     }
-                    clearTimeout(this.podiumTimer);
-                    this.addEvent(this.events.TURN_OFF_PODIUM, {});
                 } else if (this.cues[`PODIUM_${event.data.num}_CUE`] === 'off') {
                     this.score -= 8
                     if (this.score <= 0) {
                         this.score = 0
                     }
                 }
+                clearTimeout(this.podiumTimer);
+                this.addEvent(this.events.TURN_OFF_PODIUM, {num: event.data.num});
             }
 
             // Set on-states
@@ -292,7 +292,7 @@ class GameMachine {
                 console.log("LEVER IS ON AT " + this.cues.LEVER_POS);
             }
             if (event.name === this.events.TURN_ON_PODIUM && this.cues[`PODIUM_${event.data.num}_CUE`] === 'off') {
-                this.cues[`PODIUM_${event.data.num}_CUE`] === 'on'
+                this.cues[`PODIUM_${event.data.num}_CUE`] = 'on'
                 turnOnPodiumLED(event.data.num);
                 this.podiumTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_PODIUM, {num: event.data.num});
@@ -300,32 +300,34 @@ class GameMachine {
             }
 
             // Set off-states
-            if (event.name == this.events.TURN_OFF_APPLAUSE && this.cues.APPLAUSE_CUE === 'on') {
+            if (event.name === this.events.TURN_OFF_APPLAUSE && this.cues.APPLAUSE_CUE === 'on') {
                 this.cues.APPLAUSE_CUE = 'off'
                 turnOffApplauseLED();
                 this.applauseTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_APPLAUSE, {});
                 }, 1 * 1000);
             }
-            if (event.name == this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE === 'on') {
+            if (event.name === this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE === 'on') {
                 this.cues.CHEAT_CUE = 'off'
                 turnOffCheatLED();
                 this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_CHEAT, {});
                 }, 2 * 1000);
             }
-            if (event.name == this.events.TURN_OFF_JOYSTICK) {
+            if (event.name === this.events.TURN_OFF_JOYSTICK) {
                 this.cues.JOYSTICK_CUE = 'off'
             }
-            if (event.name == this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE === 'on') {
+            if (event.name === this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE === 'on') {
                 this.cues.LEVER_CUE = 'off'
             }
-            if (event.name == this.events.TURN_OFF_PODIUM && this.cues[`PODIUM_${event.data.num}_CUE`] === 'on') {
-                this.cues[`PODIUM_${event.data.num}_CUE`] === 'off'
-                turnOffPodiumLED(event.data.num);
+            if (event.name == this.events.TURN_OFF_PODIUM) {
+                for(let i = 1; i <= 4; i++) {
+                    this.cues[`PODIUM_${i}_CUE`] = 'off'
+                    turnOffPodiumLED(i);
+                }
                 const podiumToTrigger = Math.floor(Math.random() * 4) + 1
                 this.podiumTimer = setTimeout(() => {
-                    this.addEvent(this.events.TURN_ON_PODIUM, { podiumToTrigger });
+                    this.addEvent(this.events.TURN_ON_PODIUM, { num: podiumToTrigger });
                 }, 3 * 1000);
             }
             
