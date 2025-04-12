@@ -35,6 +35,7 @@ class GameMachine {
     isRunning = false
     loopHandle = null
     score = 0
+    cheatTimer = null
 
     states = {
         IDLE: 'IDLE',
@@ -81,14 +82,16 @@ class GameMachine {
         JOYSTICK_TARGET: 0
     }
 
-
     constructor(initialState) {
         this.state = initialState;
     }
 
     getState() {
-        states
-        cues
+        return {
+            state: this.state,
+            score: this.score,
+            cues: this.cues
+        };
     }
 
     // This is your (state, event) => state function
@@ -169,16 +172,16 @@ class GameMachine {
 
                 // Trigger on state after downtime
                 setTimeout(() => {
-                    this.addEvent(this.addEvent.TURN_ON_APPLAUSE, {});
+                    this.addEvent(this.events.TURN_ON_APPLAUSE, {});
                 }, 5 * 1000);
             }
-            if (event.name === this.events.CHEAT_BUTTON_PRESSED) { //REFER TO CHEAT FOR UPDATES
+            if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 if (this.cues.CHEAT_CUE === 'on') {
                     this.score += 15
                     if (this.score >= 100) {
                         this.score = 100
                     }
-
+                    clearTimeout(this.cheatTimer);
                     this.addEvent(this.events.TURN_OFF_CHEAT);
                 } else if (this.cues.CHEAT_CUE === 'off') {
                     this.score -= 15
@@ -186,7 +189,6 @@ class GameMachine {
                         this.score = 0
                     }
                 }
-               
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
                 // store the data 
@@ -234,12 +236,6 @@ class GameMachine {
                 //     }
                 // }
                 console.log(this.score)
-
-
-                // Trigger on state after downtime
-                // setTimeout(() => {
-                //     this.addEvent('turn-on-lever', {position});
-                // }, 5 * 1000);
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data.num
@@ -274,8 +270,8 @@ class GameMachine {
             if (event.name === this.events.TURN_ON_CHEAT && this.cues.CHEAT_CUE === 'off') {
                 this.cues.CHEAT_CUE = 'on'
                 turnOnCheatLED();
-                setTimeout(() => {
-                    this.addEvent(this.events.TURN_OFF_CHEAT)
+                this.cheatTimer = setTimeout(() => {
+                    this.addEvent(this.events.TURN_OFF_CHEAT, {});
                 }, 5 * 1000);
             }
             if (event.name === this.events.TURN_ON_JOYSTICK) {
@@ -283,7 +279,7 @@ class GameMachine {
                 this.cues.JOYSTICK_DIR = event.data.dir
                 console.log("JOYSTICK IS ON AT " + this.cues.JOYSTICK_DIR);
             }
-            if (event.name === this.events.TURN_ON_LEVER && this.cues.CHEAT_CUE === 'off') {
+            if (event.name === this.events.TURN_ON_LEVER && this.cues.LEVER_CUE === 'off') {
                 this.cues.LEVER_CUE = 'on'
                 this.cues.LEVER_TARGET = event.data.position
 
@@ -313,8 +309,7 @@ class GameMachine {
             if (event.name == this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE === 'on') {
                 this.cues.CHEAT_CUE = 'off'
                 turnOffCheatLED();
-                // clearTimeout(someVariable);
-                setTimeout(() => {
+                this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_CHEAT, {});
                 }, 2 * 1000);
             }
@@ -403,7 +398,7 @@ const runExample = () => {
     console.log('Current state:', machine.state);
 
     //DEBUG PURPOSES: START AT PLAYING STATE
-    machine.state = "PLAYING";
+    moveToPlaying(machine);
 
     /*
     // Simulate an RFID scan after 5 seconds
