@@ -5,33 +5,31 @@ const moveToPlaying = (machine) => {
     console.log(`State transition: ONBOARDING -> PLAYING`);
     // Start the game timer
     setTimeout(() => {
-        machine.addEvent('game-over', {});
+        machine.addEvent(machine.events.GAME_OVER, {});
     }, 75 * 1000);
-
+    //INITIALIZE ALL GAMEPLAY COMPONENTS HERE (e.g. Score)
     machine.score = 0
     setTimeout(() => {
-        machine.addEvent('turn-on-applause', {});
+        machine.addEvent(machine.events.TURN_ON_APPLAUSE, {});
     }, 3 * 1000);
     setTimeout(() => {
-        machine.addEvent(this.events.TURN_ON_CHEAT, {});
+        machine.addEvent(machine.events.TURN_ON_CHEAT, {});
     }, 2 * 1000);
     setTimeout(() => {
-        const direction = machine.interactionState.JOYSTICK_DIR
-        machine.addEvent('turn-on-joystick', { direction });
+        const direction = machine.cues.JOYSTICK_DIR
+        machine.addEvent(machine.events.TURN_ON_JOYSTICK, { direction });
     }, 3 * 1000);
     setTimeout(() => {
         const podiumToTrigger = Math.floor(Math.random() * 4) + 1
-        machine.addEvent('turn-on-podium', { podiumToTrigger });
+        machine.addEvent(machine.events.TURN_ON_PODIUM, { podiumToTrigger });
     }, 3 * 1000);
     setTimeout(() => {
-        this.addEvent(this.events.TURN_ON_LEVER, {
-            position: Math.random() * 100
-        });
+        machine.addEvent(machine.events.TURN_ON_LEVER, {position: Math.random() * 100});
     }, 5 * 1000);
 
 }
 
-// OUTER LOOP / GAME MACHINE (Idle, Onboard, Playing)
+// GAME MACHINE (Idle, Onboard, Playing (w/ Associated Sub Machine Functions))
 class GameMachine {
     eventQueue = []
     isRunning = false
@@ -68,18 +66,19 @@ class GameMachine {
         GAME_OVER: 'game-over',
     }
 
-    interactionState = {
-        APPLAUSE_BTN: 'off',
-        CHEAT_BTN: 'off',
-        PODIUM_1_BTN: 'off',
-        PODIUM_2_BTN: 'off',
-        PODIUM_3_BTN: 'off',
-        PODIUM_4_BTN: 'off',
-        LEVER_DESIRED: 'off', //Lever's on/off state for turning on and off lever
-        LEVER_POS: null,
+    cues = {
+        APPLAUSE_CUE: 'off',
+        CHEAT_CUE: 'off',
+        PODIUM_1_CUE: 'off',
+        PODIUM_2_CUE: 'off',
+        PODIUM_3_CUE: 'off',
+        PODIUM_4_CUE: 'off',
+        LEVER_CUE: 'off',
+        LEVER_POS: null,      // whatever default state should be
         LEVER_TARGET: null,
-        JOYSTICK_DESIRED: 'off', //Joystick same ^
+        JOYSTICK_CUE: 'off',
         JOYSTICK_DIR: 0,     // whatever default state should be
+        JOYSTICK_TARGET: 0
     }
 
 
@@ -88,7 +87,8 @@ class GameMachine {
     }
 
     getState() {
-
+        states
+        cues
     }
 
     // This is your (state, event) => state function
@@ -97,7 +97,7 @@ class GameMachine {
         if (!event) return;
         console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
-        if (event.name === this.events.LEVER_MOVED) {
+        if (event.name === this.events.LEVER_MOVED) {// TRAVIS PUT THIS IN
             // store the data 
             let position = event.data.value
             if(position > 100) {
@@ -105,26 +105,26 @@ class GameMachine {
             } else if (position < 1) {
                 position = 1
             }
-            this.interactionState.LEVER_POS = position
+            this.cues.LEVER_POS = position
         }
         
 
         if (this.state === this.states.IDLE) {                      //IDLE STATE
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 // DEBUG Purposes, goes to onboarding
-                this.state = 'ONBOARDING';
+                this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 setTimeout(() => {
-                    this.addEvent('onboarding-complete', {});
+                    this.addEvent(this.events.ONBOARDING_COMPLETE, {});
                 }, 60 * 1000);
             }
             if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
-                this.state = 'ONBOARDING';
+                this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 // set 60 second timer, change length depending on how long onboarding is
                 setTimeout(() => {
-                    this.addEvent('onboarding-complete', {});
+                    this.addEvent(this.events.ONBOARDING_COMPLETE, {});
                 }, 60 * 1000);
             }
             else {
@@ -132,7 +132,7 @@ class GameMachine {
             }
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
             if (event.name === this.events.ONBOARDING_COMPLETE) {
-                moveToPlaying(this);
+                moveToPlaying(this); //TRAVIS MADE THIS CHANGE
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 // this.state = 'PLAYING';
@@ -148,39 +148,39 @@ class GameMachine {
             }
         } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE           
             if (event.name === this.events.GAME_OVER) {
-                this.state = 'IDLE';
+                this.state = this.states.IDLE;
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
-                if (this.interactionState.APPLAUSE_BTN === 'on') {
+                if (this.cues.APPLAUSE_CUE === 'on') {
                     this.score += 5
                     if (this.score >= 100) {
                         this.score = 100
                     }
-                } else if (this.interactionState.APPLAUSE_BTN === 'off') {
+                } else if (this.cues.APPLAUSE_CUE === 'off') {
                     this.score -= 5
                     if (this.score <= 0) {
                         this.score = 0
                     }
                 }
-                this.interactionState.APPLAUSE_BTN = 'off'
+                this.cues.APPLAUSE_CUE = 'off'
                 turnOffApplauseLED()
                 console.log(this.score)
 
                 // Trigger on state after downtime
                 setTimeout(() => {
-                    this.addEvent('turn-on-applause', {});
+                    this.addEvent(this.addEvent.TURN_ON_APPLAUSE, {});
                 }, 5 * 1000);
             }
-            if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
-                if (this.interactionState.CHEAT_BTN === 'on') {
+            if (event.name === this.events.CHEAT_BUTTON_PRESSED) { //REFER TO CHEAT FOR UPDATES
+                if (this.cues.CHEAT_CUE === 'on') {
                     this.score += 15
                     if (this.score >= 100) {
                         this.score = 100
                     }
 
                     this.addEvent(this.events.TURN_OFF_CHEAT);
-                } else if (this.interactionState.CHEAT_BTN === 'off') {
+                } else if (this.cues.CHEAT_CUE === 'off') {
                     this.score -= 15
                     if (this.score <= 0) {
                         this.score = 0
@@ -192,22 +192,22 @@ class GameMachine {
                 // store the data 
                 let dir = event.data.value
             
-                this.interactionState.SPOTLIGHT_POSITION += dir;
+                this.cues.SPOTLIGHT_POSITION += dir;
     
-                if (this.interactionState.APPLAUSE_BTN === 'on') { //CHANGE THIS
+                if (this.cues.APPLAUSE_CUE === 'on') { //CHANGE THIS
                     this.score += 10
                     if (this.score >= 100) {
                         this.score = 100
                     }
-                } else if (this.interactionState.APPLAUSE_BTN === 'off') {
+                } else if (this.cues.APPLAUSE_CUE === 'off') {
                     this.score -= 10
                     if (this.score <= 0) {
                         this.score = 0
                     }
                 }
-                this.interactionState.JOYSTICK_DESIRED = 'off'
+                this.cues.JOYSTICK_CUE = 'off'
                 const direction = event.data.dir
-                this.interactionState.JOYSTICK_DIR = direction
+                this.cues.JOYSTICK_DIR = direction
                 console.log(`joystick moved in: ${direction}`)
                 console.log(this.score)
 
@@ -220,22 +220,19 @@ class GameMachine {
 
                 // if lever is cued (desired) && lever_pos is in range of lever_target
 
-                if (this.interactionState.LEVER_DESIRED === 'on') {
+                if (this.cues.LEVER_CUE === 'on') {
                     this.score += 7
                     if (this.score >= 100) {
                         this.score = 100
                     }
                     this.addEvent(this.events.TURN_OFF_LEVER);
                 } 
-                // else if (this.interactionState.LEVER_DESIRED === 'off') {
+                // else if (this.cues.LEVER_CUE === 'off') {
                 //     this.score -= 7
                 //     if (this.score <= 0) {
                 //         this.score = 0
                 //     }
                 // }
-
-   
-                console.log(`lever moved: ${position}`)
                 console.log(this.score)
 
 
@@ -246,18 +243,18 @@ class GameMachine {
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data.num
-                if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'on') {
+                if (this.cues[`PODIUM_${podiumNum}_CUE`] === 'on') {
                     this.score += 8
                     if (this.score >= 100) {
                         this.score = 100
                     }
-                } else if (this.interactionState[`PODIUM_${podiumNum}_BTN`] === 'off') {
+                } else if (this.cues[`PODIUM_${podiumNum}_CUE`] === 'off') {
                     this.score -= 8
                     if (this.score <= 0) {
                         this.score = 0
                     }
                 }
-                this.interactionState[`PODIUM_${podiumNum}_BTN`] = 'off'
+                this.cues[`PODIUM_${podiumNum}_CUE`] = 'off'
                 turnOffPodiumLED(podiumNum)
                 console.log(this.score)
 
@@ -271,50 +268,50 @@ class GameMachine {
 
             // Set on-states
             if (event.name === this.events.TURN_ON_APPLAUSE) {
-                this.interactionState.APPLAUSE_BTN = 'on'
+                this.cues.APPLAUSE_CUE = 'on'
                 turnOnApplauseLED();
             }
-            if (event.name === this.events.TURN_ON_CHEAT && this.interactionState.CHEAT_BTN === 'off') {
-                this.interactionState.CHEAT_BTN = 'on'
+            if (event.name === this.events.TURN_ON_CHEAT && this.cues.CHEAT_CUE === 'off') {
+                this.cues.CHEAT_CUE = 'on'
                 turnOnCheatLED();
                 setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_CHEAT)
                 }, 5 * 1000);
             }
             if (event.name === this.events.TURN_ON_JOYSTICK) {
-                this.interactionState.JOYSTICK_DESIRED = 'on'
-                this.interactionState.JOYSTICK_DIR = event.data.dir
-                console.log("JOYSTICK IS ON AT " + this.interactionState.JOYSTICK_DIR);
+                this.cues.JOYSTICK_CUE = 'on'
+                this.cues.JOYSTICK_DIR = event.data.dir
+                console.log("JOYSTICK IS ON AT " + this.cues.JOYSTICK_DIR);
             }
-            if (event.name === this.events.TURN_ON_LEVER && this.interactionState.CHEAT_BTN === 'off') {
-                this.interactionState.LEVER_DESIRED = 'on'
-                this.interactionState.LEVER_TARGET = event.data.position
+            if (event.name === this.events.TURN_ON_LEVER && this.cues.CHEAT_CUE === 'off') {
+                this.cues.LEVER_CUE = 'on'
+                this.cues.LEVER_TARGET = event.data.position
 
-                console.log("LEVER IS ON AT " + this.interactionState.LEVER_POS);
+                console.log("LEVER IS ON AT " + this.cues.LEVER_POS);
             }
             if (event.name === this.events.TURN_ON_PODIUM) {
-                this.interactionState.PODIUM_CUED = 'on';
-                this.interactionState.PODIUM_TARGET = event.data.podiumToTrigger;
+                this.cues.PODIUM_CUED = 'on';
+                this.cues.PODIUM_TARGET = event.data.podiumToTrigger;
 
                 if(event.data.podiumToTrigger === 1) {
-                    this.interactionState.PODIUM_1_BTN = 'on'
+                    this.cues.PODIUM_1_CUE = 'on'
                 } else if (event.data.podiumToTrigger === 2) {
-                    this.interactionState.PODIUM_2_BTN = 'on'
+                    this.cues.PODIUM_2_CUE = 'on'
                 } else if (event.data.podiumToTrigger === 3) {
-                    this.interactionState.PODIUM_3_BTN = 'on'
+                    this.cues.PODIUM_3_CUE = 'on'
                 } else if (event.data.podiumToTrigger === 4) {
-                    this.interactionState.PODIUM_4_BTN = 'on'
+                    this.cues.PODIUM_4_CUE = 'on'
                 }
-                turnOnPodiumLED(event.data.podiumToTrigger);
+                turnOnPodiumLED(this.cues.PODIUM_TARGET);
             }
 
             // Set off-states
             if (event.name == this.events.TURN_OFF_APPLAUSE) {
-                this.interactionState.APPLAUSE_BTN = 'off'
+                this.cues.APPLAUSE_CUE = 'off'
                 turnOffApplauseLED();
             }
-            if (event.name == this.events.TURN_OFF_CHEAT && this.interactionState.CHEAT_BTN === 'on') {
-                this.interactionState.CHEAT_BTN = 'off'
+            if (event.name == this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE === 'on') {
+                this.cues.CHEAT_CUE = 'off'
                 turnOffCheatLED();
                 // clearTimeout(someVariable);
                 setTimeout(() => {
@@ -322,20 +319,20 @@ class GameMachine {
                 }, 2 * 1000);
             }
             if (event.name == this.events.TURN_OFF_JOYSTICK) {
-                this.interactionState.JOYSTICK_DESIRED = 'off'
+                this.cues.JOYSTICK_CUE = 'off'
             }
-            if (event.name == this.events.TURN_OFF_LEVER  && this.interactionState.LEVER_DESIRED === 'on') {
-                this.interactionState.LEVER_DESIRED = 'off'
+            if (event.name == this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE === 'on') {
+                this.cues.LEVER_CUE = 'off'
             }
             if (event.name == this.events.TURN_OFF_PODIUM) {
                 if (event.data.podiumToTrigger === 1) {
-                    this.interactionState.PODIUM_1_BTN = 'off'
+                    this.cues.PODIUM_1_CUE = 'off'
                 } else if (event.data.podiumToTrigger === 2) {
-                    this.interactionState.PODIUM_2_BTN = 'off'
+                    this.cues.PODIUM_2_CUE = 'off'
                 } else if (event.data.podiumToTrigger === 3) {
-                    this.interactionState.PODIUM_3_BTN = 'off'
+                    this.cues.PODIUM_3_CUE = 'off'
                 } else if (event.data.podiumToTrigger === 4) {
-                    this.interactionState.PODIUM_4_BTN = 'off'
+                    this.cues.PODIUM_4_CUE = 'off'
                 }
                 turnOffPodiumLED(event.data.podiumToTrigger);
             }
@@ -381,19 +378,19 @@ const machine = new GameMachine('IDLE');
 
 // Gets all 5 Inputs from Panel.js
 panel.on('cheatPressed', () => {
-    machine.addEvent('cheat-button-pressed', {})
+    machine.addEvent(machine.events.CHEAT_BUTTON_PRESSED, {})
 });
 panel.on('applausePressed', () => {
-    machine.addEvent('applause-button-pressed', {});
+    machine.addEvent(machine.events.APPLAUSE_BUTTON_PRESSED, {});
 });
 panel.on('podiumPressed', (num) => {
-    machine.addEvent(`podium-button-pressed`, { num });
+    machine.addEvent(machine.events.PODIUM_BUTTON_PRESSED, { num });
 });
 panel.on('joystickMoved', (dir) => {
-    machine.addEvent('joystick-moved', { dir });
+    machine.addEvent(machine.events.JOYSTICK_MOVED, { dir });
 });
 panel.on('leverMoved', (value) => {
-    machine.addEvent('lever-moved', { value });
+    machine.addEvent(machine.events.LEVER_MOVED, { value });
 });
 
 // Example usage
