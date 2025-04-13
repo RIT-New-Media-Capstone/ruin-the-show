@@ -43,8 +43,7 @@ const serialSetup = () => {
         else if (data == "PODIUM_2_PRESSED") podiumButtonPressed(2);
         else if (data == "PODIUM_3_PRESSED") podiumButtonPressed(3);
         else if (data == "PODIUM_4_PRESSED") podiumButtonPressed(4);
-        else if (data == "JOYSTICK_LEFT") joystickMoved(-1);
-        else if (data == "JOYSTICK_RIGHT") joystickMoved(1);
+        else if (data.startsWith("JOYSTICK_POSITION:")) joystickMoved(data);
         else if (data.startsWith("LEVER_VALUE:")) leverRotated(data)
         else if (data.lastIndexOf("ACK") === -1) console.log(data) // if it isn't ack 
     });
@@ -92,7 +91,7 @@ const podiumButtonPressed = (podiumNum) => {
     eventBus.emit('podiumPressed', podiumNum);
 }
 const joystickMoved = (direction) => {
-    eventBus.emit('joystickMoved', direction);
+    eventBus.emit('joystickMoved', parseInt(direction.split(':')[1], 10));
 }
 const leverRotated = (value) => {
     eventBus.emit('leverMoved', parseInt(value.split(':')[1], 10));

@@ -15,8 +15,8 @@ const int APPLAUSE_BTN = 3;
 
 // Button LEDs - Digital outputs
 const int PODIUM_LED_1 = 10;
-const int PODIUM_LED_2 = 11;
-const int PODIUM_LED_3 = 12;
+const int PODIUM_LED_2 = 12;
+const int PODIUM_LED_3 = 11;
 const int PODIUM_LED_4 = 13;
 const int CHEAT_LED = 8;
 const int APPLAUSE_LED = 9;
@@ -37,6 +37,7 @@ int cheatState = 0;
 int applauseState = 0;
 int joystickLeftState = 0;
 int joystickRightState = 0;
+int joystickValue = 0;  // Variable to store joystick position (-1, 0, or 1)
 
 // Variables to store previous button states for edge detection
 int prevPodium1State = 0;
@@ -52,6 +53,10 @@ int prevJoystickRightState = 0;
 int leverValue = 0;
 int prevLeverValue = 0;
 const int LEVER_THRESHOLD = 2; // Threshold for lever value change
+
+// Timing for joystick streaming
+unsigned long lastJoystickStreamTime = 0;
+const int JOYSTICK_STREAM_INTERVAL = 100; // Stream joystick value every 100ms
 
 void setup() {
   // Initialize serial communication
@@ -101,9 +106,27 @@ void loop() {
   joystickLeftState = !digitalRead(JOYSTICK_LEFT);
   joystickRightState = !digitalRead(JOYSTICK_RIGHT);
   
+  // Determine joystick value: -1 (left), 0 (neutral), or 1 (right)
+  if (joystickLeftState && !joystickRightState) {
+    joystickValue = -1;
+  } else if (!joystickLeftState && joystickRightState) {
+    joystickValue = 1;
+  } else {
+    joystickValue = 0;
+  }
+  
+  // Stream joystick position at regular intervals
+  unsigned long currentTime = millis();
+  if (currentTime - lastJoystickStreamTime >= JOYSTICK_STREAM_INTERVAL) {
+    Serial.print("JOYSTICK_POSITION:");
+    Serial.println(joystickValue);
+    lastJoystickStreamTime = currentTime;
+  }
+  
   // Read potentiometer and map to 1-100
   int rawLeverValue = analogRead(LEVER_POT);
-  leverValue = map(rawLeverValue, 834, 327, 1, 100);
+  leverValue = map(rawLeverValue, 834, 328, 1, 100);
+  //leverValue= rawLeverValue;
   
   // Check for button presses (rising edge detection)
   if (podium1State && !prevPodium1State) {
@@ -123,14 +146,6 @@ void loop() {
   }
   if (applauseState && !prevApplauseState) {
     Serial.println("APPLAUSE_PRESSED");
-  }
-  
-  // Check for joystick position changes
-  if (joystickLeftState && !prevJoystickLeftState) {
-    Serial.println("JOYSTICK_LEFT");
-  }
-  if (joystickRightState && !prevJoystickRightState) {
-    Serial.println("JOYSTICK_RIGHT");
   }
   
   // Check for significant lever value changes
@@ -240,8 +255,7 @@ void processCommand(String command) {
     Serial.print("PODIUM_4_BTN:"); Serial.println(podium4State);
     Serial.print("CHEAT_BTN:"); Serial.println(cheatState);
     Serial.print("APPLAUSE_BTN:"); Serial.println(applauseState);
-    Serial.print("JOYSTICK_LEFT:"); Serial.println(joystickLeftState);
-    Serial.print("JOYSTICK_RIGHT:"); Serial.println(joystickRightState);
+    Serial.print("JOYSTICK_POSITION:"); Serial.println(joystickValue);
     Serial.print("LEVER_VALUE:"); Serial.println(leverValue);
     Serial.println("STATUS_END");
   }

@@ -206,7 +206,14 @@ class GameMachine {
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
                 this.feedback.JOYSTICK_DIR = event.data.dir
-                console.log(this.feedback.JOYSTICK_DIR);
+                if (this.feedback.JOYSTICK_DIR === -1) {
+                    console.log("RIGHT");
+                } else if (this.feedback.JOYSTICK_DIR === 1) {
+                    console.log("LEFT");
+                } else if (this.feedback.JOYSTICK_DIR === 0) {
+                    console.log("NEUTRAL");
+                }
+                
                 if (this.cues.JOYSTICK_CUE === 'on') {
                     this.score += 10
                     if (this.score >= 100) {
