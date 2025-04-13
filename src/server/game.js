@@ -30,8 +30,7 @@ const moveToPlaying = (machine) => {
         machine.addEvent(machine.events.TURN_ON_CHEAT, {});
     }, 2 * 1000);
     setTimeout(() => {
-        const direction = machine.cues.JOYSTICK_DIR
-        machine.addEvent(machine.events.TURN_ON_JOYSTICK, { direction });
+        machine.addEvent(machine.events.TURN_ON_JOYSTICK, {});
     }, 3 * 1000);
     setTimeout(() => {
         const podiumToTrigger = Math.floor(Math.random() * 4) + 1
@@ -94,14 +93,14 @@ class GameMachine {
         PODIUM_4_CUE: 'off',
         LEVER_CUE: 'off',
         JOYSTICK_CUE: 'off',
-        JOYSTICK_DIR: 0,     // whatever default state should be
-        JOYSTICK_TARGET: 0
     }
 
     feedback = {
         LEVER_INITIAL: null,
         LEVER_POS: null,
         LEVER_TARGET: null,
+        JOYSTICK_DIR: 0,     // whatever default state should be
+        JOYSTICK_TARGET: 0
     }
 
     constructor(initialState) {
@@ -206,32 +205,21 @@ class GameMachine {
                 }
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
-                // store the data 
-                let dir = event.data.value
-            
-                this.cues.SPOTLIGHT_POSITION += dir;
-    
-                if (this.cues.APPLAUSE_CUE === 'on') { //CHANGE THIS
+                this.feedback.JOYSTICK_DIR = event.data.dir
+                console.log(this.feedback.JOYSTICK_DIR);
+                if (this.cues.JOYSTICK_CUE === 'on') {
                     this.score += 10
                     if (this.score >= 100) {
                         this.score = 100
                     }
-                } else if (this.cues.APPLAUSE_CUE === 'off') {
+                    clearTimeout(this.joystickTimer);
+                    this.addEvent(this.events.TURN_OFF_JOYSTICK);
+                } else if (this.cues.JOYSTICK_CUE === 'off') {
                     this.score -= 10
                     if (this.score <= 0) {
                         this.score = 0
                     }
                 }
-                this.cues.JOYSTICK_CUE = 'off'
-                const direction = event.data.dir
-                this.cues.JOYSTICK_DIR = direction
-                console.log(`joystick moved in: ${direction}`)
-                console.log(this.score)
-
-                // Trigger on state after downtime
-                setTimeout(() => {
-                    this.addEvent(`turn-on-joystick', ${direction}`);
-                }, 5 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
                 const pos = this.feedback.LEVER_POS;
@@ -287,10 +275,11 @@ class GameMachine {
                     this.addEvent(this.events.TURN_OFF_CHEAT, {});
                 }, 5 * 1000);
             }
-            if (event.name === this.events.TURN_ON_JOYSTICK) {
+            if (event.name === this.events.TURN_ON_JOYSTICK && this.cues.JOYSTICK_CUE === 'off') {
                 this.cues.JOYSTICK_CUE = 'on'
-                this.cues.JOYSTICK_DIR = event.data.dir
-                console.log("JOYSTICK IS ON AT " + this.cues.JOYSTICK_DIR);
+                this.joystickTimer = setTimeout(() => {
+                    this.addEvent(this.events.TURN_OFF_JOYSTICK, {});
+                }, 5 * 1000);
             }
             if (event.name === this.events.TURN_ON_LEVER && this.cues.LEVER_CUE === 'off') {
                 this.cues.LEVER_CUE = 'on'
@@ -341,8 +330,11 @@ class GameMachine {
                     this.addEvent(this.events.TURN_ON_CHEAT, {});
                 }, 2 * 1000);
             }
-            if (event.name === this.events.TURN_OFF_JOYSTICK) {
+            if (event.name === this.events.TURN_OFF_JOYSTICK && this.cues.JOYSTICK_CUE === 'on') {
                 this.cues.JOYSTICK_CUE = 'off'
+                this.joystickTimer = setTimeout(() => {
+                    this.addEvent(this.events.TURN_ON_JOYSTICK, {});
+                }, 5 * 1000);
             }
             if (event.name === this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE === 'on') {
                 this.cues.LEVER_CUE = 'off'
