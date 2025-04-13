@@ -53,6 +53,7 @@ class GameMachine {
     joystickTimer = null
     leverTimer = null
     podiumTimer = null
+    leverTouched = false
 
     states = {
         IDLE: 'IDLE',
@@ -98,6 +99,7 @@ class GameMachine {
     }
 
     feedback = {
+        LEVER_INITIAL: null,
         LEVER_POS: null,
         LEVER_TARGET: null,
     }
@@ -232,13 +234,26 @@ class GameMachine {
                 }, 5 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
-                // if lever is cued (desired) && lever_pos is in range of lever_target
-                if (this.cues.LEVER_CUE === 'on') {
-                    this.score += 7
-                    if (this.score >= 100) {
-                        this.score = 100
+                const pos = this.feedback.LEVER_POS;
+                const start = this.feedback.LEVER_INITIAL || pos;
+                //Handling for sensitive lever
+                if (!this.leverTouched && Math.abs(pos - start) > 3) {
+                    this.leverTouched = true;
+                }
+                if (this.cues.LEVER_CUE === 'on' && this.feedback.LEVER_TARGET) {                    
+                    const { min, max } = this.feedback.LEVER_TARGET;
+                    
+                    if (pos >= min && pos <= max) {
+                        // Successful move
+                        this.score += 7;
+                        if (this.score >= 100) {
+                            this.score = 100;
+                        }
+                        clearTimeout(this.leverTimer);
+                        this.feedback.LEVER_TARGET = null; // prevent double scoring
+                        console.log("Lever moved correctly. Score rewarded.");
+                        this.addEvent(this.events.TURN_OFF_LEVER);
                     }
-                    this.addEvent(this.events.TURN_OFF_LEVER);
                 }
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
@@ -279,9 +294,29 @@ class GameMachine {
             }
             if (event.name === this.events.TURN_ON_LEVER && this.cues.LEVER_CUE === 'off') {
                 this.cues.LEVER_CUE = 'on'
+                this.leverTouched = false;
+
+                const currentPos = this.feedback.LEVER_POS;
+                if (currentPos <= 50) {
+                    this.feedback.LEVER_TARGET = {min: 85, max: 100};
+                } else {
+                    this.feedback.LEVER_TARGET = {min: 1, max: 15};
+                }
+                this.feedback.LEVER_INITIAL = currentPos;
+
                 this.leverTimer = setTimeout(() => {
+                    if (this.feedback.LEVER_TARGET) {
+                        if (this.leverTouched) {
+                            // Moved but failed to hit target
+                            this.score -= 7;
+                            if (this.score < 0) this.score = 0;
+                            console.log("Lever moved but missed target. Score penalized.");
+                        } else {
+                            console.log("Lever not touched. No penalty.");
+                        }
+                    }
                     this.addEvent(this.events.TURN_OFF_LEVER, {});
-                }, 5 * 1000);
+                }, 10 * 1000);
             }
             if (event.name === this.events.TURN_ON_PODIUM && this.cues[`PODIUM_${event.data.num}_CUE`] === 'off') {
                 this.cues[`PODIUM_${event.data.num}_CUE`] = 'on'
@@ -313,7 +348,7 @@ class GameMachine {
                 this.cues.LEVER_CUE = 'off'
                 this.leverTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_LEVER, {});
-                }, 5 * 1000);
+                }, 2 * 1000);
             }
             if (event.name == this.events.TURN_OFF_PODIUM) {
                 for(let i = 1; i <= 4; i++) {
