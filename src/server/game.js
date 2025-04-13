@@ -38,9 +38,8 @@ const moveToPlaying = (machine) => {
         machine.addEvent(machine.events.TURN_ON_PODIUM, { num: podiumToTrigger });
     }, 3 * 1000);
     setTimeout(() => {
-        machine.addEvent(machine.events.TURN_ON_LEVER, {position: Math.random() * 100});
+        machine.addEvent(machine.events.TURN_ON_LEVER, {});
     }, 5 * 1000);
-
 }
 
 // GAME MACHINE (Idle, Onboard, Playing (w/ Associated Sub Machine Functions))
@@ -93,11 +92,14 @@ class GameMachine {
         PODIUM_3_CUE: 'off',
         PODIUM_4_CUE: 'off',
         LEVER_CUE: 'off',
-        LEVER_POS: null,      // whatever default state should be
-        LEVER_TARGET: null,
         JOYSTICK_CUE: 'off',
         JOYSTICK_DIR: 0,     // whatever default state should be
         JOYSTICK_TARGET: 0
+    }
+
+    feedback = {
+        LEVER_POS: null,
+        LEVER_TARGET: null,
     }
 
     constructor(initialState) {
@@ -108,7 +110,8 @@ class GameMachine {
         return {
             state: this.state,
             score: this.score,
-            cues: this.cues
+            cues: this.cues,
+            feedback: this.feedback,
         };
     }
 
@@ -118,18 +121,16 @@ class GameMachine {
         if (!event) return;
         console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
-        if (event.name === this.events.LEVER_MOVED) {// TRAVIS PUT THIS IN
-            // store the data 
+        if (event.name === this.events.LEVER_MOVED) { //LEVER VALUE INITIALIZATION
             let position = event.data.value
             if(position > 100) {
                 position = 100
             } else if (position < 1) {
                 position = 1
             }
-            this.cues.LEVER_POS = position
+            this.feedback.LEVER_POS = position
         }
         
-
         if (this.state === this.states.IDLE) {                      //IDLE STATE
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 // DEBUG Purposes, goes to onboarding
@@ -231,23 +232,14 @@ class GameMachine {
                 }, 5 * 1000);
             }
             if (event.name === this.events.LEVER_MOVED) {
-
                 // if lever is cued (desired) && lever_pos is in range of lever_target
-
                 if (this.cues.LEVER_CUE === 'on') {
                     this.score += 7
                     if (this.score >= 100) {
                         this.score = 100
                     }
                     this.addEvent(this.events.TURN_OFF_LEVER);
-                } 
-                // else if (this.cues.LEVER_CUE === 'off') {
-                //     this.score -= 7
-                //     if (this.score <= 0) {
-                //         this.score = 0
-                //     }
-                // }
-                console.log(this.score)
+                }
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 if (this.cues[`PODIUM_${event.data.num}_CUE`] === 'on') {
@@ -287,9 +279,9 @@ class GameMachine {
             }
             if (event.name === this.events.TURN_ON_LEVER && this.cues.LEVER_CUE === 'off') {
                 this.cues.LEVER_CUE = 'on'
-                this.cues.LEVER_TARGET = event.data.position
-
-                console.log("LEVER IS ON AT " + this.cues.LEVER_POS);
+                this.leverTimer = setTimeout(() => {
+                    this.addEvent(this.events.TURN_OFF_LEVER, {});
+                }, 5 * 1000);
             }
             if (event.name === this.events.TURN_ON_PODIUM && this.cues[`PODIUM_${event.data.num}_CUE`] === 'off') {
                 this.cues[`PODIUM_${event.data.num}_CUE`] = 'on'
@@ -319,6 +311,9 @@ class GameMachine {
             }
             if (event.name === this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE === 'on') {
                 this.cues.LEVER_CUE = 'off'
+                this.leverTimer = setTimeout(() => {
+                    this.addEvent(this.events.TURN_ON_LEVER, {});
+                }, 5 * 1000);
             }
             if (event.name == this.events.TURN_OFF_PODIUM) {
                 for(let i = 1; i <= 4; i++) {
@@ -330,7 +325,6 @@ class GameMachine {
                     this.addEvent(this.events.TURN_ON_PODIUM, { num: podiumToTrigger });
                 }, 3 * 1000);
             }
-            
         }
     }
 
