@@ -47,13 +47,16 @@ class GameMachine {
     isRunning = false
     loopHandle = null
     score = 0
+    //Timeout Timers
     applauseTimer = null
     cheatTimer = null
     joystickTimer = null
     leverTimer = null
     podiumTimer = null
+    //Lever Variables
     leverTouched = false
     joystickTouched = false
+    //Joystick Variables
     lastDir = null
     targetDir = null
 
@@ -88,6 +91,15 @@ class GameMachine {
         GAME_OVER: 'game-over',
     }
 
+    host = {
+        POSITION: Math.floor(Math.random() * 100) - 50,
+        DIRECTION: 1,
+        VELOCITY: 2,
+        PAUSED: false,
+        MAX: 50,
+        MIN: -50
+    }
+
     cues = {
         APPLAUSE_CUE: false,
         CHEAT_CUE: false,
@@ -104,7 +116,7 @@ class GameMachine {
         LEVER_POS: null,
         LEVER_TARGET: null,
         JOYSTICK_POS: 0,
-        JOYSTICK_TARGET: Math.floor(Math.random() * 100) - 50 //Range between -50 and 50 Change later (AL's Xcoord)
+        JOYSTICK_TARGET: 0
     }
 
     constructor(initialState) {
@@ -124,7 +136,7 @@ class GameMachine {
     step() {
         const event = this.eventQueue.shift();
         if (!event) return;
-        console.log(`Processing event: ${event.name} in state: ${this.state}`);
+        //console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
         if (event.name === this.events.LEVER_MOVED) { //LEVER VALUE INITIALIZATION
             let position = event.data.value
@@ -137,9 +149,24 @@ class GameMachine {
         }
 
         if (event.name === this.events.HOST_MOVED) {
-            // take the data steps amount, try to move him
-            // if boundary check fails, force the direction to be good
-                // set his position to the boundary
+            const steps = event.data.steps || 0;
+            let newPos = this.host.POSITION + steps * this.host.DIRECTION;
+
+            // Boundary check
+            if (newPos >= this.host.MAX) {
+                newPos = this.host.MAX;
+                this.host.DIRECTION = -1; // Flip direction to left
+                this.host.PAUSED = true;
+                setTimeout(() => { this.host.PAUSED = false; }, 500);
+            } else if (newPos <= this.host.MIN) {
+                newPos = this.host.MIN;
+                this.host.DIRECTION = 1; // Flip direction to right
+                this.host.PAUSED = true;
+                setTimeout(() => { this.host.PAUSED = false; }, 500);
+            }
+
+            this.host.POSITION = newPos;
+            console.log(this.host.POSITION)
         }
         
         if (this.state === this.states.IDLE) {                      //IDLE STATE
@@ -280,6 +307,7 @@ class GameMachine {
                 this.cues.JOYSTICK_CUE = true
 
                 this.joystickTimer = setTimeout(() => {
+                    this.feedback.JOYSTICK_TARGET = this.host.POSITION;
                     const diff = Math.abs(this.feedback.JOYSTICK_POS - this.feedback.JOYSTICK_TARGET)
                     if (this.joystickTouched) {
                         if (diff <= 10) {
@@ -401,7 +429,7 @@ class GameMachine {
             name: eventName,
             data: eventData
         });
-        console.log(`Event added: ${eventName}`);
+        //console.log(`Event added: ${eventName}`);
     }
 }
 
@@ -432,17 +460,32 @@ panel.on('leverMoved', (value) => {
     machine.addEvent(machine.events.LEVER_MOVED, { value });
 });
 
-/*
-const updateAlPosition = () => {
-    machine.addEvent(machine.events.HOST_MOVED, { steps: 10 });
-    // check his direction
-    // if right, 80% chance of firing +10
-    // if left, 80% chance of firing -10
+const updateHostPosition = () => {
+    const host = machine.host;
 
-    setTimeout(updateAlPosition, 100);
+    // Skip if paused
+    if (host.paused) {
+        setTimeout(updateHostPosition, 100);
+        return;
+    }
+
+    // 10% chance to pause randomly for a short break mid-track
+    if (Math.random() < 0.1) {
+        host.paused = true;
+        setTimeout(() => {
+            host.paused = false;
+        }, 300); // brief pause
+    }
+
+    // 80% chance to move
+    if (Math.random() < 0.8) {
+        const steps = 2;
+        machine.addEvent(machine.events.HOST_MOVED, { steps });
+    }
+
+    setTimeout(updateHostPosition, 100);
 };
-setTimeout(updateAlPosition, 100);
-*/
+setTimeout(updateHostPosition, 100);
 
 // Example usage
 const runExample = () => {
