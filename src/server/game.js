@@ -87,14 +87,14 @@ class GameMachine {
     }
 
     cues = {
-        APPLAUSE_CUE: 'off',
-        CHEAT_CUE: 'off',
-        PODIUM_1_CUE: 'off',
-        PODIUM_2_CUE: 'off',
-        PODIUM_3_CUE: 'off',
-        PODIUM_4_CUE: 'off',
-        LEVER_CUE: 'off',
-        JOYSTICK_CUE: 'off',
+        APPLAUSE_CUE: false,
+        CHEAT_CUE: false,
+        PODIUM_1_CUE: false,
+        PODIUM_2_CUE: false,
+        PODIUM_3_CUE: false,
+        PODIUM_4_CUE: false,
+        LEVER_CUE: false,
+        JOYSTICK_CUE: false,
     }
 
     feedback = {
@@ -132,6 +132,12 @@ class GameMachine {
                 position = 1
             }
             this.feedback.LEVER_POS = position
+        }
+
+        if (event.name === this.events.AL_MOVED) {
+            // take the data steps amount, try to move him
+            // if boundary check fails, force the direction to be good
+                // set his position to the boundary
         }
         
         if (this.state === this.states.IDLE) {                      //IDLE STATE
@@ -171,14 +177,14 @@ class GameMachine {
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
-                if (this.cues.APPLAUSE_CUE === 'on') {
+                if (this.cues.APPLAUSE_CUE) {
                     this.score += 5
                     if (this.score >= 100) {
                         this.score = 100
                     }
                     clearTimeout(this.applauseTimer);
                     this.addEvent(this.events.TURN_OFF_APPLAUSE);
-                } else if (this.cues.APPLAUSE_CUE === 'off') {
+                } else if (!this.cues.APPLAUSE_CUE) {
                     this.score -= 5
                     if (this.score <= 0) {
                         this.score = 0
@@ -186,14 +192,14 @@ class GameMachine {
                 }
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
-                if (this.cues.CHEAT_CUE === 'on') {
+                if (this.cues.CHEAT_CUE) {
                     this.score += 15
                     if (this.score >= 100) {
                         this.score = 100
                     }
                     clearTimeout(this.cheatTimer);
                     this.addEvent(this.events.TURN_OFF_CHEAT);
-                } else if (this.cues.CHEAT_CUE === 'off') {
+                } else if (!this.cues.CHEAT_CUE) {
                     this.score -= 15
                     if (this.score <= 0) {
                         this.score = 0
@@ -203,14 +209,14 @@ class GameMachine {
             if (event.name === this.events.JOYSTICK_MOVED) {
                 this.feedback.JOYSTICK_POS -= event.data.dir
                 //CLAMP MOVEMENT HERE (Xcoord borders)
-                if (this.cues.JOYSTICK_CUE === 'on') {
+                if (this.cues.JOYSTICK_CUE) {
                     this.score += 10
                     if (this.score >= 100) {
                         this.score = 100
                     }
                     clearTimeout(this.joystickTimer);
                     this.addEvent(this.events.TURN_OFF_JOYSTICK);
-                } else if (this.cues.JOYSTICK_CUE === 'off') {
+                } else if (!this.cues.JOYSTICK_CUE) {
                     this.score -= 10
                     if (this.score <= 0) {
                         this.score = 0
@@ -224,7 +230,7 @@ class GameMachine {
                 if (!this.leverTouched && Math.abs(pos - start) > 3) {
                     this.leverTouched = true;
                 }
-                if (this.cues.LEVER_CUE === 'on' && this.feedback.LEVER_TARGET) {                    
+                if (this.cues.LEVER_CUE && this.feedback.LEVER_TARGET) {                    
                     const { min, max } = this.feedback.LEVER_TARGET;
                     
                     if (pos >= min && pos <= max) {
@@ -241,12 +247,12 @@ class GameMachine {
                 }
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
-                if (this.cues[`PODIUM_${event.data.num}_CUE`] === 'on') {
+                if (this.cues[`PODIUM_${event.data.num}_CUE`]) {
                     this.score += 8
                     if (this.score >= 100) {
                         this.score = 100
                     }
-                } else if (this.cues[`PODIUM_${event.data.num}_CUE`] === 'off') {
+                } else if (!this.cues[`PODIUM_${event.data.num}_CUE`]) {
                     this.score -= 8
                     if (this.score <= 0) {
                         this.score = 0
@@ -257,22 +263,22 @@ class GameMachine {
             }
 
             // Set on-states
-            if (event.name === this.events.TURN_ON_APPLAUSE && this.cues.APPLAUSE_CUE === 'off') {
-                this.cues.APPLAUSE_CUE = 'on'
+            if (event.name === this.events.TURN_ON_APPLAUSE && !this.cues.APPLAUSE_CUE) {
+                this.cues.APPLAUSE_CUE = true
                 turnOnApplauseLED();
                 this.applauseTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_APPLAUSE, {});
                 }, 10 * 1000);
             }
-            if (event.name === this.events.TURN_ON_CHEAT && this.cues.CHEAT_CUE === 'off') {
-                this.cues.CHEAT_CUE = 'on'
+            if (event.name === this.events.TURN_ON_CHEAT && !this.cues.CHEAT_CUE) {
+                this.cues.CHEAT_CUE = true
                 turnOnCheatLED();
                 this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_CHEAT, {});
                 }, 5 * 1000);
             }
-            if (event.name === this.events.TURN_ON_JOYSTICK && this.cues.JOYSTICK_CUE === 'off') {
-                this.cues.JOYSTICK_CUE = 'on'
+            if (event.name === this.events.TURN_ON_JOYSTICK && !this.cues.JOYSTICK_CUE) {
+                this.cues.JOYSTICK_CUE = true
                 this.feedback.JOYSTICK_POS = 0
                 this.joystickTimer = setTimeout(() => {
                     const diff = Math.abs(this.feedback.JOYSTICK_POS - this.feedback.JOYSTICK_TARGET)
@@ -288,8 +294,8 @@ class GameMachine {
                     this.addEvent(this.events.TURN_OFF_JOYSTICK, {});
                 }, 5 * 1000);
             }
-            if (event.name === this.events.TURN_ON_LEVER && this.cues.LEVER_CUE === 'off') {
-                this.cues.LEVER_CUE = 'on'
+            if (event.name === this.events.TURN_ON_LEVER && !this.cues.LEVER_CUE) {
+                this.cues.LEVER_CUE = true
                 this.leverTouched = false;
 
                 const currentPos = this.feedback.LEVER_POS;
@@ -314,8 +320,8 @@ class GameMachine {
                     this.addEvent(this.events.TURN_OFF_LEVER, {});
                 }, 10 * 1000);
             }
-            if (event.name === this.events.TURN_ON_PODIUM && this.cues[`PODIUM_${event.data.num}_CUE`] === 'off') {
-                this.cues[`PODIUM_${event.data.num}_CUE`] = 'on'
+            if (event.name === this.events.TURN_ON_PODIUM && !this.cues[`PODIUM_${event.data.num}_CUE`]) {
+                this.cues[`PODIUM_${event.data.num}_CUE`] = true
                 turnOnPodiumLED(event.data.num);
                 this.podiumTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_PODIUM, {num: event.data.num});
@@ -323,35 +329,35 @@ class GameMachine {
             }
 
             // Set off-states
-            if (event.name === this.events.TURN_OFF_APPLAUSE && this.cues.APPLAUSE_CUE === 'on') {
-                this.cues.APPLAUSE_CUE = 'off'
+            if (event.name === this.events.TURN_OFF_APPLAUSE && this.cues.APPLAUSE_CUE) {
+                this.cues.APPLAUSE_CUE = false
                 turnOffApplauseLED();
                 this.applauseTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_APPLAUSE, {});
                 }, 1 * 1000);
             }
-            if (event.name === this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE === 'on') {
-                this.cues.CHEAT_CUE = 'off'
+            if (event.name === this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE) {
+                this.cues.CHEAT_CUE = false
                 turnOffCheatLED();
                 this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_CHEAT, {});
                 }, 2 * 1000);
             }
-            if (event.name === this.events.TURN_OFF_JOYSTICK && this.cues.JOYSTICK_CUE === 'on') {
-                this.cues.JOYSTICK_CUE = 'off'
+            if (event.name === this.events.TURN_OFF_JOYSTICK && this.cues.JOYSTICK_CUE) {
+                this.cues.JOYSTICK_CUE = false
                 this.joystickTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_JOYSTICK, {});
                 }, 5 * 1000);
             }
-            if (event.name === this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE === 'on') {
-                this.cues.LEVER_CUE = 'off'
+            if (event.name === this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE) {
+                this.cues.LEVER_CUE = false
                 this.leverTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_LEVER, {});
                 }, 2 * 1000);
             }
             if (event.name == this.events.TURN_OFF_PODIUM) {
                 for(let i = 1; i <= 4; i++) {
-                    this.cues[`PODIUM_${i}_CUE`] = 'off'
+                    this.cues[`PODIUM_${i}_CUE`] = false
                     turnOffPodiumLED(i);
                 }
                 const podiumToTrigger = Math.floor(Math.random() * 4) + 1
@@ -422,6 +428,16 @@ panel.on('joystickMoved', (dir) => {
 panel.on('leverMoved', (value) => {
     machine.addEvent(machine.events.LEVER_MOVED, { value });
 });
+
+const updateAlPosition = () => {
+    machine.addEvent(machine.events.AL_MOVED, { steps: 10 });
+    // check his direction
+    // if right, 80% chance of firing +10
+    // if left, 80% chance of firing -10
+
+    setTimeout(updateAlPosition, 100);
+};
+setTimeout(updateAlPosition, 100);
 
 // Example usage
 const runExample = () => {
