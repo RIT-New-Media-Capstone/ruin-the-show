@@ -2,9 +2,17 @@
 
 //Sprite Sheet Animation Variables for Contestants
 let al;
+
 let contestantFrames = [];
+let contestantFramesR = [];
+let contestantFramesW = [];
+
+
 let currentFrameHost = 0;
 let currentFrameContestants = 0;
+let currentFrameContestantsR = 0;
+let currentFrameContestantsW = 0;
+
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
 const numRows = 8;//4; // idle + al
 const numRowsRW = 8; // number of rows for right + wrong
@@ -23,10 +31,13 @@ let countdownFont;
 let countdown = 60;
 let countdownTimer;
 
+let talking;
+
 const assets = {
     audience: "",
     background: "",
     contestants: "",
+    contestantsW: "",
     cheat: "",
     curtains: "",
     hands: "",
@@ -75,6 +86,8 @@ window.preload = function () {
     //'Right'
     //'Wrong'
 
+    
+
     //CONTESTANT ANIMATIONS WRONG
     for (let i = 1; i <= 4; i++) {
         
@@ -82,20 +95,19 @@ window.preload = function () {
         assets.contestants.push(sheet);
 
         // Preload frames for smoother animation
-        let frames = [];
-        for (let frame = 0; frame < totalFrames; frame++) {
-            let row = Math.floor(frame / numCols);
-            let col = frame % numCols;
-            frames.push({
+        let framesW = [];
+        for (let frameW = 0; frameW < totalFrames; frameW++) {
+            let row = Math.floor(frameW / numCols);
+            let col = frameW % numCols;
+            framesW.push({
                 sx: col * frameWidth,
                 sy: row * frameHeight,
                 sheet,
             });
         }
-        contestantFrames.push(frames);
+        contestantFramesW.push(framesW);
     }
 
-    /*
     //CONTESTANT ANIMATIONS RIGHT
     for (let i = 1; i <= 4; i++) {
         
@@ -113,11 +125,11 @@ window.preload = function () {
                 sheet,
             });
         }
-        contestantFrames.push(frames);
-    }*/
+        contestantFramesR.push(frames);
+    }
 
     /*
-    //IDLE 
+    //IDLE // 
     for (let i = 1; i <= 4; i++) {
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
         assets.contestants.push(sheet);
@@ -152,6 +164,10 @@ window.preload = function () {
 
     //GAMEOVER
    // assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
+
+
+
+   
 }
 
 async function syncStateLoop() {
@@ -165,15 +181,18 @@ window.setup = async function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     countdownTimer = countdown;
+    
 
     await syncStateLoop();
 }
 
 window.draw = function () {
+
+
     background(255);
     drawBackground();
 
-    drawContestant();
+    drawContestantW();
     //drawRWLight();
     drawPodiums();
     drawHUD();
@@ -192,6 +211,7 @@ window.draw = function () {
 
     drawHands();
     drawAudience();
+
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //image(assets.curtains, 0, 0, width, height)
@@ -221,6 +241,7 @@ function drawAudience() {
     }
 }
 
+//right 
 function drawContestant() {
     let x = 309;
     const y = 290;
@@ -245,6 +266,32 @@ function drawContestant() {
         currentFrameContestants = (currentFrameContestants + 1) % totalFrames;
     }
 }
+
+function drawContestantW() {
+    let x = 309;
+    const y = 290;
+    const spacing = 158;
+    let scaleFactor = 0.32;
+    
+    assets.contestantsW.forEach((sheet, index) => {
+        let frame = contestantFramesW[index][currentFrameContestantsW];
+
+        if (frame && frame.sheet) {
+            image(
+                frame.sheet,
+                x + index * spacing, y, // Destination position
+                frameWidth * scaleFactor, frameHeight * scaleFactor, // Destination size
+                frame.sx, frame.sy, frameWidth, frameHeight // Source position & size from sprite sheet
+            );
+        }
+    });
+
+    // Update frame only every few draw cycles
+    if (frameCount % frameDelay === 0) {
+        currentFrameContestantsW = (currentFrameContestantsW + 1) % totalFrames;
+    }
+}
+
 
 function drawPodiums() {
     if (assets.podium1) {
