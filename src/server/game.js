@@ -22,7 +22,7 @@ const moveToPlaying = (machine) => {
     // Start the game timer
     setTimeout(() => {
         machine.addEvent(machine.events.GAME_OVER, {});
-    }, 75 * 1000);
+    }, 60 * 1000);
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_APPLAUSE, {});
     }, 3 * 1000);
@@ -53,6 +53,8 @@ class GameMachine {
     leverTimer = null
     podiumTimer = null
     leverTouched = false
+    lastDir = null
+    targetDir = null
 
     states = {
         IDLE: 'IDLE',
@@ -99,8 +101,8 @@ class GameMachine {
         LEVER_INITIAL: null,
         LEVER_POS: null,
         LEVER_TARGET: null,
-        JOYSTICK_DIR: 0,     // whatever default state should be
-        JOYSTICK_TARGET: 0
+        JOYSTICK_POS: 0,
+        JOYSTICK_TARGET: Math.floor(Math.random() * 100) - 50 //Range between -50 and 50 Change later (AL's Xcoord)
     }
 
     constructor(initialState) {
@@ -155,15 +157,9 @@ class GameMachine {
             }
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
             if (event.name === this.events.ONBOARDING_COMPLETE) {
-                moveToPlaying(this); //TRAVIS MADE THIS CHANGE
+                moveToPlaying(this);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
-                // this.state = 'PLAYING';
-                // console.log(`State transition: ONBOARDING -> PLAYING`);
-                // // Start the game timer (Game Time / 1 min AND 15 sec (for this.score screen)
-                // setTimeout(() => {
-                //     this.addEvent('game-over', {});
-                // }, 75 * 1000);
                 moveToPlaying(this);
             }
             else {
@@ -205,15 +201,8 @@ class GameMachine {
                 }
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
-                this.feedback.JOYSTICK_DIR = event.data.dir
-                if (this.feedback.JOYSTICK_DIR === -1) {
-                    console.log("RIGHT");
-                } else if (this.feedback.JOYSTICK_DIR === 1) {
-                    console.log("LEFT");
-                } else if (this.feedback.JOYSTICK_DIR === 0) {
-                    console.log("NEUTRAL");
-                }
-                
+                this.feedback.JOYSTICK_POS -= event.data.dir
+                //CLAMP MOVEMENT HERE (Xcoord borders)
                 if (this.cues.JOYSTICK_CUE === 'on') {
                     this.score += 10
                     if (this.score >= 100) {
@@ -284,7 +273,18 @@ class GameMachine {
             }
             if (event.name === this.events.TURN_ON_JOYSTICK && this.cues.JOYSTICK_CUE === 'off') {
                 this.cues.JOYSTICK_CUE = 'on'
+                this.feedback.JOYSTICK_POS = 0
                 this.joystickTimer = setTimeout(() => {
+                    const diff = Math.abs(this.feedback.JOYSTICK_POS - this.feedback.JOYSTICK_TARGET)
+                    if (diff <= 10) {
+                        this.score += 10
+                        if (this.score > 100) this.score = 100
+                        console.log("Joystick moved correctly to target. Score rewarded.")
+                    } else {
+                        this.score -= 10
+                        if (this.score < 0) this.score = 0
+                        console.log("Joystick missed the target. Score penalized.")
+                    }
                     this.addEvent(this.events.TURN_OFF_JOYSTICK, {});
                 }, 5 * 1000);
             }
@@ -409,7 +409,15 @@ panel.on('podiumPressed', (num) => {
     machine.addEvent(machine.events.PODIUM_BUTTON_PRESSED, { num });
 });
 panel.on('joystickMoved', (dir) => {
-    machine.addEvent(machine.events.JOYSTICK_MOVED, { dir });
+    if (dir === 0 && machine.lastDir === 0) {
+        return; // Ignore if still at 0
+    }
+    if (dir !== 0) {
+        machine.lastDir = dir; // Update lastDir to new direction
+        machine.addEvent(machine.events.JOYSTICK_MOVED, { dir });
+    } else {
+        machine.lastDir = dir; // Keep track of neutral state
+    }
 });
 panel.on('leverMoved', (value) => {
     machine.addEvent(machine.events.LEVER_MOVED, { value });
