@@ -53,6 +53,7 @@ class GameMachine {
     leverTimer = null
     podiumTimer = null
     leverTouched = false
+    joystickTouched = false
     lastDir = null
     targetDir = null
 
@@ -81,6 +82,7 @@ class GameMachine {
         TURN_OFF_JOYSTICK: 'turn-off-joystick',
         TURN_ON_LEVER: 'turn-on-lever',
         TURN_OFF_LEVER: 'turn-off-lever',
+        HOST_MOVED: 'host-moved',
         //Possible Time (Auto) Events
         ONBOARDING_COMPLETE: 'onboarding-complete',
         GAME_OVER: 'game-over',
@@ -134,7 +136,7 @@ class GameMachine {
             this.feedback.LEVER_POS = position
         }
 
-        if (event.name === this.events.AL_MOVED) {
+        if (event.name === this.events.HOST_MOVED) {
             // take the data steps amount, try to move him
             // if boundary check fails, force the direction to be good
                 // set his position to the boundary
@@ -207,20 +209,15 @@ class GameMachine {
                 }
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
-                this.feedback.JOYSTICK_POS -= event.data.dir
-                //CLAMP MOVEMENT HERE (Xcoord borders)
                 if (this.cues.JOYSTICK_CUE) {
-                    this.score += 10
-                    if (this.score >= 100) {
-                        this.score = 100
+                    this.joystickTouched = true
+                    this.feedback.JOYSTICK_POS -= event.data.dir
+                    if (this.feedback.JOYSTICK_POS <= -50) {
+                        this.feedback.JOYSTICK_POS = -50;
+                    } else if (this.feedback.JOYSTICK_POS >= 50) {
+                        this.feedback.JOYSTICK_POS = 50;
                     }
-                    clearTimeout(this.joystickTimer);
-                    this.addEvent(this.events.TURN_OFF_JOYSTICK);
-                } else if (!this.cues.JOYSTICK_CUE) {
-                    this.score -= 10
-                    if (this.score <= 0) {
-                        this.score = 0
-                    }
+                    console.log(this.feedback.JOYSTICK_POS);
                 }
             }
             if (event.name === this.events.LEVER_MOVED) {
@@ -278,18 +275,24 @@ class GameMachine {
                 }, 5 * 1000);
             }
             if (event.name === this.events.TURN_ON_JOYSTICK && !this.cues.JOYSTICK_CUE) {
-                this.cues.JOYSTICK_CUE = true
                 this.feedback.JOYSTICK_POS = 0
+                this.joystickTouched = false
+                this.cues.JOYSTICK_CUE = true
+
                 this.joystickTimer = setTimeout(() => {
                     const diff = Math.abs(this.feedback.JOYSTICK_POS - this.feedback.JOYSTICK_TARGET)
-                    if (diff <= 10) {
-                        this.score += 10
-                        if (this.score > 100) this.score = 100
-                        console.log("Joystick moved correctly to target. Score rewarded.")
+                    if (this.joystickTouched) {
+                        if (diff <= 10) {
+                            this.score += 10
+                            if (this.score > 100) this.score = 100
+                            console.log("Joystick moved correctly to target. Score rewarded.")
+                        } else {
+                            this.score -= 10
+                            if (this.score < 0) this.score = 0
+                            console.log("Joystick missed the target. Score penalized.")
+                        }
                     } else {
-                        this.score -= 10
-                        if (this.score < 0) this.score = 0
-                        console.log("Joystick missed the target. Score penalized.")
+                        console.log("Joystick was not touched. Nothing happens")
                     }
                     this.addEvent(this.events.TURN_OFF_JOYSTICK, {});
                 }, 5 * 1000);
@@ -429,8 +432,9 @@ panel.on('leverMoved', (value) => {
     machine.addEvent(machine.events.LEVER_MOVED, { value });
 });
 
+/*
 const updateAlPosition = () => {
-    machine.addEvent(machine.events.AL_MOVED, { steps: 10 });
+    machine.addEvent(machine.events.HOST_MOVED, { steps: 10 });
     // check his direction
     // if right, 80% chance of firing +10
     // if left, 80% chance of firing -10
@@ -438,6 +442,7 @@ const updateAlPosition = () => {
     setTimeout(updateAlPosition, 100);
 };
 setTimeout(updateAlPosition, 100);
+*/
 
 // Example usage
 const runExample = () => {
