@@ -14,13 +14,14 @@ let currentFrameContestantsR = 0;
 let currentFrameContestantsW = 0;
 
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
-const numRows = 8;//4; // idle + al
+const numRows = 4;//4; // idle + al
 const numRowsRW = 8; // number of rows for right + wrong
 const numCols = 5;
 const totalFrames = numRows * numCols;
+const totalFramesRW = numRowsRW * numCols;
 const frameWidth =  4802  / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
-const frameHeight =  4324/ numRows; // idle-> 2162 / numRows; // (al) 5410/5 = 1080/2 = 540
-const frameHeightRW =  4324/ numRows;
+const frameHeight =  2162 / numRows; // idle->  2162 / numRows; // (al) 5410/5 = 1080/2 = 540
+const frameHeightRW =  4324/ numRowsRW;
 const frameWidthAL = 4802 / numCols;
 const frameHeightAL = 4324 / numRows;
 
@@ -31,13 +32,13 @@ let countdownFont;
 let countdown = 60;
 let countdownTimer;
 
-let talking;
 
 const assets = {
     audience: "",
     background: "",
     contestants: "",
     contestantsW: "",
+    contestantR: "",
     cheat: "",
     curtains: "",
     hands: "",
@@ -75,33 +76,26 @@ window.preload = function () {
     //AL 
     al = loadImage('/Assets/SpriteSheets/Host/AL_Idle.png'); 
     
-    //CONTESTANT ANIMATIONS IDLE
-    assets.contestants = [];
-    contestantFrames = [];
-
-    // if the current state of the animation is idle then pass in 
-    //if ( animation = 'Idle'){
-        
-    //}
-    //'Right'
-    //'Wrong'
-
     
 
     //CONTESTANT ANIMATIONS WRONG
+    assets.contestantsW = [];
+    contestantFramesW = [];
+
+
     for (let i = 1; i <= 4; i++) {
         
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Wrong.png`);
-        assets.contestants.push(sheet);
+        assets.contestantsW.push(sheet);
 
         // Preload frames for smoother animation
         let framesW = [];
-        for (let frameW = 0; frameW < totalFrames; frameW++) {
+        for (let frameW = 0; frameW < totalFramesRW; frameW++) {
             let row = Math.floor(frameW / numCols);
             let col = frameW % numCols;
             framesW.push({
                 sx: col * frameWidth,
-                sy: row * frameHeight,
+                sy: row * frameHeightRW,
                 sheet,
             });
         }
@@ -109,27 +103,38 @@ window.preload = function () {
     }
 
     //CONTESTANT ANIMATIONS RIGHT
+
+    
+    assets.contestantsR = [];
+    contestantFramesR = [];
+
+
     for (let i = 1; i <= 4; i++) {
         
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
-        assets.contestants.push(sheet);
+        assets.contestantsR.push(sheet);
 
         // Preload frames for smoother animation
-        let frames = [];
-        for (let frame = 0; frame < totalFrames; frame++) {
-            let row = Math.floor(frame / numCols);
-            let col = frame % numCols;
-            frames.push({
+        let framesR = [];
+        for (let frameR = 0; frameR < totalFramesRW; frameR++) {
+            let row = Math.floor(frameR / numCols);
+            let col = frameR % numCols;
+            framesR.push({
                 sx: col * frameWidth,
-                sy: row * frameHeight,
+                sy: row * frameHeightRW,
                 sheet,
             });
         }
-        contestantFramesR.push(frames);
+        contestantFramesR.push(framesR);
     }
 
-    /*
-    //IDLE // 
+    
+    // CONTESTANT IDLE // 
+
+
+    assets.contestants = [];
+    contestantFrames = [];
+
     for (let i = 1; i <= 4; i++) {
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
         assets.contestants.push(sheet);
@@ -146,7 +151,7 @@ window.preload = function () {
             });
         }
         contestantFrames.push(frames);
-    }*/
+    }
 
     //CUE
     assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
@@ -192,7 +197,18 @@ window.draw = function () {
     background(255);
     drawBackground();
 
-    drawContestantW();
+    /*if( state.right){
+
+         // drawContestantR();
+         
+    } if(state.wrong){
+
+           //drawContestantW();
+
+    }*/
+ 
+  
+    drawContestant();
     //drawRWLight();
     drawPodiums();
     drawHUD();
@@ -202,6 +218,7 @@ window.draw = function () {
     //podiumLight3();
     //podiumLight4();
     spotlight();
+    
 
     drawHost();
     drawCheat();
@@ -241,7 +258,7 @@ function drawAudience() {
     }
 }
 
-//right 
+
 function drawContestant() {
     let x = 309;
     const y = 290;
@@ -256,7 +273,8 @@ function drawContestant() {
                 frame.sheet,
                 x + index * spacing, y, // Destination position
                 frameWidth * scaleFactor, frameHeight * scaleFactor, // Destination size
-                frame.sx, frame.sy, frameWidth, frameHeight // Source position & size from sprite sheet
+                frame.sx, frame.sy, 
+                frameWidth, frameHeight // Source position & size from sprite sheet
             );
         }
     });
@@ -267,28 +285,63 @@ function drawContestant() {
     }
 }
 
+
+
 function drawContestantW() {
     let x = 309;
     const y = 290;
     const spacing = 158;
     let scaleFactor = 0.32;
     
-    assets.contestantsW.forEach((sheet, index) => {
+    assets.contestantsW.forEach((frameW, index) => {
         let frame = contestantFramesW[index][currentFrameContestantsW];
 
         if (frame && frame.sheet) {
+            const drawWidth = frameWidth * scaleFactor;
+            const drawHeight = frameHeightRW * scaleFactor;
+
             image(
                 frame.sheet,
                 x + index * spacing, y, // Destination position
-                frameWidth * scaleFactor, frameHeight * scaleFactor, // Destination size
-                frame.sx, frame.sy, frameWidth, frameHeight // Source position & size from sprite sheet
+                drawWidth, drawHeight, // Destination size
+                frame.sx, frame.sy, frameWidth, frameHeightRW // Source position & size from sprite sheet
             );
         }
     });
 
     // Update frame only every few draw cycles
     if (frameCount % frameDelay === 0) {
-        currentFrameContestantsW = (currentFrameContestantsW + 1) % totalFrames;
+        currentFrameContestantsW = (currentFrameContestantsW + 1) % totalFramesRW;
+    }
+}
+
+
+
+function drawContestantR() {
+    let x = 309;
+    const y = 290;
+    const spacing = 158;
+    let scaleFactor = 0.32;
+    
+    assets.contestantsR.forEach((frameR, index) => {
+        let frame = contestantFramesR[index][currentFrameContestantsR];
+
+        if (frame && frame.sheet) {
+            const drawWidth = frameWidth * scaleFactor;
+            const drawHeight = frameHeightRW * scaleFactor;
+
+            image(
+                frame.sheet,
+                x + index * spacing, y, // Destination position
+                drawWidth, drawHeight, // Destination size
+                frame.sx, frame.sy, frameWidth, frameHeightRW // Source position & size from sprite sheet
+            );
+        }
+    });
+
+    // Update frame only every few draw cycles
+    if (frameCount % frameDelay === 0) {
+        currentFrameContestantsR = (currentFrameContestantsR + 1) % totalFramesRW;
     }
 }
 
