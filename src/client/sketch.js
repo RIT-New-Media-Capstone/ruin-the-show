@@ -1,5 +1,7 @@
 //let state = {};
 
+let backgroundLayer;
+
 //Sprite Sheet Animation Variables for Contestants
 let al ;
 let alTalk ; 
@@ -74,6 +76,7 @@ const assets = {
     stagelights: "",
     stars: "",
     timer: "",
+    score: "", 
     
 }
   
@@ -94,6 +97,7 @@ window.preload = function () {
     //HUD (timer & score)
     assets.stars = loadImage('/Assets/Background/StarRatings.png');
     assets.timer = loadImage('/Assets/Background/Timer.png');
+    assets.score = loadImage('/Assets/Background/PointTrack.png')
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
 
     //AL 
@@ -401,18 +405,24 @@ function drawPodiums() {
 
 // heads up display
 function drawHUD() {
+    if(assets.timer) {
+        image(assets.timer, -20, 60, assets.timer.width / 5, assets.timer.height / 5);
+        drawCountdown();
+    }
     if(assets.stars) {
+        let x = 10
+        let y = -10
+
         fill('#d9d9d9')
-        rect(width - 285, 60, 250 * 2/3 + 70, 50 * 2/3)
+        rect(x + 15, y + 70, 250 * 2/3 + 70, 50 * 2/3)
         fill('#dc4042')
         let ratings = 0
         if (ratings > 250) ratings = 250
-        rect(width - 285, 60, ratings * 2/3, 50 * 2/3)
-        image(assets.stars, width - 300, -10, width/5, height/5);
+        rect(x + 15, y + 70, ratings * 2/3, 50 * 2/3)
+        image(assets.stars, x, y, width/5, height/5);
     }
-    if(assets.timer) {
-        image(assets.timer, -20, -40, width/4, height/4);
-        drawCountdown();
+    if(assets.score) {
+        image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
     }
 }
 
@@ -424,9 +434,9 @@ function drawCountdown() {
 
     fill('black');
     textFont(countdownFont);
-    textSize(40);
+    textSize(32);
     textAlign(CENTER, CENTER);
-    text(timeString, 160, 67); 
+    text(timeString, 112, 148); 
 }
 
 function updateCountdown() {
