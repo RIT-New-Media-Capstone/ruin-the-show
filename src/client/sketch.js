@@ -3,25 +3,28 @@
 let backgroundLayer;
 
 let zoomedIn = false; // for lever
+let zoom;
+let zoomTimer = 0;
+let zoomDuration = 30
 
 //Sprite Sheet Animation Variables for Contestants
-let al ;
-let alTalk ; 
-let alTurnFL; 
-let alTurnFR; 
-let alTurnLF; 
-let alTurnRF; 
-let alTurnR ; 
+let al;
+let alTalk;
+let alTurnFL;
+let alTurnFR;
+let alTurnLF;
+let alTurnRF;
+let alTurnR;
 let alWalkL;
 let alWalkR;
-    
-    
+
+
 /*
 let hostState;//; // idle, talkL, talkR, walkL, walkR, turnL, turnR
 let hostSpriteSheet;
 let hostFrames = [];
 */
-    
+
 
 let contestantFrames = [];
 let contestantFramesR = [];
@@ -44,11 +47,11 @@ const totalFrames = numRows * numCols;
 const totalFramesRW = numRowsRW * numCols;
 const totalFramesLR = numRowsLR * numCols;
 
-const frameWidth =  4802  / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
+const frameWidth = 4802 / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
 const frameHeightLR = 1081 / numRowsLR;
-const frameHeight =  2162 / numRows; // idle->  2162 / numRows; // (al) 5410/5 = 1080/2 = 540
-const frameHeightRW =  4324/ numRowsRW;
-const frameWidthAL = 4802 / numCols; 
+const frameHeight = 2162 / numRows; // idle->  2162 / numRows; // (al) 5410/5 = 1080/2 = 540
+const frameHeightRW = 4324 / numRowsRW;
+const frameWidthAL = 4802 / numCols;
 const frameHeightAL = 4324 / numRows;
 
 
@@ -78,10 +81,10 @@ const assets = {
     stagelights: "",
     stars: "",
     timer: "",
-    score: "", 
-    
+    score: "",
+
 }
-  
+
 window.preload = function () {
     //BACKGROUND
     assets.background = loadImage('/Assets/Background/MainBackground.png');
@@ -89,13 +92,13 @@ window.preload = function () {
     assets.stagelights = loadImage('/Assets/Background/StageLights.png');
     assets.audience = loadImage('/Assets/Background/Audience.png');
     assets.applause = loadImage('/Assets/Background/Applause_OFF.png');
-    
+
     //podiums are in front of animated contestants
     assets.podium1 = loadImage('/Assets/Background/PodiumYellow_Resized0.png');
     assets.podium2 = loadImage('/Assets/Background/PodiumWhite_Resized0.png');
     assets.podium3 = loadImage('/Assets/Background/PodiumRed_Resized0.png');
     assets.podium4 = loadImage('/Assets/Background/PodiumBlue_Resized0.png');
-    
+
     //HUD (timer & score)
     assets.stars = loadImage('/Assets/Background/StarRatings.png');
     assets.timer = loadImage('/Assets/Background/Timer.png');
@@ -103,7 +106,7 @@ window.preload = function () {
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
 
     //AL 
-    al = loadImage('/Assets/SpriteSheets/Host/AL_Idle.png'); 
+    al = loadImage('/Assets/SpriteSheets/Host/AL_Idle.png');
     //alTalk = loadImage('/Assets/SpriteSheets/Host/AL_Talk.png'); 
     //alTurnFL = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_L.png'); 
     //alTurnFR= loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_R.png'); 
@@ -111,8 +114,8 @@ window.preload = function () {
     //alTurnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_toF.png'); 
     //alWalkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png')
     alWalkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png')
-    
-    
+
+
 
     //CONTESTANT ANIMATIONS WRONG
     assets.contestantsW = [];
@@ -120,7 +123,7 @@ window.preload = function () {
 
 
     for (let i = 1; i <= 4; i++) {
-        
+
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Wrong.png`);
         assets.contestantsW.push(sheet);
 
@@ -140,13 +143,13 @@ window.preload = function () {
 
     //CONTESTANT ANIMATIONS RIGHT
 
-    
+
     assets.contestantsR = [];
     contestantFramesR = [];
 
 
     for (let i = 1; i <= 4; i++) {
-        
+
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
         assets.contestantsR.push(sheet);
 
@@ -164,7 +167,7 @@ window.preload = function () {
         contestantFramesR.push(framesR);
     }
 
-    
+
     // CONTESTANT IDLE // 
 
 
@@ -204,11 +207,11 @@ window.preload = function () {
     assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
 
     //GAMEOVER
-   // assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
+    // assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
 
 
 
-   
+
 }
 
 async function syncStateLoop() {
@@ -223,7 +226,7 @@ window.setup = async function () {
     frameRate(30);
     countdownTimer = countdown;
     backgroundLayer = createGraphics(width, height)
-    
+
 
     await syncStateLoop();
 }
@@ -243,8 +246,8 @@ window.draw = function () {
            //drawContestantW();
 
     }*/
- 
-  
+
+
     //drawContestant();
 
     drawContestantR();
@@ -256,7 +259,7 @@ window.draw = function () {
     //podiumLight3();
     //podiumLight4();
     spotlight();
-    
+
 
     //drawHost("al");
     //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
@@ -265,9 +268,21 @@ window.draw = function () {
     //drawSpritesHost(hostState)
     drawHostWalkR()
 
-    image(backgroundLayer, 0, 0, width, height, 
-        zoomedIn ? 175 : 0, zoomedIn ? 125 : 0, 
-        zoomedIn ? width * 3 / 4 : width, zoomedIn ? height * 3 / 4 : height)
+    // TODO: when zoom change event trigger, set zoomTimer to 0
+    if (zoomedIn) {
+        if (zoomTimer <= zoomDuration) {
+            zoom = changeZoom(0, 0, 175, 125, width, width * 3 / 4, height, height * 3 / 4, zoomTimer, zoomDuration)
+            zoomTimer++
+        }
+    }
+    if (!zoomedIn) {
+        if (zoomTimer <= zoomDuration) {
+            zoom = changeZoom(175, 125, 0, 0, width * 3 / 4, width, height * 3 / 4, height, zoomTimer, zoomDuration)
+            zoomTimer++
+        }
+    }
+
+    image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
 
     drawCheat();
 
@@ -284,25 +299,34 @@ window.draw = function () {
 }
 
 const syncGameState = async () => {
-    if (frameCount % 30 === 0 && countdownTimer > 0) { 
+    if (frameCount % 30 === 0 && countdownTimer > 0) {
         updateCountdown();
     }
+}
+
+function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
+    let amount = timer / duration
+    let x = lerp(oldX, newX, amount)
+    let y = lerp(oldY, newY, amount)
+    let w = lerp(oldWidth, newWidth, amount)
+    let h = lerp(oldHeight, newHeight, amount)
+    return { x, y, w, h }
 }
 
 function drawBackground() {
     if (assets.background) {
         backgroundLayer.image(assets.background, 0, 0, width, height);
     }
-    if (assets.stage) {                  
-        backgroundLayer.image(assets.stage, width/10, height/1.75, width/1.25, height/2);
+    if (assets.stage) {
+        backgroundLayer.image(assets.stage, width / 10, height / 1.75, width / 1.25, height / 2);
     }
     if (assets.stagelights) {
-        backgroundLayer.image(assets.stagelights, 0, -45, width, height/3);
+        backgroundLayer.image(assets.stagelights, 0, -45, width, height / 3);
     }
 }
 
 function drawAudience() {
-    if(assets.audience) {
+    if (assets.audience) {
         image(assets.audience, 0, 100, width, height);
     }
 }
@@ -313,7 +337,7 @@ function drawContestant() {
     const y = 290;
     const spacing = 158;
     let scaleFactor = 0.32;
-    
+
     assets.contestants.forEach((sheet, index) => {
         let frame = contestantFrames[index][currentFrameContestants];
 
@@ -322,7 +346,7 @@ function drawContestant() {
                 frame.sheet,
                 x + index * spacing, y, // Destination position
                 frameWidth * scaleFactor, frameHeight * scaleFactor, // Destination size
-                frame.sx, frame.sy, 
+                frame.sx, frame.sy,
                 frameWidth, frameHeight // Source position & size from sprite sheet
             );
         }
@@ -341,7 +365,7 @@ function drawContestantW() {
     const y = 290;
     const spacing = 158;
     let scaleFactor = 0.32;
-    
+
     assets.contestantsW.forEach((frameW, index) => {
         let frame = contestantFramesW[index][currentFrameContestantsW];
 
@@ -371,7 +395,7 @@ function drawContestantR() {
     const y = 290;
     const spacing = 158;
     let scaleFactor = 0.32;
-    
+
     assets.contestantsR.forEach((frameR, index) => {
         let frame = contestantFramesR[index][currentFrameContestantsR];
 
@@ -397,38 +421,38 @@ function drawContestantR() {
 
 function drawPodiums() {
     if (assets.podium1) {
-        backgroundLayer.image(assets.podium1, width/4.5, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium1, width / 4.5, height / 2 + 20, width / 4, height / 4);
     }
     if (assets.podium2) {
-        backgroundLayer.image(assets.podium2, width/2.93, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium2, width / 2.93, height / 2 + 20, width / 4, height / 4);
     }
     if (assets.podium3) {
-        backgroundLayer.image(assets.podium3, width/2.16, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium3, width / 2.16, height / 2 + 20, width / 4, height / 4);
     }
     if (assets.podium4) {
-        backgroundLayer.image(assets.podium4, width/1.74, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium4, width / 1.74, height / 2 + 20, width / 4, height / 4);
     }
 }
 
 // heads up display
 function drawHUD() {
-    if(assets.timer) {
+    if (assets.timer) {
         image(assets.timer, -20, 60, assets.timer.width / 5, assets.timer.height / 5);
         drawCountdown();
     }
-    if(assets.stars) {
+    if (assets.stars) {
         let x = 10
         let y = -10
 
         fill('#d9d9d9')
-        rect(x + 15, y + 70, 250 * 2/3 + 70, 50 * 2/3)
+        rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3)
         fill('#dc4042')
         let ratings = 0
         if (ratings > 250) ratings = 250
-        rect(x + 15, y + 70, ratings * 2/3, 50 * 2/3)
-        image(assets.stars, x, y, width/5, height/5);
+        rect(x + 15, y + 70, ratings * 2 / 3, 50 * 2 / 3)
+        image(assets.stars, x, y, width / 5, height / 5);
     }
-    if(assets.score) {
+    if (assets.score) {
         image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
     }
 }
@@ -443,7 +467,7 @@ function drawCountdown() {
     textFont(countdownFont);
     textSize(32);
     textAlign(CENTER, CENTER);
-    text(timeString, 112, 148); 
+    text(timeString, 112, 148);
 }
 
 function updateCountdown() {
@@ -453,36 +477,36 @@ function updateCountdown() {
 }
 
 //display right wrong light
-function drawRWLight(x,y){
+function drawRWLight(x, y) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
-    image(assets.rightLit, 393, 100, width/3, height/1.5);
-    image(assets.wrongLit, 243, 123, width/3, height/1.5);
+    image(assets.rightLit, 393, 100, width / 3, height / 1.5);
+    image(assets.wrongLit, 243, 123, width / 3, height / 1.5);
 
 }
 
 // displays cheat asset
-function drawCheat(){
+function drawCheat() {
     if (assets.cheat) {
-        image(assets.cheat, 0, 100, width/3, height/1.5);
+        image(assets.cheat, 0, 100, width / 3, height / 1.5);
     }
 }
 
-function drawApplause(){
-    if(assets.applause){
-        image(assets.applause, width/2 - 150, -55, width/4, height/4);
+function drawApplause() {
+    if (assets.applause) {
+        image(assets.applause, width / 2 - 150, -55, width / 4, height / 4);
     }
 }
 
-function drawApplauseON(){
-    if(assets.applauseon){
-        image(assets.applauseon, width/2 - 150, -55, width/4, height/4);
+function drawApplauseON() {
+    if (assets.applauseon) {
+        image(assets.applauseon, width / 2 - 150, -55, width / 4, height / 4);
     }
 }
 
 function drawHands() {
-    if(assets.hands) {
-        image(assets.hands, width/10 - 150, height/2 + 50, width, height/2);
+    if (assets.hands) {
+        image(assets.hands, width / 10 - 150, height / 2 + 50, width, height / 2);
     }
 }
 
@@ -551,10 +575,10 @@ function drawSpritesHost(sx,sy) {
 
 
 //draw host sprite and calls animations based of state
-function drawHost(sx, sy){
+function drawHost(sx, sy) {
     //if host is in idle then call idle positions and state
     let x = 100;
-    const y = height/2;
+    const y = height / 2;
     //const spacing = 160;
     let scaleFactor = 0.7;
     let frameSpeed = 2
@@ -568,16 +592,16 @@ function drawHost(sx, sy){
 
     //anim
     image(anim, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
-   
+
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFrames;
     }
 }
 
-function drawHostWalkR(sx, sy){
+function drawHostWalkR(sx, sy) {
     //if host is in idle then call idle positions and state
     let x = 100;
-    const y = height/2;
+    const y = height / 2;
     //const spacing = 160;
     let scaleFactor = 0.32;
     let frameSpeed = 2
@@ -591,35 +615,35 @@ function drawHostWalkR(sx, sy){
 
     //anim
     backgroundLayer.image(alWalkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-   
+
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
     }
 }
 
-function spotlight(){
-    if(assets.spotlight){
-        backgroundLayer.image(assets.spotlight, 120,100, width/2, height)
+function spotlight() {
+    if (assets.spotlight) {
+        backgroundLayer.image(assets.spotlight, 120, 100, width / 2, height)
     }
 }
 
-function podiumLight1(){
-    if(assets.podiumlit1){
-        image(assets.podiumlit1, 345,-50, width/3, height)
+function podiumLight1() {
+    if (assets.podiumlit1) {
+        image(assets.podiumlit1, 345, -50, width / 3, height)
     }
 }
-function podiumLight2(){
-    if(assets.podiumlit2){
-        image(assets.podiumlit2, 241,-50, width/3, height)
+function podiumLight2() {
+    if (assets.podiumlit2) {
+        image(assets.podiumlit2, 241, -50, width / 3, height)
     }
 }
-function podiumLight3(){
-    if(assets.podiumlit3){
-        image(assets.podiumlit3, 635,-50, width/3, height)
+function podiumLight3() {
+    if (assets.podiumlit3) {
+        image(assets.podiumlit3, 635, -50, width / 3, height)
     }
 }
-function podiumLight4(){
-    if(assets.podiumlit4){
-    image(assets.podiumlit4, 565,-50, width/3, height)
+function podiumLight4() {
+    if (assets.podiumlit4) {
+        image(assets.podiumlit4, 565, -50, width / 3, height)
     }
 }
