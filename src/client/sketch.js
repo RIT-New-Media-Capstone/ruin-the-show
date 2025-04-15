@@ -2,6 +2,8 @@
 
 let backgroundLayer;
 
+let zoomedIn = false; // for lever
+
 //Sprite Sheet Animation Variables for Contestants
 let al ;
 let alTalk ; 
@@ -220,6 +222,7 @@ window.setup = async function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     countdownTimer = countdown;
+    backgroundLayer = createGraphics(width, height)
     
 
     await syncStateLoop();
@@ -228,7 +231,7 @@ window.setup = async function () {
 window.draw = function () {
 
 
-    background(255);
+    backgroundLayer.background(255);
     drawBackground();
 
     /*if( state.right){
@@ -247,7 +250,6 @@ window.draw = function () {
     drawContestantR();
     //drawRWLight();
     drawPodiums();
-    drawHUD();
 
     //podiumLight1();
     //podiumLight2();
@@ -263,6 +265,10 @@ window.draw = function () {
     //drawSpritesHost(hostState)
     drawHostWalkR()
 
+    image(backgroundLayer, 0, 0, width, height, 
+        zoomedIn ? 175 : 0, zoomedIn ? 125 : 0, 
+        zoomedIn ? width * 3 / 4 : width, zoomedIn ? height * 3 / 4 : height)
+
     drawCheat();
 
     drawApplause();
@@ -271,6 +277,7 @@ window.draw = function () {
     drawHands();
     drawAudience();
 
+    drawHUD();
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //image(assets.curtains, 0, 0, width, height)
@@ -284,13 +291,13 @@ const syncGameState = async () => {
 
 function drawBackground() {
     if (assets.background) {
-        image(assets.background, 0, 0, width, height);
+        backgroundLayer.image(assets.background, 0, 0, width, height);
     }
     if (assets.stage) {                  
-        image(assets.stage, width/10, height/1.75, width/1.25, height/2);
+        backgroundLayer.image(assets.stage, width/10, height/1.75, width/1.25, height/2);
     }
     if (assets.stagelights) {
-        image(assets.stagelights, 0, -45, width, height/3);
+        backgroundLayer.image(assets.stagelights, 0, -45, width, height/3);
     }
 }
 
@@ -372,7 +379,7 @@ function drawContestantR() {
             const drawWidth = frameWidth * scaleFactor;
             const drawHeight = frameHeightRW * scaleFactor;
 
-            image(
+            backgroundLayer.image(
                 frame.sheet,
                 x + index * spacing, y, // Destination position
                 drawWidth, drawHeight, // Destination size
@@ -390,16 +397,16 @@ function drawContestantR() {
 
 function drawPodiums() {
     if (assets.podium1) {
-        image(assets.podium1, width/4.5, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium1, width/4.5, height/2 + 20, width/4, height/4);
     }
     if (assets.podium2) {
-        image(assets.podium2, width/2.93, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium2, width/2.93, height/2 + 20, width/4, height/4);
     }
     if (assets.podium3) {
-        image(assets.podium3, width/2.16, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium3, width/2.16, height/2 + 20, width/4, height/4);
     }
     if (assets.podium4) {
-        image(assets.podium4, width/1.74, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium4, width/1.74, height/2 + 20, width/4, height/4);
     }
 }
 
@@ -583,7 +590,7 @@ function drawHostWalkR(sx, sy){
     sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
 
     //anim
-    image(alWalkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+    backgroundLayer.image(alWalkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
    
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
@@ -592,7 +599,7 @@ function drawHostWalkR(sx, sy){
 
 function spotlight(){
     if(assets.spotlight){
-        image(assets.spotlight, 120,100, width/2, height)
+        backgroundLayer.image(assets.spotlight, 120,100, width/2, height)
     }
 }
 
