@@ -2,6 +2,19 @@
 
 //Sprite Sheet Animation Variables for Contestants
 let al;
+let alTalkL;
+let alTalkR;
+let alWalkL;
+let alWalkR;
+let alTurnL;
+let alTurnR;
+
+let hostState;//; // idle, talkL, talkR, walkL, walkR, turnL, turnR
+let hostSpriteSheet;
+let hostFrames = [];
+let hostX = 100; // Starting x position
+let hostY = height/2; // y position stays mostly constant
+    
 
 let contestantFrames = [];
 let contestantFramesR = [];
@@ -75,6 +88,12 @@ window.preload = function () {
 
     //AL 
     al = loadImage('/Assets/SpriteSheets/Host/AL_Idle.png'); 
+    alTalkL = loadImage('/Assets/SpriteSheets/Host/AL_Talk_L.png'); 
+    alTalkR = loadImage('/Assets/SpriteSheets/Host/AL_Talk_R.png'); 
+    alWalkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png'); 
+    alWalkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png'); 
+    alTurnL = loadImage('/Assets/SpriteSheets/Host/AL_Turn_L.png'); 
+    alTurnR = loadImage('/Assets/SpriteSheets/Host/AL_Turn_R.png'); 
     
     
 
@@ -200,7 +219,7 @@ window.draw = function () {
     /*if( state.right){
 
          // drawContestantR();
-         
+         // draw light feedback?
     } if(state.wrong){
 
            //drawContestantW();
@@ -220,7 +239,12 @@ window.draw = function () {
     spotlight();
     
 
-    drawHost();
+    //drawHost("al");
+    //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
+
+    hostState = "walkL";
+    drawSpritesHost(hostState)
+
     drawCheat();
 
     drawApplause();
@@ -430,7 +454,66 @@ function drawHands() {
         image(assets.hands, width/10 - 150, height/2 + 50, width, height/2);
     }
 }
-  
+
+function drawSpritesHost(sx,sy) {
+    let hostX = 100;
+    const hostY = height/2;
+
+    switch (hostState) {
+        case "idle":
+            hostSpriteSheet = al;
+            break;
+        case "talkL":
+            hostSpriteSheet = alTalkL;
+            break;
+        case "talkR":
+            hostSpriteSheet = alTalkR;
+            break;
+        case "walkL":
+            hostSpriteSheet = alWalkL;
+            hostX -= 1; // Walk left
+            break;
+        case "walkR":
+            hostSpriteSheet = alWalkR;
+            hostX += 1; // Walk right
+            break;
+        case "turnL":
+            hostSpriteSheet = alTurnL;
+            break;
+        case "turnR":
+            hostSpriteSheet = alTurnR;
+            break;
+    }
+
+    let scaleFactor = 0.7;
+    // Calculate frame for animation (loop through totalFrames)
+   // let row = Math.floor(currentFrameHost / numCols);
+    //let col = currentFrameHost % numCols;
+
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;
+
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightAL * scaleFactor;
+
+    image(
+        hostSpriteSheet,
+        hostX,
+        hostY,
+        alWidth,
+        alHeight,
+        sx,
+        sy,
+        frameWidthAL,
+        frameHeightAL
+    );
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFrames;
+    }
+}
+
+
 //draw host sprite and calls animations based of state
 function drawHost(sx, sy){
     //if host is in idle then call idle positions and state
@@ -447,8 +530,8 @@ function drawHost(sx, sy){
     sx = (currentFrameHost % numCols) * frameWidthAL;
     sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;//frameHeight;
 
-
-    image(al, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
+    //anim
+    image(anim, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
    
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFrames;
