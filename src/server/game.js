@@ -166,7 +166,6 @@ class GameMachine {
             }
 
             this.host.POSITION = newPos;
-            console.log(this.host.POSITION)
         }
         
         if (this.state === this.states.IDLE) {                      //IDLE STATE
@@ -203,6 +202,7 @@ class GameMachine {
         } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE           
             if (event.name === this.events.GAME_OVER) {
                 this.state = this.states.IDLE;
+                console.log("YOUR FINAL SCORE IS: " + this.score);
                 console.log(`State transition: PLAYING -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
@@ -332,8 +332,10 @@ class GameMachine {
                 const currentPos = this.feedback.LEVER_POS;
                 if (currentPos <= 50) {
                     this.feedback.LEVER_TARGET = {min: 85, max: 100};
+                    console.log("YOUR LEVER SHOULD GO HIGH")
                 } else {
                     this.feedback.LEVER_TARGET = {min: 1, max: 15};
+                    console.log("YOUR LEVER SHOULD GO LOW")
                 }
                 this.feedback.LEVER_INITIAL = currentPos;
 
@@ -487,8 +489,9 @@ const updateHostPosition = () => {
 };
 setTimeout(updateHostPosition, 100);
 
-// Example usage
-const runExample = () => {
+// On Start Up
+const awake = () => {
+    console.log("WELCOME TO RUIN THE SHOW! PLEASE SHOW YOUR RFID BAND TO START PLAYING!");
     // Create a new game machine in IDLE state
 
     // Start the state machine
@@ -497,30 +500,13 @@ const runExample = () => {
     console.log('Current state:', machine.state);
 
     //DEBUG PURPOSES: START AT PLAYING STATE
-    moveToPlaying(machine);
+    //moveToPlaying(machine);
 
-    /*
+    
     // Simulate an RFID scan after 5 seconds
     setTimeout(() => {
         machine.addEvent('rfid-scan');
     }, 5000);
-
-    // Simulate the game ending early after 30 seconds (user presses red button)
-    setTimeout(() => {
-        machine.addEvent('button-pushed-red');
-    }, 30000);
-
-    // Stop the state machine after 3 minute
-    setTimeout(() => {
-        machine.stop();
-        console.log('Example complete. Final state:', machine.state);
-    }, 60000 * 3);
-    */
-};
-
-//On Start Up, Light Up All LEDs Now (TEST)
-const awake = () => {
-    runExample();
 };
 
 export { awake, machine }
