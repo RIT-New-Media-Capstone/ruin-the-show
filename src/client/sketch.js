@@ -1,18 +1,22 @@
 //let state = {};
 
 //Sprite Sheet Animation Variables for Contestants
-let al;
-let alTalkL;
-let alTalkR;
+let al ;
+let alTalk ; 
+let alTurnFL; 
+let alTurnFR; 
+let alTurnLF; 
+let alTurnRF; 
+let alTurnR ; 
 let alWalkL;
 let alWalkR;
-let alTurnL;
-let alTurnR;
-
+    
+    
+/*
 let hostState;//; // idle, talkL, talkR, walkL, walkR, turnL, turnR
 let hostSpriteSheet;
 let hostFrames = [];
-
+*/
     
 
 let contestantFrames = [];
@@ -26,16 +30,23 @@ let currentFrameContestantsR = 0;
 let currentFrameContestantsW = 0;
 
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
+
 const numRows = 4;//4; // idle + al
+const numRowsLR = 2;
 const numRowsRW = 8; // number of rows for right + wrong
 const numCols = 5;
+
 const totalFrames = numRows * numCols;
 const totalFramesRW = numRowsRW * numCols;
+const totalFramesLR = numRowsLR * numCols;
+
 const frameWidth =  4802  / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
+const frameHeightLR = 1081 / numRowsLR;
 const frameHeight =  2162 / numRows; // idle->  2162 / numRows; // (al) 5410/5 = 1080/2 = 540
 const frameHeightRW =  4324/ numRowsRW;
-const frameWidthAL = 4802 / numCols;
+const frameWidthAL = 4802 / numCols; 
 const frameHeightAL = 4324 / numRows;
+
 
 
 
@@ -87,12 +98,13 @@ window.preload = function () {
 
     //AL 
     al = loadImage('/Assets/SpriteSheets/Host/AL_Idle.png'); 
-    alTalkL = loadImage('/Assets/SpriteSheets/Host/AL_Talk_L.png'); 
-    alTalkR = loadImage('/Assets/SpriteSheets/Host/AL_Talk_R.png'); 
-    alWalkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png'); 
-    alWalkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png'); 
-    alTurnL = loadImage('/Assets/SpriteSheets/Host/AL_Turn_L.png'); 
-    alTurnR = loadImage('/Assets/SpriteSheets/Host/AL_Turn_R.png'); 
+    //alTalk = loadImage('/Assets/SpriteSheets/Host/AL_Talk.png'); 
+    //alTurnFL = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_L.png'); 
+    //alTurnFR= loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_R.png'); 
+    //alTurnLF = loadImage('/Assets/SpriteSheets/Host/AL_TurnL_to_F.png'); 
+    //alTurnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_toF.png'); 
+    //alWalkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png')
+    alWalkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png')
     
     
 
@@ -549,22 +561,22 @@ function drawHostWalkR(sx, sy){
     //if host is in idle then call idle positions and state
     let x = 100;
     const y = height/2;
-    const spacing = 160;
+    //const spacing = 160;
     let scaleFactor = 0.32;
     let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
 
     ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
     sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;//frameHeight;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
 
     //anim
-    image(alWalkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
+    image(alWalkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
    
     if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFrames;
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
     }
 }
 
