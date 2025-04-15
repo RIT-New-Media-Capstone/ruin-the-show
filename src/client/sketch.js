@@ -1,5 +1,9 @@
 //let state = {};
 
+let backgroundLayer;
+
+let zoomedIn = false; // for lever
+
 //Sprite Sheet Animation Variables for Contestants
 let al ;
 let alTalk ; 
@@ -74,6 +78,7 @@ const assets = {
     stagelights: "",
     stars: "",
     timer: "",
+    score: "", 
     
 }
   
@@ -94,6 +99,7 @@ window.preload = function () {
     //HUD (timer & score)
     assets.stars = loadImage('/Assets/Background/StarRatings.png');
     assets.timer = loadImage('/Assets/Background/Timer.png');
+    assets.score = loadImage('/Assets/Background/PointTrack.png')
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
 
     //AL 
@@ -216,6 +222,7 @@ window.setup = async function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     countdownTimer = countdown;
+    backgroundLayer = createGraphics(width, height)
     
 
     await syncStateLoop();
@@ -224,7 +231,7 @@ window.setup = async function () {
 window.draw = function () {
 
 
-    background(255);
+    backgroundLayer.background(255);
     drawBackground();
 
     /*if( state.right){
@@ -243,7 +250,6 @@ window.draw = function () {
     drawContestantR();
     //drawRWLight();
     drawPodiums();
-    drawHUD();
 
     //podiumLight1();
     //podiumLight2();
@@ -260,6 +266,10 @@ window.draw = function () {
     drawHostWalkR()
     drawHostWalkL()
 
+    image(backgroundLayer, 0, 0, width, height, 
+        zoomedIn ? 175 : 0, zoomedIn ? 125 : 0, 
+        zoomedIn ? width * 3 / 4 : width, zoomedIn ? height * 3 / 4 : height)
+
     drawCheat();
 
     drawApplause();
@@ -268,6 +278,7 @@ window.draw = function () {
     drawHands();
     drawAudience();
 
+    drawHUD();
 
     text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
     //image(assets.curtains, 0, 0, width, height)
@@ -281,13 +292,13 @@ const syncGameState = async () => {
 
 function drawBackground() {
     if (assets.background) {
-        image(assets.background, 0, 0, width, height);
+        backgroundLayer.image(assets.background, 0, 0, width, height);
     }
     if (assets.stage) {                  
-        image(assets.stage, width/10, height/1.75, width/1.25, height/2);
+        backgroundLayer.image(assets.stage, width/10, height/1.75, width/1.25, height/2);
     }
     if (assets.stagelights) {
-        image(assets.stagelights, 0, -45, width, height/3);
+        backgroundLayer.image(assets.stagelights, 0, -45, width, height/3);
     }
 }
 
@@ -369,7 +380,7 @@ function drawContestantR() {
             const drawWidth = frameWidth * scaleFactor;
             const drawHeight = frameHeightRW * scaleFactor;
 
-            image(
+            backgroundLayer.image(
                 frame.sheet,
                 x + index * spacing, y, // Destination position
                 drawWidth, drawHeight, // Destination size
@@ -387,33 +398,39 @@ function drawContestantR() {
 
 function drawPodiums() {
     if (assets.podium1) {
-        image(assets.podium1, width/4.5, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium1, width/4.5, height/2 + 20, width/4, height/4);
     }
     if (assets.podium2) {
-        image(assets.podium2, width/2.93, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium2, width/2.93, height/2 + 20, width/4, height/4);
     }
     if (assets.podium3) {
-        image(assets.podium3, width/2.16, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium3, width/2.16, height/2 + 20, width/4, height/4);
     }
     if (assets.podium4) {
-        image(assets.podium4, width/1.74, height/2 + 20, width/4, height/4);
+        backgroundLayer.image(assets.podium4, width/1.74, height/2 + 20, width/4, height/4);
     }
 }
 
 // heads up display
 function drawHUD() {
+    if(assets.timer) {
+        image(assets.timer, -20, 60, assets.timer.width / 5, assets.timer.height / 5);
+        drawCountdown();
+    }
     if(assets.stars) {
+        let x = 10
+        let y = -10
+
         fill('#d9d9d9')
-        rect(width - 285, 60, 250 * 2/3 + 70, 50 * 2/3)
+        rect(x + 15, y + 70, 250 * 2/3 + 70, 50 * 2/3)
         fill('#dc4042')
         let ratings = 0
         if (ratings > 250) ratings = 250
-        rect(width - 285, 60, ratings * 2/3, 50 * 2/3)
-        image(assets.stars, width - 300, -10, width/5, height/5);
+        rect(x + 15, y + 70, ratings * 2/3, 50 * 2/3)
+        image(assets.stars, x, y, width/5, height/5);
     }
-    if(assets.timer) {
-        image(assets.timer, -20, -40, width/4, height/4);
-        drawCountdown();
+    if(assets.score) {
+        image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
     }
 }
 
@@ -425,9 +442,9 @@ function drawCountdown() {
 
     fill('black');
     textFont(countdownFont);
-    textSize(40);
+    textSize(32);
     textAlign(CENTER, CENTER);
-    text(timeString, 160, 67); 
+    text(timeString, 112, 148); 
 }
 
 function updateCountdown() {
@@ -598,7 +615,7 @@ function drawHostWalkR(sx, sy){
     sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
 
     //anim
-    image(alWalkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+    backgroundLayer.image(alWalkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
    
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
@@ -632,7 +649,7 @@ function drawHostWalkL(sx, sy){
 
 function spotlight(){
     if(assets.spotlight){
-        image(assets.spotlight, 120,100, width/2, height)
+        backgroundLayer.image(assets.spotlight, 120,100, width/2, height)
     }
 }
 
