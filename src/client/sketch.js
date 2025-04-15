@@ -267,6 +267,7 @@ window.draw = function () {
     //hostState = "talkR";
     //drawSpritesHost(hostState)
     drawHostWalkR()
+    drawHostWalkL()
 
     // TODO: when zoom change event trigger, set zoomTimer to 0
     if (zoomedIn) {
@@ -598,31 +599,7 @@ function drawHost(sx, sy) {
     }
 }
 
-/*
-function drawHostWalkL(sx, sy){
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height/2;
-    //const spacing = 160;
-    let scaleFactor = 0.32;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
 
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    image(alWalkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-   
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-}*/
-
-/*
 function drawHostWalkL(sx, sy){
     //if host is in idle then call idle positions and state
     let x = 100;
@@ -644,7 +621,7 @@ function drawHostWalkL(sx, sy){
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
     }
-}*/
+}
 
 function drawHostWalkR(sx, sy) {
     //if host is in idle then call idle positions and state
@@ -670,53 +647,10 @@ function drawHostWalkR(sx, sy) {
 }
 
 
-function drawHostWalkL(sx, sy){
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height/2;
-    //const spacing = 160;
-    let scaleFactor = 0.32;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    image(alWalkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-   
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-}
 
 
 
-function drawHostWalkL(sx, sy){
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height/2;
-    //const spacing = 160;
-    let scaleFactor = 0.32;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
 
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    image(alWalkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-   
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-}
 
 
 function spotlight() {
