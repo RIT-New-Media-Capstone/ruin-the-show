@@ -103,7 +103,7 @@ window.preload = function () {
     //alTurnFR= loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_R.png'); 
     //alTurnLF = loadImage('/Assets/SpriteSheets/Host/AL_TurnL_to_F.png'); 
     //alTurnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_toF.png'); 
-    //alWalkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png')
+    alWalkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png')
     alWalkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png')
     
     
@@ -258,6 +258,7 @@ window.draw = function () {
     //hostState = "talkR";
     //drawSpritesHost(hostState)
     drawHostWalkR()
+    drawHostWalkL()
 
     drawCheat();
 
@@ -557,6 +558,30 @@ function drawHost(sx, sy){
     }
 }
 
+/*
+function drawHostWalkL(sx, sy){
+    //if host is in idle then call idle positions and state
+    let x = 100;
+    const y = height/2;
+    //const spacing = 160;
+    let scaleFactor = 0.32;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    image(alWalkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+   
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+}*/
+
 function drawHostWalkR(sx, sy){
     //if host is in idle then call idle positions and state
     let x = 100;
@@ -579,6 +604,31 @@ function drawHostWalkR(sx, sy){
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
     }
 }
+
+
+function drawHostWalkL(sx, sy){
+    //if host is in idle then call idle positions and state
+    let x = 100;
+    const y = height/2;
+    //const spacing = 160;
+    let scaleFactor = 0.32;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    image(alWalkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+   
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+}
+
 
 function spotlight(){
     if(assets.spotlight){
