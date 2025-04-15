@@ -129,6 +129,8 @@ class GameMachine {
             score: this.score,
             cues: this.cues,
             feedback: this.feedback,
+            host: this.host, 
+            events: this.events,
         };
     }
 

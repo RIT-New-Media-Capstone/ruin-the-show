@@ -4,35 +4,17 @@ let p5Instance = null;
 let p5Loaded = false;
 
 // Set up state checking interval
-setInterval(() => {
-  fetch('/getState')
+function getState () {
+  return fetch('/getState')
     .then(res => res.json())
     .then(data => {
-      if (data.state) {
-        let newPage = data.state;
-        
-        // Convert state name to page name as needed
-        if (newPage === 'PLAYING') {
-          newPage = 'sketch';
-        } else if (newPage === 'IDLE') {
-          newPage = 'idle';
-        } else if (newPage === 'ONBOARDING') {
-          newPage = 'onboarding';
-        }
-        
-        // Only change if state has actually changed
-        if (newPage.toLowerCase() !== currentPage) {
-          console.log(`State change detected: ${currentPage || 'none'} -> ${newPage}`);
-          unloadPage();
-          currentPage = newPage.toLowerCase();
-          loadPage(currentPage);
-        }
-      }
+      return data.state
     })
     .catch(err => {
       console.error('Error fetching game state:', err);
     });
-}, 1000);
+}
+
 
 // Cleanly unload the current page/sketch
 function unloadPage() {
@@ -173,3 +155,5 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // For debugging in console
 window.getCurrentPage = () => currentPage;
+
+export { getState }
