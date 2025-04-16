@@ -1,4 +1,11 @@
-//let state = {};
+let state = {
+    score: 0,
+    states: {},
+    events: {},
+    host: {},
+    cues: {},
+    feedback: {}
+};
 
 let backgroundLayer;
 
@@ -18,7 +25,6 @@ let alTurnR;
 let alWalkL;
 let alWalkR;
 
-
 /*
 let hostState;//; // idle, talkL, talkR, walkL, walkR, turnL, turnR
 let hostSpriteSheet;
@@ -35,19 +41,15 @@ let host = {
     turnRF: null,
     walkL: null,
     walkR: null,
-  };
-  
+};
 
 //manage states
 let contestantStates = ['idle', 'right', 'wrong'];
 let currentContestantState = 'idle';
 
-
-
 let contestantFrames = [];
 let contestantFramesR = [];
 let contestantFramesW = [];
-
 
 let currentFrameHost = 0;
 let currentFrameContestants = 0;
@@ -76,7 +78,6 @@ const frameHeightAL = 4324 / numRows;
 let countdownFont;
 let countdown = 60;
 let countdownTimer;
-
 
 const assets = {
     audience: "",
@@ -247,8 +248,6 @@ window.setup = async function () {
 }
 
 window.draw = function () {
-
-
     backgroundLayer.background(255);
     drawBackground();
 
@@ -262,7 +261,6 @@ window.draw = function () {
 
     }*/
 
-
     //drawContestant();
 
     drawContestantR();
@@ -274,7 +272,6 @@ window.draw = function () {
     //podiumLight3();
     //podiumLight4();
     spotlight();
-
 
     //drawHost("al");
     //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
@@ -289,7 +286,6 @@ window.draw = function () {
     //drawHostTurnRF()
     //drawHostIdle()
     drawHostTalk()
-    
 
     // TODO: when zoom change event trigger, set zoomTimer to 0
     if (zoomedIn) {
@@ -354,7 +350,6 @@ function drawAudience() {
     }
 }
 
-
 function drawContestant() {
     let x = 309;
     const y = 290;
@@ -380,9 +375,6 @@ function drawContestant() {
         currentFrameContestants = (currentFrameContestants + 1) % totalFrames;
     }
 }
-
-
-
 function drawContestantW() {
     let x = 309;
     const y = 290;
@@ -410,9 +402,6 @@ function drawContestantW() {
         currentFrameContestantsW = (currentFrameContestantsW + 1) % totalFramesRW;
     }
 }
-
-
-
 function drawContestantR() {
     let x = 309;
     const y = 290;
@@ -440,7 +429,6 @@ function drawContestantR() {
         currentFrameContestantsR = (currentFrameContestantsR + 1) % totalFramesRW;
     }
 }
-
 
 function drawPodiums() {
     if (assets.podium1) {
@@ -492,7 +480,6 @@ function drawCountdown() {
     textAlign(CENTER, CENTER);
     text(timeString, 112, 148);
 }
-
 function updateCountdown() {
     if (countdownTimer > 0) {
         countdownTimer -= 1; // Decrease by one second
@@ -520,7 +507,6 @@ function drawApplause() {
         image(assets.applause, width / 2 - 150, -55, width / 4, height / 4);
     }
 }
-
 function drawApplauseON() {
     if (assets.applauseon) {
         image(assets.applauseon, width / 2 - 150, -55, width / 4, height / 4);
@@ -594,9 +580,6 @@ function drawSpritesHost(sx,sy) {
     }
 }*/
 
-
-
-
 //draw host sprite and calls animations based of state
 function drawHostIdle(sx, sy) {
     //8*5
@@ -621,7 +604,6 @@ function drawHostIdle(sx, sy) {
         currentFrameHost = (currentFrameHost + 1) % totalFrames;
     }
 }
-
 function drawHostTalk(sx,sy){
     //4*5
     //if host is in idle then call idle positions and state
@@ -646,7 +628,6 @@ function drawHostTalk(sx,sy){
     }
 
 }
-
 function drawHostTurnLF(sx,sy){
     let x = 100;
     const y = height / 2;
@@ -669,7 +650,6 @@ function drawHostTurnLF(sx,sy){
     }
 
 }
-
 function drawHostTurnFL(sx,sy){
     let x = 100;
     const y = height / 2;
@@ -692,7 +672,6 @@ function drawHostTurnFL(sx,sy){
     }
 
 }
-
 function drawHostTurnRF(sx,sy){
     let x = 100;
     const y = height / 2;
