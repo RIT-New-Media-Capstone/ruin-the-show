@@ -8,6 +8,7 @@ const oscClient = new osc.UDPPort({
     remoteAddress: "127.0.0.1",
     remotePort: 7000
 });
+oscClient.open();
 
 const moveToPlaying = (machine) => {
     machine.state = 'PLAYING';
@@ -33,7 +34,7 @@ const moveToPlaying = (machine) => {
     for (let i = 1; i <= 4; i++) {
         turnOffPodiumLED(i);
     }
-    
+
     machine.cheatTimer = null;
     machine.applauseTimer = null;
     machine.joystickTimer = null;
@@ -47,7 +48,7 @@ const moveToPlaying = (machine) => {
     machine.scoreJoystick = 0
     machine.scoreLever = 0
     machine.scorePodium = 0
-    
+
     // Start the game timer
     setTimeout(() => {
         machine.addEvent(machine.events.GAME_OVER, {});
@@ -73,7 +74,7 @@ const moveToPlaying = (machine) => {
 //Third variable temporary (For Testing Purposes)
 const scoreChange = (machine, scoreEarned, minigame) => {
     machine.score += scoreEarned;
-    if(machine.score <= 0) {
+    if (machine.score <= 0) {
         machine.score = 0
     }
 
@@ -84,7 +85,7 @@ const scoreChange = (machine, scoreEarned, minigame) => {
     //Delete below after testing
     const key = `score${minigame}`;
     machine[key] += scoreEarned;
-    if(machine[key] <= 0) {
+    if (machine[key] <= 0) {
         machine[key] = 0
     }
     console.log("Your " + minigame + " score is: " + machine[key]);
@@ -193,17 +194,17 @@ class GameMachine {
 
     lighting = {
         START_GAME: "start-game",
-        WIN: "win", 
-        FAIL: "fail", 
-        CHEAT: "cheat", 
-        PODIUM_1: "podium-1", 
+        WIN: "win",
+        FAIL: "fail",
+        CHEAT: "cheat",
+        PODIUM_1: "podium-1",
         PODIUM_2: "podium-2",
-        PODIUM_3: "podium-3", 
-        PODIUM_4: "podium-4", 
-        IDLE: "idle", 
-        POSITIVE_FEEDBACK: "positive-feedback", 
-        NEGATIVE_FEEDBACK: "negative-feedback", 
-        ONBOARDING_START: "onboarding-start", 
+        PODIUM_3: "podium-3",
+        PODIUM_4: "podium-4",
+        IDLE: "idle",
+        POSITIVE_FEEDBACK: "positive-feedback",
+        NEGATIVE_FEEDBACK: "negative-feedback",
+        ONBOARDING_START: "onboarding-start",
     }
 
     constructor(initialState) {
@@ -228,7 +229,7 @@ class GameMachine {
 
         if (event.name === this.events.LEVER_MOVED) { //LEVER VALUE INITIALIZATION
             let position = event.data.value
-            if(position > 100) {
+            if (position > 100) {
                 position = 100
             } else if (position < 1) {
                 position = 1
@@ -255,7 +256,7 @@ class GameMachine {
 
             this.host.POSITION = newPos;
         }
-        
+
         if (this.state === this.states.IDLE) {                                //IDLE STATE
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 // DEBUG Purposes, goes to onboarding
@@ -303,7 +304,7 @@ class GameMachine {
 
                 turnOffApplauseLED();
                 turnOffCheatLED();
-                for(let i = 1; i <= 4; i++) {
+                for (let i = 1; i <= 4; i++) {
                     this.cues[`PODIUM_${i}_CUE`] = false
                     turnOffPodiumLED(i);
                 }
@@ -337,7 +338,8 @@ class GameMachine {
                     scoreChange(this, 15, "Cheat");
                     clearTimeout(this.cheatTimer);
                     this.addEvent(this.events.TURN_OFF_CHEAT);
-                    this.this.sendOscCue(this.lighting.CHEAT)
+                    this.sendOscCue(this.lighting.CHEAT)
+                    this.sendOscCue(this.lighting.IDLE)
                 } else if (!this.cues.CHEAT_CUE) {
                     scoreChange(this, -15, "Cheat");
                 }
@@ -361,9 +363,9 @@ class GameMachine {
                 if (!this.leverTouched && Math.abs(pos - start) > 3) {
                     this.leverTouched = true;
                 }
-                if (this.cues.LEVER_CUE && this.cues.LEVER_TARGET) {                    
+                if (this.cues.LEVER_CUE && this.cues.LEVER_TARGET) {
                     const { min, max } = this.cues.LEVER_TARGET;
-                    
+
                     if (pos >= min && pos <= max) {
                         // Successful move
                         scoreChange(this, 7, "Lever");
@@ -383,7 +385,7 @@ class GameMachine {
                     scoreChange(this, -8, "Podium");
                 }
                 clearTimeout(this.podiumTimer);
-                this.addEvent(this.events.TURN_OFF_PODIUM, {num: podiumNum});
+                this.addEvent(this.events.TURN_OFF_PODIUM, { num: podiumNum });
             }
 
             // Set on-states
@@ -429,10 +431,10 @@ class GameMachine {
 
                 const currentPos = this.feedback.LEVER_POS;
                 if (currentPos <= 50) {
-                    this.cues.LEVER_TARGET = {min: 85, max: 100};
+                    this.cues.LEVER_TARGET = { min: 85, max: 100 };
                     console.log("YOUR LEVER SHOULD GO HIGH")
                 } else {
-                    this.cues.LEVER_TARGET = {min: 1, max: 15};
+                    this.cues.LEVER_TARGET = { min: 1, max: 15 };
                     console.log("YOUR LEVER SHOULD GO LOW")
                 }
                 this.feedback.LEVER_INITIAL = currentPos;
@@ -454,7 +456,7 @@ class GameMachine {
                 this.cues[`PODIUM_${event.data.num}_CUE`] = true
                 turnOnPodiumLED(event.data.num);
                 this.podiumTimer = setTimeout(() => {
-                    this.addEvent(this.events.TURN_OFF_PODIUM, {num: event.data.num});
+                    this.addEvent(this.events.TURN_OFF_PODIUM, { num: event.data.num });
                 }, 3 * 1000);
             }
 
@@ -479,14 +481,14 @@ class GameMachine {
                     this.addEvent(this.events.TURN_ON_JOYSTICK, {});
                 }, 5 * 1000);
             }
-            if (event.name === this.events.TURN_OFF_LEVER  && this.cues.LEVER_CUE) {
+            if (event.name === this.events.TURN_OFF_LEVER && this.cues.LEVER_CUE) {
                 this.cues.LEVER_CUE = false
                 this.leverTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_LEVER, {});
                 }, 2 * 1000);
             }
             if (event.name == this.events.TURN_OFF_PODIUM) {
-                for(let i = 1; i <= 4; i++) {
+                for (let i = 1; i <= 4; i++) {
                     this.cues[`PODIUM_${i}_CUE`] = false
                     turnOffPodiumLED(i);
                 }
@@ -547,66 +549,84 @@ class GameMachine {
 
     // Helper method to send cues to lighting 
     sendOscCue(cueType) {
+        let layer = null
+        let clip = null
         let column = null
         switch (cueType) {
-            case this.lighting.START_GAME: 
-            column = 0
-            break;
+            case this.lighting.START_GAME:
+                column = 10
+                break;
 
-            case this.lighting.WIN: 
-            column = 0
-            break;
+            case this.lighting.WIN:
+                column = 5
+                break;
 
-            case this.lighting.FAIL: 
-            column = 0
-            break;
+            case this.lighting.FAIL:
+                column = 4
+                break;
 
-            case this.lighting.CHEAT: 
-            column = 0
-            break;
+            case this.lighting.CHEAT:
+                layer = 3
+                clip = 2
+                break;
 
-            case this.lighting.PODIUM_1: 
-            column = 0
-            break;
+            case this.lighting.PODIUM_1:
+                layer = 2
+                clip = 11
+                break;
 
-            case this.lighting.PODIUM_2: 
-            column = 0
-            break;
+            case this.lighting.PODIUM_2:
+                layer = 2
+                clip = 12
+                break;
 
-            case this.lighting.PODIUM_3: 
-            column = 0
-            break;
+            case this.lighting.PODIUM_3:
+                layer = 2
+                clip = 13
+                break;
 
-            case this.lighting.PODIUM_4: 
-            column = 0
-            break;
+            case this.lighting.PODIUM_4:
+                layer = 2
+                clip = 14
+                break;
 
-            case this.lighting.IDLE: 
-            column = 0
-            break;
+            case this.lighting.IDLE:
+                column = 6
+                break;
 
-            case this.lighting.POSITIVE_FEEDBACK: 
-            column = 0
-            break;
+            case this.lighting.POSITIVE_FEEDBACK:
+                layer = 3
+                clip = 5
+                break;
 
-            case this.lighting.NEGATIVE_FEEDBACK: 
-            column = 0
-            break;
+            case this.lighting.NEGATIVE_FEEDBACK:
+                layer = 3
+                clip = 1
+                break;
 
-            case this.lighting.ONBOARDING_START: 
-            column = 0
-            break;
+            case this.lighting.ONBOARDING_START:
+                column = 15
+                break;
         }
 
-        if(column == null || column <= 0) {
+        if (column !== null && column > 0) {
+            oscClient.send({
+                address: `/composition/columns/${column}/connect`,  // selects whole column and plays all animations in column
+                args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
+            });
+        }
+
+        if (layer !== null && layer > 0 && clip !== null && clip > 0) {
+            oscClient.send({
+                address: `/composition/layers/${layer}/clips/${clip}/connect`,  // selects specific layer & clip 
+                args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
+            });
+        }
+
+        else {
             console.log(`Cue ${cueType} is not valid`)
             return
-        } 
-
-        oscClient.send({
-            address: `/composition/columns/${column}/connect`,  // selects whole column and plays all animations in column
-            args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
-        });
+        }
     }
 }
 
@@ -677,7 +697,7 @@ const awake = () => {
     //DEBUG PURPOSES: START AT PLAYING STATE
     //moveToPlaying(machine);
 
-    
+
     // Simulate an RFID scan after 5 seconds
     setTimeout(() => {
         machine.addEvent('rfid-scan');
