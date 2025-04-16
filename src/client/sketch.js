@@ -44,6 +44,8 @@ let RTSstate = { // Initial Values Based on Start of State Machine
 };
 
 let backgroundLayer;
+let idleGraphicsLayer;
+let onboardingGraphicsLayer;
 
 let zoomedIn = false; // for lever
 let zoom;
@@ -138,6 +140,7 @@ const assets = {
 const idleOnboarding = {
     idle: "",
     onboarding: "",
+    onboarding_playing: false,
     easy: "",
     medium: "",
     hard: "",
@@ -156,6 +159,7 @@ window.preload = function () {
     idleOnboarding.easy = loadImage('/Assets/Idle_Onboarding/LevelSelections_EASY.png');
     idleOnboarding.medium = loadImage('/Assets/Idle_Onboarding/LevelSelections_MED.png');
     idleOnboarding.hard = loadImage('/Assets/Idle_Onboarding/LevelSelections_HARD.png');
+    idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif')
     
     //BACKGROUND
     assets.background = loadImage('/Assets/Background/MainBackground.png');
@@ -280,9 +284,10 @@ window.setup = async function () {
     frameRate(30);
     countdownTimer = countdown;
     backgroundLayer = createGraphics(width, height);
+    idleGraphicsLayer = createGraphics(width, height);
+    onboardingGraphicsLayer = createGraphics(width, height)
 
-    // Animated Files Setup
-    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding thingy.mp4');
+    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding Thingy.mp4')
     idleOnboarding.onboarding.hide();
 
     syncStateLoop();
@@ -303,11 +308,21 @@ window.draw = function () {
     console.log(RTSstate);
     backgroundLayer.background(255);
     if (RTSstate.state === 'IDLE') {
-        idleOnboarding.idle = createImg('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
-        idleOnboarding.idle.size(width, height);
+        idleOnboarding.onboarding.stop()
+        idleGraphicsLayer.image(idleOnboarding.idle, 0, 0, width, height);
+
+        image(idleGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'ONBOARDING') {
-        idleOnboarding.idle.remove();
+        if(!idleOnboarding.onboarding_playing){
+            idleOnboarding.onboarding.play()
+            idleOnboarding.onboarding_playing = true
+        }
+
+        onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
+
+        image(onboardingGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'PLAYING') {
+        idleOnboarding.onboarding.stop()
         drawBackground();
         if (frameCount % 30 === 0 && countdownTimer > 0) {
             updateCountdown();
@@ -378,7 +393,7 @@ window.draw = function () {
         text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
         //image(assets.curtains, 0, 0, width, height)
     } else if (RTSstate.state === 'END') {
-
+        idleOnboarding.onboarding.stop()
     }
 }
 
