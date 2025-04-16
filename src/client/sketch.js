@@ -281,12 +281,14 @@ window.draw = function () {
 
     //hostState = "talkR";
     //drawSpritesHost(hostState)
-    drawHostWalkR()
-    drawHostWalkL()
+    //drawHostWalkR()
+    //drawHostWalkL()
     //drawHostTurnFL()
     //drawHostTurnLF()
     //drawHostTurnFR()
     //drawHostTurnRF()
+    //drawHostIdle()
+    drawHostTalk()
     
 
     // TODO: when zoom change event trigger, set zoomTimer to 0
@@ -596,7 +598,8 @@ function drawSpritesHost(sx,sy) {
 
 
 //draw host sprite and calls animations based of state
-function drawHost(sx, sy) {
+function drawHostIdle(sx, sy) {
+    //8*5
     //if host is in idle then call idle positions and state
     let x = 100;
     const y = height / 2;
@@ -612,11 +615,36 @@ function drawHost(sx, sy) {
     sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;//frameHeight;
 
     //anim
-    image(anim, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
+    backgroundLayer.image(host.idle, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
 
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFrames;
     }
+}
+
+function drawHostTalk(sx,sy){
+    //4*5
+    //if host is in idle then call idle positions and state
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.7;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightRW * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightRW;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.talk, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightRW);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFrames;
+    }
+
 }
 
 function drawHostTurnLF(sx,sy){
@@ -646,7 +674,7 @@ function drawHostTurnFL(sx,sy){
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
-    let scaleFactor = 0.32;
+    let scaleFactor = 0.52;
     let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidthAL * scaleFactor;
@@ -669,7 +697,7 @@ function drawHostTurnRF(sx,sy){
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
-    let scaleFactor = 0.32;
+    let scaleFactor = 0.52;
     let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidthAL * scaleFactor;
@@ -691,7 +719,7 @@ function drawHostTurnFR(sx,sy){
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
-    let scaleFactor = 0.32;
+    let scaleFactor = 0.52;
     let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidthAL * scaleFactor;
@@ -715,7 +743,7 @@ function drawHostWalkL(sx, sy){
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
-    let scaleFactor = 0.32;
+    let scaleFactor = 0.52;
     let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidthAL * scaleFactor;
@@ -738,7 +766,7 @@ function drawHostWalkR(sx, sy) {
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
-    let scaleFactor = 0.32;
+    let scaleFactor = 0.52;
     let frameSpeed = 2
     //const alY = height / 2.25
     const alWidth = frameWidthAL * scaleFactor;
