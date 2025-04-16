@@ -122,7 +122,6 @@ const assets = {
     contestantsW: "",
     contestantR: "",
     cheat: "",
-    curtains: "",
     hands: "",
     podium1: "",
     podium2: "",
@@ -154,9 +153,6 @@ const end = {
 
 window.preload = function () {
     //IDLE & ONBOARDING
-    idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
-    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding thingy.mp4');
-    idleOnboarding.onboarding.hide();
     idleOnboarding.easy = loadImage('/Assets/Idle_Onboarding/LevelSelections_EASY.png');
     idleOnboarding.medium = loadImage('/Assets/Idle_Onboarding/LevelSelections_MED.png');
     idleOnboarding.hard = loadImage('/Assets/Idle_Onboarding/LevelSelections_HARD.png');
@@ -187,8 +183,8 @@ window.preload = function () {
     host.turnFR= loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_R.png'); 
     host.turnLF = loadImage('/Assets/SpriteSheets/Host/AL_TurnL_to_F.png'); 
     host.turnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_to_F.png'); 
-    host.walkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png')
-    host.walkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png')
+    host.walkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png');
+    host.walkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png');
 
     //CONTESTANT ANIMATIONS WRONG
     assets.contestantsW = [];
@@ -271,7 +267,6 @@ window.preload = function () {
     assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
 
     //END
-    assets.curtains = loadImage('/Assets/Background/Curtains-02 1.png');
     end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
     end.star = loadImage('/Assets/EndState/SingleStar.png');
     end.success = loadImage('Assets/EndState/Success_EndState.png');
@@ -284,7 +279,12 @@ window.setup = async function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     countdownTimer = countdown;
-    backgroundLayer = createGraphics(width, height)
+    backgroundLayer = createGraphics(width, height);
+
+    // Animated Files Setup
+    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding thingy.mp4');
+    idleOnboarding.onboarding.hide();
+
     syncStateLoop();
 }
 
@@ -303,9 +303,10 @@ window.draw = function () {
     console.log(RTSstate);
     backgroundLayer.background(255);
     if (RTSstate.state === 'IDLE') {
-        console.log("OMG OMG OMG")
+        idleOnboarding.idle = createImg('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
+        idleOnboarding.idle.size(width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
-        console.log("TWICE");
+        idleOnboarding.idle.remove();
     } else if (RTSstate.state === 'PLAYING') {
         drawBackground();
         if (frameCount % 30 === 0 && countdownTimer > 0) {
