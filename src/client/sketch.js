@@ -1,11 +1,4 @@
-let state = {
-    score: 0,
-    states: {},
-    events: {},
-    host: {},
-    cues: {},
-    feedback: {}
-};
+let RTSstate = {};
 
 let backgroundLayer;
 
@@ -230,26 +223,22 @@ window.preload = function () {
 
 }
 
-async function syncStateLoop() {
-    await syncGameState();
-
-    setTimeout(syncStateLoop, 30);
-}
-
 window.setup = async function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     countdownTimer = countdown;
     backgroundLayer = createGraphics(width, height)
-
-
-    await syncStateLoop();
+    syncStateLoop();
 }
 
 window.draw = function () {
+    console.log(RTSstate.state);
     backgroundLayer.background(255);
     drawBackground();
+    if (frameCount % 30 === 0 && countdownTimer > 0) {
+        updateCountdown();
+    }
 
     /*if( state.right){
 
@@ -317,10 +306,15 @@ window.draw = function () {
     //image(assets.curtains, 0, 0, width, height)
 }
 
-const syncGameState = async () => {
-    if (frameCount % 30 === 0 && countdownTimer > 0) {
-        updateCountdown();
+const syncStateLoop = async () => {
+    try {
+        const res = await fetch('/getState');
+        const state = await res.json();
+        RTSstate = state.state;
+    } catch (err) {
+        console.error('Error syncing state:', err);
     }
+    setTimeout(syncStateLoop, 1000);
 }
 
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {

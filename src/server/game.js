@@ -185,8 +185,7 @@ class GameMachine {
     getState() {
         return {
             score: this.score,
-            states: this.states,
-            events: this.events,
+            state: this.state,
             host: this.host,
             cues: this.cues,
             feedback: this.feedback,
