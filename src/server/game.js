@@ -1,5 +1,14 @@
 import panel, { turnOnCheatLED, turnOffCheatLED, turnOnApplauseLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
+import pkg from "osc";
+const osc = pkg;
+const oscClient = new osc.UDPPort({
+    localAddress: "127.0.0.1",
+    localPort: 3000,
+    remoteAddress: "127.0.0.1",
+    remotePort: 7000
+});
+
 const moveToPlaying = (machine) => {
     machine.state = 'PLAYING';
     console.log(`State transition: ONBOARDING -> PLAYING`);
@@ -67,6 +76,10 @@ const scoreChange = (machine, scoreEarned, minigame) => {
     if(machine.score <= 0) {
         machine.score = 0
     }
+
+    if (scoreEarned > 0) sendOscCue(this.lighting.POSITIVE_FEEDBACK)
+    else if (scoreEarned < 0) sendOscCue(this.lighting.NEGATIVE_FEEDBACK)
+
     console.log("Your total score is: " + machine.score);
     //Delete below after testing
     const key = `score${minigame}`;
@@ -178,6 +191,21 @@ class GameMachine {
         JOYSTICK_BAD: false, // Spotlight is Red
     }
 
+    lighting = {
+        START_GAME: "start-game",
+        WIN: "win", 
+        FAIL: "fail", 
+        CHEAT: "cheat", 
+        PODIUM_1: "podium-1", 
+        PODIUM_2: "podium-2",
+        PODIUM_3: "podium-3", 
+        PODIUM_4: "podium-4", 
+        IDLE: "idle", 
+        POSITIVE_FEEDBACK: "positive-feedback", 
+        NEGATIVE_FEEDBACK: "negative-feedback", 
+        ONBOARDING_START: "onboarding-start", 
+    }
+
     constructor(initialState) {
         this.state = initialState;
     }
@@ -233,11 +261,13 @@ class GameMachine {
                 // DEBUG Purposes, goes to onboarding
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
+                sendOscCue(this.lighting.ONBOARDING_START)
             }
             if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
+                sendOscCue(this.lighting.ONBOARDING_START)
             }
             else {
                 return;
@@ -245,9 +275,11 @@ class GameMachine {
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
             if (event.name === this.events.ONBOARDING_COMPLETE) {
                 moveToPlaying(this);
+                sendOscCue(this.lighting.START_GAME)
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 moveToPlaying(this);
+                sendOscCue(this.lighting.START_GAME)
             }
             else {
                 return;
@@ -280,6 +312,11 @@ class GameMachine {
                 console.log(`Final score: ${this.score} | Applause: ${this.scoreApplause}, Cheat: ${this.scoreCheat}, Joystick: ${this.scoreJoystick}, Lever: ${this.scoreLever}, Podium: ${this.scorePodium}`);
 
                 this.state = this.states.END;
+
+                // However we want to figure win vs lose 
+                if (this.score > 0) sendOscCue(this.lighting.WIN)
+                else sendOscCue(this.lighting.FAIL)
+
                 console.log(`State transition: PLAYING -> END`);
                 turnOnApplauseLED();
                 setTimeout(() => {
@@ -300,6 +337,7 @@ class GameMachine {
                     scoreChange(this, 15, "Cheat");
                     clearTimeout(this.cheatTimer);
                     this.addEvent(this.events.TURN_OFF_CHEAT);
+                    this.sendOscCue(this.lighting.CHEAT)
                 } else if (!this.cues.CHEAT_CUE) {
                     scoreChange(this, -15, "Cheat");
                 }
@@ -337,13 +375,15 @@ class GameMachine {
                 }
             }
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
-                if (this.cues[`PODIUM_${event.data.num}_CUE`]) {
+                const podiumNum = event.data.num
+                if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, 8, "Podium");
-                } else if (!this.cues[`PODIUM_${event.data.num}_CUE`]) {
+                    this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
+                } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, -8, "Podium");
                 }
                 clearTimeout(this.podiumTimer);
-                this.addEvent(this.events.TURN_OFF_PODIUM, {num: event.data.num});
+                this.addEvent(this.events.TURN_OFF_PODIUM, {num: podiumNum});
             }
 
             // Set on-states
@@ -460,11 +500,13 @@ class GameMachine {
                 turnOffApplauseLED();
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
+                sendOscCue(this.lighting.IDLE)
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 turnOffApplauseLED();
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
+                sendOscCue(this.lighting.IDLE)
             }
         }
     }
@@ -500,6 +542,70 @@ class GameMachine {
             data: eventData
         });
         //console.log(`Event added: ${eventName}`);
+    }
+
+    // Helper method to send cues to lighting 
+    sendOscCue = (cueType) => {
+        let column = null
+        switch (cueType) {
+            case this.lighting.START_GAME: 
+            column = 0
+            break;
+
+            case this.lighting.WIN: 
+            column = 0
+            break;
+
+            case this.lighting.FAIL: 
+            column = 0
+            break;
+
+            case this.lighting.CHEAT: 
+            column = 0
+            break;
+
+            case this.lighting.PODIUM_1: 
+            column = 0
+            break;
+
+            case this.lighting.PODIUM_2: 
+            column = 0
+            break;
+
+            case this.lighting.PODIUM_3: 
+            column = 0
+            break;
+
+            case this.lighting.PODIUM_4: 
+            column = 0
+            break;
+
+            case this.lighting.IDLE: 
+            column = 0
+            break;
+
+            case this.lighting.POSITIVE_FEEDBACK: 
+            column = 0
+            break;
+
+            case this.lighting.NEGATIVE_FEEDBACK: 
+            column = 0
+            break;
+
+            case this.lighting.ONBOARDING_START: 
+            column = 0
+            break;
+        }
+
+        if(column == null || column <= 0) {
+            console.log(`Cue ${cueType} is not valid`)
+            return
+        } 
+
+        oscClient.send({
+            address: `/composition/columns/${column}/connect`,  // selects whole column and plays all animations in column
+            args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
+        });
     }
 }
 
