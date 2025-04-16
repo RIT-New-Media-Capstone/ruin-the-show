@@ -10,6 +10,20 @@ const moveToPlaying = (machine) => {
     clearTimeout(machine.joystickTimer);
     clearTimeout(machine.leverTimer);
     clearTimeout(machine.podiumTimer);
+
+    machine.cues.APPLAUSE_CUE = false;
+    machine.cues.CHEAT_CUE = false;
+    machine.cues.JOYSTICK_CUE = false;
+    machine.cues.LEVER_CUE = false;
+    for (let i = 1; i <= 4; i++) {
+        machine.cues[`PODIUM_${i}_CUE`] = false;
+    }
+
+    turnOffApplauseLED();
+    turnOffCheatLED();
+    for (let i = 1; i <= 4; i++) {
+        turnOffPodiumLED(i);
+    }
     
     machine.cheatTimer = null;
     machine.applauseTimer = null;
@@ -18,6 +32,12 @@ const moveToPlaying = (machine) => {
     machine.podiumTimer = null;
 
     machine.score = 0
+    //Delete below after testing
+    machine.scoreApplause = 0
+    machine.scoreCheat = 0
+    machine.scoreJoystick = 0
+    machine.scoreLever = 0
+    machine.scorePodium = 0
     
     // Start the game timer
     setTimeout(() => {
@@ -54,7 +74,7 @@ const scoreChange = (machine, scoreEarned, minigame) => {
     if(machine[key] <= 0) {
         machine[key] = 0
     }
-    console.log("Your " + minigame + "score is: " + machine[key]);
+    console.log("Your " + minigame + " score is: " + machine[key]);
 }
 
 // GAME MACHINE (Idle, Onboard, Playing (w/ Associated Sub Machine Functions))
@@ -164,12 +184,12 @@ class GameMachine {
 
     getState() {
         return {
-            states: this.states,
             score: this.score,
+            states: this.states,
+            events: this.events,
+            host: this.host,
             cues: this.cues,
             feedback: this.feedback,
-            host: this.host, 
-            events: this.events,
         };
     }
 
@@ -209,7 +229,7 @@ class GameMachine {
             this.host.POSITION = newPos;
         }
         
-        if (this.state === this.states.IDLE) {                      //IDLE STATE
+        if (this.state === this.states.IDLE) {                                //IDLE STATE
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 // DEBUG Purposes, goes to onboarding
                 this.state = this.states.ONBOARDING;
@@ -233,10 +253,36 @@ class GameMachine {
             else {
                 return;
             }
-        } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE           
+        } else if (this.state === this.states.PLAYING) {                      //PLAYING STATE
             if (event.name === this.events.GAME_OVER) {
+
+                clearTimeout(this.applauseTimer);
+                clearTimeout(this.cheatTimer);
+                clearTimeout(this.joystickTimer);
+                clearTimeout(this.leverTimer);
+                clearTimeout(this.podiumTimer);
+
+                this.cues.APPLAUSE_CUE = false;
+                this.cues.CHEAT_CUE = false;
+                this.cues.JOYSTICK_CUE = false;
+                this.cues.LEVER_CUE = false;
+                for (let i = 1; i <= 4; i++) {
+                    this.cues[`PODIUM_${i}_CUE`] = false;
+                }
+
+                turnOffApplauseLED();
+                turnOffCheatLED();
+                for(let i = 1; i <= 4; i++) {
+                    this.cues[`PODIUM_${i}_CUE`] = false
+                    turnOffPodiumLED(i);
+                }
+
+                //Delete Afterwards; Testing Purposes
+                console.log(`Final score: ${this.score} | Applause: ${this.scoreApplause}, Cheat: ${this.scoreCheat}, Joystick: ${this.scoreJoystick}, Lever: ${this.scoreLever}, Podium: ${this.scorePodium}`);
+
                 this.state = this.states.END;
                 console.log(`State transition: PLAYING -> END`);
+                turnOnApplauseLED();
                 setTimeout(() => {
                     machine.addEvent(machine.events.RETURN_IDLE, {});
                 }, 15 * 1000);
@@ -410,12 +456,14 @@ class GameMachine {
                     this.addEvent(this.events.TURN_ON_PODIUM, { num: podiumToTrigger });
                 }, 3 * 1000);
             }
-        } else if (this.state === this.states.END) {
+        } else if (this.state === this.states.END) {                          //END STATE
             if (event.name === this.events.RETURN_IDLE) {
+                turnOffApplauseLED();
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                turnOffApplauseLED();
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
             }
