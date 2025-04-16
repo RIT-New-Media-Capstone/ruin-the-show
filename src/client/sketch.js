@@ -93,6 +93,7 @@ let currentFrameHost = 0;
 let currentFrameContestants = 0;
 let currentFrameContestantsR = 0;
 let currentFrameContestantsW = 0;
+let currentFrameCurtains = 0;
 
 let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
 
@@ -100,10 +101,12 @@ const numRows = 4;//4; // idle + al
 const numRowsLR = 2;
 const numRowsRW = 8; // number of rows for right + wrong
 const numCols = 5;
+const numRowsCurtains = 2
 
 const totalFrames = numRows * numCols;
 const totalFramesRW = numRowsRW * numCols;
 const totalFramesLR = numRowsLR * numCols;
+const totalFramesCurtains = numRowsCurtains * numCols
 
 const frameWidth = 4802 / numCols; // old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
 const frameHeightLR = 1081 / numRowsLR;
@@ -111,6 +114,7 @@ const frameHeight = 2162 / numRows; // idle->  2162 / numRows; // (al) 5410/5 = 
 const frameHeightRW = 4324 / numRowsRW;
 const frameWidthAL = 4802 / numCols;
 const frameHeightAL = 4324 / numRows;
+const frameWidthCurtains = 9604 / numCols
 
 //Countdown Timer (Possibly Temporary)
 let countdownFont;
@@ -152,6 +156,8 @@ const end = {
     success: "",
     middle: "",
     fail: "",
+    curtains: "",
+    curtainsClosed: false,
 }
 
 window.preload = function () {
@@ -160,7 +166,7 @@ window.preload = function () {
     idleOnboarding.medium = loadImage('/Assets/Idle_Onboarding/LevelSelections_MED.png');
     idleOnboarding.hard = loadImage('/Assets/Idle_Onboarding/LevelSelections_HARD.png');
     idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif')
-    
+
     //BACKGROUND
     assets.background = loadImage('/Assets/Background/MainBackground.png');
     assets.stage = loadImage('/Assets/Background/Stage.png');
@@ -182,11 +188,11 @@ window.preload = function () {
 
     //AL 
     host.idle = loadImage('/Assets/SpriteSheets/Host/AL_idle.png');
-    host.talk = loadImage('/Assets/SpriteSheets/Host/AL_Talk.png'); 
-    host.turnFL = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_L.png'); 
-    host.turnFR= loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_R.png'); 
-    host.turnLF = loadImage('/Assets/SpriteSheets/Host/AL_TurnL_to_F.png'); 
-    host.turnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_to_F.png'); 
+    host.talk = loadImage('/Assets/SpriteSheets/Host/AL_Talk.png');
+    host.turnFL = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_L.png');
+    host.turnFR = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_R.png');
+    host.turnLF = loadImage('/Assets/SpriteSheets/Host/AL_TurnL_to_F.png');
+    host.turnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_to_F.png');
     host.walkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png');
     host.walkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png');
 
@@ -276,6 +282,7 @@ window.preload = function () {
     end.success = loadImage('Assets/EndState/Success_EndState.png');
     end.middle = loadImage('Assets/EndState/Middle_EndStates.png');
     end.fail = loadImage('Assets/EndState/Fail_EndState.png');
+    end.curtains = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png')
 }
 
 window.setup = async function () {
@@ -313,7 +320,7 @@ window.draw = function () {
 
         image(idleGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'ONBOARDING') {
-        if(!idleOnboarding.onboarding_playing){
+        if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
             idleOnboarding.onboarding_playing = true
         }
@@ -394,6 +401,9 @@ window.draw = function () {
         //image(assets.curtains, 0, 0, width, height)
     } else if (RTSstate.state === 'END') {
         idleOnboarding.onboarding.stop()
+
+        drawCurtainClose()
+        drawScore()
     }
 }
 
@@ -678,7 +688,7 @@ function drawHostIdle(sx, sy) {
         currentFrameHost = (currentFrameHost + 1) % totalFrames;
     }
 }
-function drawHostTalk(sx,sy){
+function drawHostTalk(sx, sy) {
     //4*5
     //if host is in idle then call idle positions and state
     let x = 100;
@@ -702,7 +712,7 @@ function drawHostTalk(sx,sy){
     }
 
 }
-function drawHostTurnLF(sx,sy){
+function drawHostTurnLF(sx, sy) {
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
@@ -724,7 +734,7 @@ function drawHostTurnLF(sx,sy){
     }
 
 }
-function drawHostTurnFL(sx,sy){
+function drawHostTurnFL(sx, sy) {
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
@@ -746,7 +756,7 @@ function drawHostTurnFL(sx,sy){
     }
 
 }
-function drawHostTurnRF(sx,sy){
+function drawHostTurnRF(sx, sy) {
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
@@ -768,7 +778,7 @@ function drawHostTurnRF(sx,sy){
     }
 
 }
-function drawHostTurnFR(sx,sy){
+function drawHostTurnFR(sx, sy) {
     let x = 100;
     const y = height / 2;
     //const spacing = 160;
@@ -791,7 +801,7 @@ function drawHostTurnFR(sx,sy){
 
 }
 
-function drawHostWalkL(sx, sy){
+function drawHostWalkL(sx, sy) {
     //if host is in idle then call idle positions and state
     let x = 100;
     const y = height / 2;
@@ -834,6 +844,41 @@ function drawHostWalkR(sx, sy) {
 
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+}
+
+function drawCurtainClose() {
+    let x = 0;
+    const y = 0;
+    let sx;
+    let sy;
+
+    // if the curtains aren't closed, draw the animation 
+    if (!end.curtainsClosed) {
+        sx = (currentFrameCurtains % numCols) * frameWidthCurtains;
+        sy = Math.floor(currentFrameCurtains / numCols) * frameHeight;
+
+        if (frameCount % frameDelay === 0) {
+            currentFrameCurtains = (currentFrameCurtains + 1) % totalFramesCurtains;
+            if (currentFrameCurtains === 0) end.curtainsClosed = true;
+        }
+    }
+    // else hardcoded to closed position 
+    else {
+        sx = numCols * frameWidthCurtains;
+        sy = frameHeight
+    }
+
+    //anim
+    image(end.curtains, x, y, width, height, sx, sy, frameWidthCurtains, frameHeight);
+}
+
+function drawScore() {
+    if(RTSstate.score) {
+        // change values based on score 
+        if(RTSstate.score > 0) {
+            image(end.success, 0, 0, width, height)
+        }
     }
 }
 
