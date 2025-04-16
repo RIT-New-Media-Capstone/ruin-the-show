@@ -1,4 +1,47 @@
-let RTSstate = {};
+let RTSstate = { // Initial Values Based on Start of State Machine
+    score: 0,
+    state: 'IDLE',
+    host: {
+        POSITION: Math.floor(Math.random() * 100) - 50,
+        DIRECTION: 1,
+        VELOCITY: 2,
+        PAUSED: false,
+        MAX: 50,
+        MIN: -50,
+    },
+    cues: {
+        APPLAUSE_CUE: false,
+        CHEAT_CUE: false,
+        PODIUM_1_CUE: false,
+        PODIUM_2_CUE: false,
+        PODIUM_3_CUE: false,
+        PODIUM_4_CUE: false,
+        LEVER_CUE: false,
+        LEVER_TARGET: null,
+        JOYSTICK_CUE: false,
+        JOYSTICK_TARGET: 0, // Host's position on screen
+    },
+    feedback: {
+        // Call true then settimout false for how many seconds needed to animate?
+        APPLAUSE_GOOD: false, // Applause
+        APPLAUSE_BAD: false, // Boos
+        CHEAT_GOOD: false, // Host Animate (Happy)
+        CHEAT_BAD: false, // Host Animate (Mad)
+        PODIUM_1_GOOD: false, // Green Light & Contestant (Happy)
+        PODIUM_1_BAD: false, // Red Light Contestant (Sad)
+        PODIUM_2_GOOD: false,
+        PODIUM_2_BAD: false,
+        PODIUM_3_GOOD: false,
+        PODIUM_3_BAD: false,
+        PODIUM_4_GOOD: false,
+        PODIUM_4_BAD: false, // ^^^
+        LEVER_INITIAL: null,
+        LEVER_POS: null, // Zoom Dial Rotating
+        JOYSTICK_POS: 0,
+        JOYSTICK_GOOD: false, // Spotlight is Green
+        JOYSTICK_BAD: false, // Spotlight is Red
+    },
+};
 
 let backgroundLayer;
 
@@ -60,7 +103,7 @@ const totalFrames = numRows * numCols;
 const totalFramesRW = numRowsRW * numCols;
 const totalFramesLR = numRowsLR * numCols;
 
-const frameWidth = 4802 / numCols; //      old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
+const frameWidth = 4802 / numCols; // old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
 const frameHeightLR = 1081 / numRowsLR;
 const frameHeight = 2162 / numRows; // idle->  2162 / numRows; // (al) 5410/5 = 1080/2 = 540
 const frameHeightRW = 4324 / numRowsRW;
@@ -85,16 +128,39 @@ const assets = {
     podium2: "",
     podium3: "",
     podium4: "",
+    score: "",
     spotlight: "",
     stage: "",
     stagelights: "",
     stars: "",
     timer: "",
-    score: "",
+}
 
+const idleOnboarding = {
+    idle: "",
+    onboarding: "",
+    easy: "",
+    medium: "",
+    hard: "",
+}
+
+const end = {
+    shadow: "",
+    star: "",
+    success: "",
+    middle: "",
+    fail: "",
 }
 
 window.preload = function () {
+    //IDLE & ONBOARDING
+    idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
+    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding thingy.mp4');
+    idleOnboarding.onboarding.hide();
+    idleOnboarding.easy = loadImage('/Assets/Idle_Onboarding/LevelSelections_EASY.png');
+    idleOnboarding.medium = loadImage('/Assets/Idle_Onboarding/LevelSelections_MED.png');
+    idleOnboarding.hard = loadImage('/Assets/Idle_Onboarding/LevelSelections_HARD.png');
+    
     //BACKGROUND
     assets.background = loadImage('/Assets/Background/MainBackground.png');
     assets.stage = loadImage('/Assets/Background/Stage.png');
@@ -102,7 +168,7 @@ window.preload = function () {
     assets.audience = loadImage('/Assets/Background/Audience.png');
     assets.applause = loadImage('/Assets/Background/Applause_OFF.png');
 
-    //podiums are in front of animated contestants
+    //PODIUMS are in front of animated contestants
     assets.podium1 = loadImage('/Assets/Background/PodiumYellow_Resized0.png');
     assets.podium2 = loadImage('/Assets/Background/PodiumWhite_Resized0.png');
     assets.podium3 = loadImage('/Assets/Background/PodiumRed_Resized0.png');
@@ -124,15 +190,11 @@ window.preload = function () {
     host.walkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png')
     host.walkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png')
 
-
-
     //CONTESTANT ANIMATIONS WRONG
     assets.contestantsW = [];
     contestantFramesW = [];
 
-
     for (let i = 1; i <= 4; i++) {
-
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Wrong.png`);
         assets.contestantsW.push(sheet);
 
@@ -151,14 +213,10 @@ window.preload = function () {
     }
 
     //CONTESTANT ANIMATIONS RIGHT
-
-
     assets.contestantsR = [];
     contestantFramesR = [];
 
-
     for (let i = 1; i <= 4; i++) {
-
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
         assets.contestantsR.push(sheet);
 
@@ -176,10 +234,7 @@ window.preload = function () {
         contestantFramesR.push(framesR);
     }
 
-
     // CONTESTANT IDLE // 
-
-
     assets.contestants = [];
     contestantFrames = [];
 
@@ -215,12 +270,13 @@ window.preload = function () {
     assets.hands = loadImage('/Assets/Interactions/Applause/StaticApplause.png');
     assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
 
-    //GAMEOVER
-    // assets.curtains = loadImage('/assets/Background/Curtains-02 1.png');
-
-
-
-
+    //END
+    assets.curtains = loadImage('/Assets/Background/Curtains-02 1.png');
+    end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
+    end.star = loadImage('/Assets/EndState/SingleStar.png');
+    end.success = loadImage('Assets/EndState/Success_EndState.png');
+    end.middle = loadImage('Assets/EndState/Middle_EndStates.png');
+    end.fail = loadImage('Assets/EndState/Fail_EndState.png');
 }
 
 window.setup = async function () {
@@ -232,80 +288,6 @@ window.setup = async function () {
     syncStateLoop();
 }
 
-window.draw = function () {
-    console.log(RTSstate.state);
-    backgroundLayer.background(255);
-    drawBackground();
-    if (frameCount % 30 === 0 && countdownTimer > 0) {
-        updateCountdown();
-    }
-
-    /*if( state.right){
-
-         // drawContestantR();
-         // draw light feedback?
-    } if(state.wrong){
-
-           //drawContestantW();
-
-    }*/
-
-    //drawContestant();
-
-    drawContestantR();
-    //drawRWLight();
-    drawPodiums();
-
-    //podiumLight1();
-    //podiumLight2();
-    //podiumLight3();
-    //podiumLight4();
-    spotlight();
-
-    //drawHost("al");
-    //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
-
-    //hostState = "talkR";
-    //drawSpritesHost(hostState)
-    //drawHostWalkR()
-    //drawHostWalkL()
-    //drawHostTurnFL()
-    //drawHostTurnLF()
-    //drawHostTurnFR()
-    //drawHostTurnRF()
-    //drawHostIdle()
-    drawHostTalk()
-
-    // TODO: when zoom change event trigger, set zoomTimer to 0
-    if (zoomedIn) {
-        if (zoomTimer <= zoomDuration) {
-            zoom = changeZoom(0, 0, 175, 125, width, width * 3 / 4, height, height * 3 / 4, zoomTimer, zoomDuration)
-            zoomTimer++
-        }
-    }
-    if (!zoomedIn) {
-        if (zoomTimer <= zoomDuration) {
-            zoom = changeZoom(175, 125, 0, 0, width * 3 / 4, width, height * 3 / 4, height, zoomTimer, zoomDuration)
-            zoomTimer++
-        }
-    }
-
-    image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
-
-    drawCheat();
-
-    drawApplause();
-    drawApplauseON();
-
-    drawHands();
-    drawAudience();
-
-    drawHUD();
-
-    text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
-    //image(assets.curtains, 0, 0, width, height)
-}
-
 const syncStateLoop = async () => {
     try {
         const res = await fetch('/getState');
@@ -315,6 +297,88 @@ const syncStateLoop = async () => {
         console.error('Error syncing state:', err);
     }
     setTimeout(syncStateLoop, 1000);
+}
+
+window.draw = function () {
+    console.log(RTSstate);
+    backgroundLayer.background(255);
+    if (RTSstate.state === 'IDLE') {
+        console.log("OMG OMG OMG")
+    } else if (RTSstate.state === 'ONBOARDING') {
+        console.log("TWICE");
+    } else if (RTSstate.state === 'PLAYING') {
+        drawBackground();
+        if (frameCount % 30 === 0 && countdownTimer > 0) {
+            updateCountdown();
+        }
+
+        /*if( state.right){
+
+            // drawContestantR();
+            // draw light feedback?
+        } if(state.wrong){
+
+            //drawContestantW();
+
+        }*/
+
+        //drawContestant();
+
+        drawContestantR();
+        //drawRWLight();
+        drawPodiums();
+
+        //podiumLight1();
+        //podiumLight2();
+        //podiumLight3();
+        //podiumLight4();
+        spotlight();
+
+        //drawHost("al");
+        //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
+
+        //hostState = "talkR";
+        //drawSpritesHost(hostState)
+        //drawHostWalkR()
+        //drawHostWalkL()
+        //drawHostTurnFL()
+        //drawHostTurnLF()
+        //drawHostTurnFR()
+        //drawHostTurnRF()
+        //drawHostIdle()
+        drawHostTalk()
+
+        // TODO: when zoom change event trigger, set zoomTimer to 0
+        if (zoomedIn) {
+            if (zoomTimer <= zoomDuration) {
+                zoom = changeZoom(0, 0, 175, 125, width, width * 3 / 4, height, height * 3 / 4, zoomTimer, zoomDuration)
+                zoomTimer++
+            }
+        }
+        if (!zoomedIn) {
+            if (zoomTimer <= zoomDuration) {
+                zoom = changeZoom(175, 125, 0, 0, width * 3 / 4, width, height * 3 / 4, height, zoomTimer, zoomDuration)
+                zoomTimer++
+            }
+        }
+
+        image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
+
+        drawCheat();
+
+        drawApplause();
+        drawApplauseON();
+
+        drawHands();
+        drawAudience();
+
+        drawHUD();
+
+        text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
+        //image(assets.curtains, 0, 0, width, height)
+    } else if (RTSstate.state === 'END') {
+
+    }
 }
 
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
