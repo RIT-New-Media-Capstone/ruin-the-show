@@ -77,8 +77,8 @@ const scoreChange = (machine, scoreEarned, minigame) => {
         machine.score = 0
     }
 
-    if (scoreEarned > 0) sendOscCue(this.lighting.POSITIVE_FEEDBACK)
-    else if (scoreEarned < 0) sendOscCue(this.lighting.NEGATIVE_FEEDBACK)
+    if (scoreEarned > 0) this.sendOscCue(this.lighting.POSITIVE_FEEDBACK)
+    else if (scoreEarned < 0) this.sendOscCue(this.lighting.NEGATIVE_FEEDBACK)
 
     console.log("Your total score is: " + machine.score);
     //Delete below after testing
@@ -261,13 +261,13 @@ class GameMachine {
                 // DEBUG Purposes, goes to onboarding
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
-                sendOscCue(this.lighting.ONBOARDING_START)
+                this.sendOscCue(this.lighting.ONBOARDING_START)
             }
             if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
-                sendOscCue(this.lighting.ONBOARDING_START)
+                this.sendOscCue(this.lighting.ONBOARDING_START)
             }
             else {
                 return;
@@ -275,11 +275,11 @@ class GameMachine {
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
             if (event.name === this.events.ONBOARDING_COMPLETE) {
                 moveToPlaying(this);
-                sendOscCue(this.lighting.START_GAME)
+                this.sendOscCue(this.lighting.START_GAME)
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 moveToPlaying(this);
-                sendOscCue(this.lighting.START_GAME)
+                this.sendOscCue(this.lighting.START_GAME)
             }
             else {
                 return;
@@ -314,8 +314,8 @@ class GameMachine {
                 this.state = this.states.END;
 
                 // However we want to figure win vs lose 
-                if (this.score > 0) sendOscCue(this.lighting.WIN)
-                else sendOscCue(this.lighting.FAIL)
+                if (this.score > 0) this.sendOscCue(this.lighting.WIN)
+                else this.sendOscCue(this.lighting.FAIL)
 
                 console.log(`State transition: PLAYING -> END`);
                 turnOnApplauseLED();
@@ -337,7 +337,7 @@ class GameMachine {
                     scoreChange(this, 15, "Cheat");
                     clearTimeout(this.cheatTimer);
                     this.addEvent(this.events.TURN_OFF_CHEAT);
-                    this.sendOscCue(this.lighting.CHEAT)
+                    this.this.sendOscCue(this.lighting.CHEAT)
                 } else if (!this.cues.CHEAT_CUE) {
                     scoreChange(this, -15, "Cheat");
                 }
@@ -378,7 +378,7 @@ class GameMachine {
                 const podiumNum = event.data.num
                 if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, 8, "Podium");
-                    this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
+                    this.this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
                 } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, -8, "Podium");
                 }
@@ -500,13 +500,13 @@ class GameMachine {
                 turnOffApplauseLED();
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
-                sendOscCue(this.lighting.IDLE)
+                this.sendOscCue(this.lighting.IDLE)
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 turnOffApplauseLED();
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
-                sendOscCue(this.lighting.IDLE)
+                this.sendOscCue(this.lighting.IDLE)
             }
         }
     }
@@ -522,6 +522,7 @@ class GameMachine {
         };
         this.loopHandle = setImmediate(loop);
         console.log('State machine started');
+        this.sendOscCue(this.lighting.IDLE)
     }
 
     stop() {
