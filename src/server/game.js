@@ -545,7 +545,7 @@ class GameMachine {
     }
 
     // Helper method to send cues to lighting 
-    sendOscCue = (cueType) => {
+    sendOscCue(cueType) {
         let column = null
         switch (cueType) {
             case this.lighting.START_GAME: 
