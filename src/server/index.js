@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 
 app.get('/getState', (req, res) => {
   res.json({
-    state: game.machine.getState() //travis
+    state: game.machine.getState()
   });
 });
 
