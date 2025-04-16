@@ -360,7 +360,32 @@ window.draw = function () {
         //drawHost("al");
         //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
 
-        //hostState = "talkR";
+        if(hostState == "idle"){
+            drawHostIdle()
+        }
+        if(hostState == "talk"){
+            drawHostTalk()
+        }
+        if(hostState == "walkR"){
+            drawHostWalkR()
+        }
+        if(hostState == "walkL"){
+            drawHostWalkL()
+        }
+        if(hostState == "turnFL"){
+            drawHostTurnFL()
+        }
+
+        if(hostState == "turnLF"){
+            drawHostTurnLF()
+        }
+        if(hostState == "turnRF"){
+            drawHostTurnRF()
+        }
+        if(hostState == "turnFR"){
+            drawHostTurnFR()
+        }
+       
         //drawSpritesHost(hostState)
         //drawHostWalkR()
         //drawHostWalkL()
@@ -368,7 +393,7 @@ window.draw = function () {
         //drawHostTurnLF()
         //drawHostTurnFR()
         //drawHostTurnRF()
-        //drawHostIdle()
+        
         drawHostTalk()
 
         // TODO: when zoom change event trigger, set zoomTimer to 0
@@ -623,7 +648,7 @@ function drawSpritesHost(sx,sy) {
             break;
         case "walkL":
             hostSpriteSheet = alWalkL;
-            hostX -= 0.1; // Walk left
+             hostX -= 0.1; // Walk left
             break;
         case "walkR":
             hostSpriteSheet = alWalkR;
@@ -844,6 +869,12 @@ function drawHostWalkR(sx, sy) {
 
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+
+    x += hostSpeed;
+
+    if (x + alWidth > width || x < 0) {
+        hostSpeed *= -1;
     }
 }
 
