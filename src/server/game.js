@@ -78,8 +78,9 @@ const scoreChange = (machine, scoreEarned, minigame) => {
         machine.score = 0
     }
 
-    if (scoreEarned > 0) this.sendOscCue(this.lighting.POSITIVE_FEEDBACK)
-    else if (scoreEarned < 0) this.sendOscCue(this.lighting.NEGATIVE_FEEDBACK)
+    //Uncomment for Midi testing
+    //if (scoreEarned > 0) this.sendOscCue(this.lighting.POSITIVE_FEEDBACK)
+    //else if (scoreEarned < 0) this.sendOscCue(this.lighting.NEGATIVE_FEEDBACK)
 
     console.log("Your total score is: " + machine.score);
     //Delete below after testing

@@ -65,11 +65,9 @@ let alTurnR;
 let alWalkL;
 let alWalkR;
 
-/*
-let hostState;//; // idle, talkL, talkR, walkL, walkR, turnL, turnR
-let hostSpriteSheet;
-let hostFrames = [];
-*/
+
+let hostState; // idle, talkL, talkR, walkL, walkR, turnL, turnR
+
 
 //host animation 
 let host = {
