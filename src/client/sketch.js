@@ -130,6 +130,7 @@ let podLitVis2 = false;
 let podLitVis3 = false;
 let podLitVis4 = false;
 let applauseVis = false;
+let leverVis = false;
 
 const assets = {
     audience: "",
@@ -445,7 +446,15 @@ window.draw = function () {
         
         drawHostTalk()
 
-        drawLeverCue()
+        if (RTSstate.cues.LEVER_CUE) {
+            showLever();
+            console.log("showing lever onnn")
+        } else if (!RTSstate.cues.LEVER_CUE) {
+            hideLever();
+            console.log("hiding lever")
+        }
+
+        
         // TODO: when zoom change event trigger, set zoomTimer to 0
         if (zoomedIn) {
             if (zoomTimer <= zoomDuration) {
@@ -560,6 +569,14 @@ function hidePod4Cue() {
 
 }
 
+function showLever(){
+    leverVis = true;
+    drawLeverCue()
+}
+
+function hideLever(){
+    leverVis = false;
+}
 //FEEDBACK will go here 
 
 
