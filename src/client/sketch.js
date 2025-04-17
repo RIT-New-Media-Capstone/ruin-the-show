@@ -364,9 +364,9 @@ window.draw = function () {
         //drawRWLight();
         drawPodiums();
 
-        /*
+        
 
-        if (RTSstate.cues.PODIUM_1_CUE) {
+        /*if (RTSstate.cues.PODIUM_1_CUE) {
             showPod1Cue();
             console.log("showing podium 1 lit")
         } else if (!RTSstate.cues.PODIUM_1_CUE) {
@@ -396,7 +396,7 @@ window.draw = function () {
         } else if (!RTSstate.cues.PODIUM_4_CUE) {
             hidePod4Cue();
             console.log("hiding podium 4")
-        }
+        }*/
 
         podiumLight1();
         podiumLight2();
