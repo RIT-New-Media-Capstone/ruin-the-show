@@ -226,7 +226,7 @@ class GameMachine {
     step() {
         const event = this.eventQueue.shift();
         if (!event) return;
-        //console.log(`Processing event: ${event.name} in state: ${this.state}`);
+        console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
         if (event.name === this.events.LEVER_MOVED) { //LEVER VALUE INITIALIZATION
             let position = event.data.value
@@ -545,7 +545,7 @@ class GameMachine {
             name: eventName,
             data: eventData
         });
-        //console.log(`Event added: ${eventName}`);
+        console.log(`Event added: ${eventName}`);
     }
 
     // Helper method to send cues to lighting 
