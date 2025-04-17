@@ -449,26 +449,26 @@ window.draw = function () {
         }
 
         if (RTSstate.cues.PODIUM_2_CUE){
-            showApplause();
+            showPod2Cue();
             console.log("showing podium 2 ")
         } else if(!RTSstate.cues.PODIUM_2_CUE){
-            hideApplause();
+            hidePod2Cue();
             console.log("hiding podium")
         }
 
         if (RTSstate.cues.PODIUM_3_CUE){
-            showApplause();
+            showPod3Cue();
             console.log("showing podium 3 ")
         } else if(!RTSstate.cues.PODIUM_3_CUE){
-            hideApplause();
+            showPod3Cue();
             console.log("hiding podium 3")
         }
 
         if (RTSstate.cues.PODIUM_4_CUE){
-            showApplause();
+            showPod4Cue();
             console.log("showing podium 4 ")
         } else if(!RTSstate.cues.PODIUM_4_CUE){
-            hideApplause();
+            hidePod4Cue();
             console.log("hiding podium 4")
         }
         
