@@ -550,84 +550,67 @@ class GameMachine {
 
     // Helper method to send cues to lighting 
     sendOscCue(cueType) {
-        let layer = null
-        let clip = null
         let column = null
         switch (cueType) {
             case this.lighting.START_GAME:
-                column = 10
+                column = 1
                 break;
 
             case this.lighting.WIN:
-                column = 5
-                break;
-
-            case this.lighting.FAIL:
                 column = 4
                 break;
 
+            case this.lighting.FAIL:
+                column = 5
+                break;
+
             case this.lighting.CHEAT:
-                layer = 3
-                clip = 2
-                break;
-
-            case this.lighting.PODIUM_1:
-                layer = 2
-                clip = 11
-                break;
-
-            case this.lighting.PODIUM_2:
-                layer = 2
-                clip = 12
-                break;
-
-            case this.lighting.PODIUM_3:
-                layer = 2
-                clip = 13
-                break;
-
-            case this.lighting.PODIUM_4:
-                layer = 2
-                clip = 14
-                break;
-
-            case this.lighting.IDLE:
                 column = 6
                 break;
 
+            case this.lighting.PODIUM_1:
+                column = 9
+                break;
+
+            case this.lighting.PODIUM_2:
+                column = 10
+                break;
+
+            case this.lighting.PODIUM_3:
+                column = 11
+                break;
+
+            case this.lighting.PODIUM_4:
+                column = 12
+                break;
+
+            case this.lighting.IDLE:
+                column = 3
+                break;
+
             case this.lighting.POSITIVE_FEEDBACK:
-                layer = 3
-                clip = 5
+                column = 7
                 break;
 
             case this.lighting.NEGATIVE_FEEDBACK:
-                layer = 3
-                clip = 1
+                column = 8
                 break;
 
             case this.lighting.ONBOARDING_START:
-                column = 15
+                column = 2
                 break;
         }
 
-        if (column !== null && column > 0) {
-            oscClient.send({
-                address: `/composition/columns/${column}/connect`,  // selects whole column and plays all animations in column
-                args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
-            });
-        }
-
-        if (layer !== null && layer > 0 && clip !== null && clip > 0) {
-            oscClient.send({
-                address: `/composition/layers/${layer}/clips/${clip}/connect`,  // selects specific layer & clip 
-                args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
-            });
-        }
-
-        else {
+        if (column == null || column <= 0) {
             console.log(`Cue ${cueType} is not valid`)
             return
         }
+
+        oscClient.send({
+            address: `/composition/columns/${column}/connect`,  // selects whole column and plays all animations in column
+            args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
+        });
+       
     }
 }
 
