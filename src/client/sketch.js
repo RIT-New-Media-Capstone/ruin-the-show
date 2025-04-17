@@ -497,6 +497,13 @@ window.draw = function () {
             console.log("hiding")
         }
 
+        if (RTSstate.feedback.APPLAUSE_GOOD) {
+            showApplauseFB();
+            console.log("FEEDBACK showing applause")
+        } else if (!RTSstate.feedback.APPLAUSE_GOOD) {
+            hideApplause();
+            console.log("FEEDBACK hiding")
+        }
 
         //drawApplauseON();
 
@@ -518,7 +525,7 @@ window.draw = function () {
     }
 }
 
-// Show and Hide Cues
+// INTERACTIONS
 function showCheat() {
     cheatVis = true;
     drawCheat();
@@ -535,6 +542,17 @@ function showApplause() {
 function hideApplause() {
     applauseVis = false;
 
+}
+
+//feedback
+function showApplauseFB(){
+    appFBVis = true;
+    drawHands();
+
+}
+
+function hideApplauseFB(){
+    appFBVis = false;
 }
 
 function showPod1Cue() {
