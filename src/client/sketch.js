@@ -163,6 +163,7 @@ const idleOnboarding = {
 const end = {
     shadow: "",
     star: "",
+    emptyStar: "", 
     success: "",
     middle: "",
     fail: "",
@@ -290,9 +291,10 @@ window.preload = function () {
     //END
     end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
     end.star = loadImage('/Assets/EndState/SingleStar.png');
-    end.success = loadImage('Assets/EndState/Success_EndState.png');
-    end.middle = loadImage('Assets/EndState/Middle_EndStates.png');
-    end.fail = loadImage('Assets/EndState/Fail_EndState.png');
+    end.emptyStar = loadImage('/Assets/EndState/EmptyStar.png')
+    end.success = loadImage('Assets/EndState/EndStates_NoStars-02.png');
+    end.middle = loadImage('Assets/EndState/EndStates_NoStars-04.png');
+    end.fail = loadImage('Assets/EndState/EndStates_NoStars-01.png');
     end.curtains = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png')
 }
 
@@ -1035,31 +1037,31 @@ function drawScore() {
         // change values based on score 
         if(RTSstate.score > 250) {
             image(end.success, 0, 0, width, height)
-            drawStar(1)
-            drawStar(2)
-            drawStar(3)
-            drawStar(4)
-            drawStar(5)
+            drawStar(1, true)
+            drawStar(2, true)
+            drawStar(3, true)
+            drawStar(4, true)
+            drawStar(5, true)
         }
     }
 }
 
-function drawStar(index) {
+function drawStar(index, filledIn) {
     switch(index) {
         case 1: 
-        image(end.star, 485, 274, 140, 140)
+        image(filledIn ? end.star : end.emptyStar, 485, 274, 140, 140)
         break;
         case 2: 
-        image(end.star, 543, 254, 140, 140)
+        image(filledIn ? end.star : end.emptyStar, 543, 254, 140, 140)
         break
         case 3: 
-        image(end.star, 602, 246, 140, 140)
+        image(filledIn ? end.star : end.emptyStar, 602, 246, 140, 140)
         break
         case 4: 
-        image(end.star, 661, 254, 140, 140)
+        image(filledIn ? end.star : end.emptyStar, 661, 254, 140, 140)
         break
         case 5: 
-        image(end.star, 720, 269, 140, 140)
+        image(filledIn ? end.star : end.emptyStar, 720, 269, 140, 140)
         break
     }
 }
