@@ -1042,21 +1042,21 @@ function spotlight() {
 
 function podiumLight1() {
     if (assets.podiumlit1) {
-        image(assets.podiumlit1, 345, -50, width / 3, height)
+        backgroundLayer.image(assets.podiumlit1, 345, -50, width / 3, height)
     }
 }
 function podiumLight2() {
     if (assets.podiumlit2) {
-        image(assets.podiumlit2, 241, -50, width / 3, height)
+        backgroundLayer.image(assets.podiumlit2, 241, -50, width / 3, height)
     }
 }
 function podiumLight3() {
     if (assets.podiumlit3) {
-        image(assets.podiumlit3, 635, -50, width / 3, height)
+        backgroundLayer.image(assets.podiumlit3, 635, -50, width / 3, height)
     }
 }
 function podiumLight4() {
     if (assets.podiumlit4) {
-        image(assets.podiumlit4, 565, -50, width / 3, height)
+        backgroundLayer.image(assets.podiumlit4, 565, -50, width / 3, height)
     }
 }
