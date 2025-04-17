@@ -443,6 +443,7 @@ window.draw = function () {
     }
 }
 
+//
 function showCheat(){
     cheatVis = true;
     drawCheat();
@@ -450,7 +451,6 @@ function showCheat(){
     function hideCheat() {
     cheatVis = false;
 }
-
 
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
     let amount = timer / duration
