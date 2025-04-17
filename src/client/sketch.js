@@ -511,7 +511,7 @@ function hideApplause() {
 
 function showPod1Cue(){
     podLitVis1 = true;
-    podiumLight1();
+    podiumLight2();
 }
 
 function hidePod1Cue() {
@@ -521,7 +521,7 @@ function hidePod1Cue() {
 
 function showPod2Cue(){
     podLitVis2 = true;
-    podiumLight2();
+    podiumLight1();
 }
 
 function hidePod2Cue() {
@@ -531,7 +531,7 @@ function hidePod2Cue() {
 
 function showPod3Cue(){
     podLitVis3 = true;
-    podiumLight3();
+    podiumLight4();
 }
 
 function hidePod3Cue() {
@@ -541,7 +541,7 @@ function hidePod3Cue() {
 
 function showPod4Cue(){
     podLitVis4 = true;
-    podiumLight4();
+   //podiumLight3();
 }
 
 function hidePod4Cue() {
