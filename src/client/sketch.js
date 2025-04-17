@@ -1171,7 +1171,7 @@ function drawStar(index, filledIn) {
 
 function spotlight() {
     if (assets.spotlight) {
-        backgroundLayer.image(assets.spotlight, 120, 100, width / 2, height)
+        backgroundLayer.image(assets.spotlight, RTSstate.feedback.JOYSTICK_POS, 100, width / 2, height)
     }
 }
 
