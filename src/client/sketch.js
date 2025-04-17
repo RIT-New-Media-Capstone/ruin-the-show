@@ -1043,6 +1043,46 @@ function drawScore() {
             drawStar(4, true)
             drawStar(5, true)
         }
+        else if(RTSstate.score > 200) {
+            image(end.success, 0, 0, width, height)
+            drawStar(1, true)
+            drawStar(2, true)
+            drawStar(3, true)
+            drawStar(4, true)
+            drawStar(5, false)
+        }
+        else if(RTSstate.score > 150) {
+            image(end.middle, 0, 0, width, height)
+            drawStar(1, true)
+            drawStar(2, true)
+            drawStar(3, true)
+            drawStar(4, false)
+            drawStar(5, false)
+        }
+        else if(RTSstate.score > 100) {
+            image(end.middle, 0, 0, width, height)
+            drawStar(1, true)
+            drawStar(2, true)
+            drawStar(3, false)
+            drawStar(4, false)
+            drawStar(5, false)
+        }
+        else if(RTSstate.score > 50) {
+            image(end.fail, 0, 0, width, height)
+            drawStar(1, true)
+            drawStar(2, false)
+            drawStar(3, false)
+            drawStar(4, false)
+            drawStar(5, false)
+        }
+        else {
+            image(end.fail, 0, 0, width, height)
+            drawStar(1, false)
+            drawStar(2, false)
+            drawStar(3, false)
+            drawStar(4, false)
+            drawStar(5, false)
+        }
     }
 }
 
