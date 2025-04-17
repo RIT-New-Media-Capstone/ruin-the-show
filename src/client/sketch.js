@@ -406,7 +406,6 @@ window.draw = function () {
         //podiumLight2();
         //podiumLight3();
        // podiumLight4();
-        RTSstate.feedback.JOYSTICK_POS = mapRange(0, -50,50,0, width);
        if (RTSstate.cues.JOYSTICK_CUE) {
         showJoyStkCue();
         console.log("spotlight on  ")
@@ -1171,11 +1170,11 @@ function drawStar(index, filledIn) {
 }
 
 function spotlight() {
+    let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
     if (assets.spotlight) {
-        backgroundLayer.image(assets.spotlight, RTSstate.feedback.JOYSTICK_POS, 100, width / 2, height)
+        backgroundLayer.image(assets.spotlight, newJoystickPosition, 100, width / 2, height)
     }
-
-    console.log("Light pos", RTSstate.feedback.JOYSTICK_POS)
+    console.log("Light pos", newJoystickPosition);
 }
 
 function mapRange(number, inMin, inMax, outMin, outMax){
