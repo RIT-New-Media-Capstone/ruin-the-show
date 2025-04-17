@@ -366,9 +366,9 @@ window.draw = function () {
 
         
 
-        /*if (RTSstate.cues.PODIUM_1_CUE) {
+        if (RTSstate.cues.PODIUM_1_CUE) {
             showPod1Cue();
-            console.log("showing podium 1 lit")
+            console.log("YELLOW showing podium 1 lit")
         } else if (!RTSstate.cues.PODIUM_1_CUE) {
             hidePod1Cue();
             console.log("hiding podium 1")
@@ -376,12 +376,12 @@ window.draw = function () {
 
         if (RTSstate.cues.PODIUM_2_CUE) {
             showPod2Cue();
-            console.log("showing podium 2 ")
+            console.log("WHITE showing podium 2 ")
         } else if (!RTSstate.cues.PODIUM_2_CUE) {
             hidePod2Cue();
             console.log("hiding podium")
         }
-
+        /*
         if (RTSstate.cues.PODIUM_3_CUE){
             showPod3Cue();
             console.log("showing podium 3 ")
@@ -398,10 +398,10 @@ window.draw = function () {
             console.log("hiding podium 4")
         }*/
 
-        podiumLight1();
-        podiumLight2();
-        podiumLight3();
-        podiumLight4();
+        //podiumLight1();
+        //podiumLight2();
+        //podiumLight3();
+       // podiumLight4();
         spotlight();
 
         //drawHost("al");
