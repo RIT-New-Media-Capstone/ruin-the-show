@@ -163,7 +163,7 @@ const idleOnboarding = {
 const end = {
     shadow: "",
     star: "",
-    emptyStar: "", 
+    emptyStar: "",
     success: "",
     middle: "",
     fail: "",
@@ -364,18 +364,18 @@ window.draw = function () {
         //drawRWLight();
         drawPodiums();
 
-        if (RTSstate.cues.PODIUM_1_CUE){
+        if (RTSstate.cues.PODIUM_1_CUE) {
             showPod1Cue();
             console.log("showing podium 1 lit")
-        } else if(!RTSstate.cues.PODIUM_1_CUE){
+        } else if (!RTSstate.cues.PODIUM_1_CUE) {
             hidePod1Cue();
             console.log("hiding podium 1")
         }
 
-        if (RTSstate.cues.PODIUM_2_CUE){
+        if (RTSstate.cues.PODIUM_2_CUE) {
             showPod2Cue();
             console.log("showing podium 2 ")
-        } else if(!RTSstate.cues.PODIUM_2_CUE){
+        } else if (!RTSstate.cues.PODIUM_2_CUE) {
             hidePod2Cue();
             console.log("hiding podium")
         }
@@ -388,14 +388,14 @@ window.draw = function () {
             console.log("hiding podium 3")
         }*/
 
-        if (RTSstate.cues.PODIUM_4_CUE){
+        if (RTSstate.cues.PODIUM_4_CUE) {
             showPod4Cue();
             console.log("showing podium 4 ")
-        } else if(!RTSstate.cues.PODIUM_4_CUE){
+        } else if (!RTSstate.cues.PODIUM_4_CUE) {
             hidePod4Cue();
             console.log("hiding podium 4")
         }
-        
+
         //podiumLight1();
         //podiumLight2();
         //podiumLight3();
@@ -405,32 +405,32 @@ window.draw = function () {
         //drawHost("al");
         //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
 
-        if(hostState == "idle"){
+        if (hostState == "idle") {
             drawHostIdle()
         }
-        if(hostState == "talk"){
+        if (hostState == "talk") {
             drawHostTalk()
         }
-        if(hostState == "walkR"){
+        if (hostState == "walkR") {
             drawHostWalkR()
         }
-        if(hostState == "walkL"){
+        if (hostState == "walkL") {
             drawHostWalkL()
         }
-        if(hostState == "turnFL"){
+        if (hostState == "turnFL") {
             drawHostTurnFL()
         }
 
-        if(hostState == "turnLF"){
+        if (hostState == "turnLF") {
             drawHostTurnLF()
         }
-        if(hostState == "turnRF"){
+        if (hostState == "turnRF") {
             drawHostTurnRF()
         }
-        if(hostState == "turnFR"){
+        if (hostState == "turnFR") {
             drawHostTurnFR()
         }
-       
+
         //drawSpritesHost(hostState)
         //drawHostWalkR()
         //drawHostWalkL()
@@ -438,7 +438,7 @@ window.draw = function () {
         //drawHostTurnLF()
         //drawHostTurnFR()
         //drawHostTurnRF()
-        
+
         drawHostTalk()
 
         // TODO: when zoom change event trigger, set zoomTimer to 0
@@ -458,28 +458,28 @@ window.draw = function () {
         image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
 
 
-        if (RTSstate.cues.CHEAT_CUE){
+        if (RTSstate.cues.CHEAT_CUE) {
             showCheat();
-        } else if(!RTSstate.cues.CHEAT_CUE){
+        } else if (!RTSstate.cues.CHEAT_CUE) {
             hideCheat();
         }
 
         drawApplause();
         drawAudience();
 
-        if (RTSstate.cues.APPLAUSE_CUE){
+        if (RTSstate.cues.APPLAUSE_CUE) {
             showApplause();
             console.log("showing applause")
-        } else if(!RTSstate.cues.APPLAUSE_CUE){
+        } else if (!RTSstate.cues.APPLAUSE_CUE) {
             hideApplause();
             console.log("hiding")
         }
 
-        
+
         //drawApplauseON();
 
         //drawHands();
-        
+
 
         drawHUD();
 
@@ -497,62 +497,62 @@ window.draw = function () {
 }
 
 // Show and Hide Cues
-function showCheat(){
+function showCheat() {
     cheatVis = true;
     drawCheat();
 }
-    function hideCheat() {
+function hideCheat() {
     cheatVis = false;
 }
 
 
-function showApplause(){
+function showApplause() {
     applauseVis = true;
     drawApplauseON();
 }
 function hideApplause() {
     applauseVis = false;
-    
+
 }
 
-function showPod1Cue(){
+function showPod1Cue() {
     podLitVis1 = true;
     podiumLight2();
 }
 
 function hidePod1Cue() {
     podLitVis1 = false;
-    
+
 }
 
-function showPod2Cue(){
+function showPod2Cue() {
     podLitVis2 = true;
     podiumLight1();
 }
 
 function hidePod2Cue() {
     podLitVis2 = false;
-    
+
 }
 
-function showPod3Cue(){
+function showPod3Cue() {
     podLitVis3 = true;
     podiumLight4();
 }
 
 function hidePod3Cue() {
     podLitVis3 = false;
-    
+
 }
 
-function showPod4Cue(){
+function showPod4Cue() {
     podLitVis4 = true;
-   //podiumLight3();
+    //podiumLight3();
 }
 
 function hidePod4Cue() {
     podLitVis4 = false;
-    
+
 }
 
 //FEEDBACK will go here 
@@ -1033,9 +1033,10 @@ function drawCurtainClose() {
 }
 
 function drawScore() {
-    if(RTSstate.score) {
+    if (RTSstate.score) {
+        image(end.shadow, 0, 0, width, height)
         // change values based on score 
-        if(RTSstate.score > 250) {
+        if (RTSstate.score > 250) {
             image(end.success, 0, 0, width, height)
             drawStar(1, true)
             drawStar(2, true)
@@ -1043,7 +1044,7 @@ function drawScore() {
             drawStar(4, true)
             drawStar(5, true)
         }
-        else if(RTSstate.score > 200) {
+        else if (RTSstate.score > 200) {
             image(end.success, 0, 0, width, height)
             drawStar(1, true)
             drawStar(2, true)
@@ -1051,7 +1052,7 @@ function drawScore() {
             drawStar(4, true)
             drawStar(5, false)
         }
-        else if(RTSstate.score > 150) {
+        else if (RTSstate.score > 150) {
             image(end.middle, 0, 0, width, height)
             drawStar(1, true)
             drawStar(2, true)
@@ -1059,7 +1060,7 @@ function drawScore() {
             drawStar(4, false)
             drawStar(5, false)
         }
-        else if(RTSstate.score > 100) {
+        else if (RTSstate.score > 100) {
             image(end.middle, 0, 0, width, height)
             drawStar(1, true)
             drawStar(2, true)
@@ -1067,7 +1068,7 @@ function drawScore() {
             drawStar(4, false)
             drawStar(5, false)
         }
-        else if(RTSstate.score > 50) {
+        else if (RTSstate.score > 50) {
             image(end.fail, 0, 0, width, height)
             drawStar(1, true)
             drawStar(2, false)
@@ -1083,26 +1084,37 @@ function drawScore() {
             drawStar(4, false)
             drawStar(5, false)
         }
+
+        // Draw numerical value 
+        push()
+
+        fill('black');
+        textFont(countdownFont);
+        textSize(64);
+        textAlign(CENTER, CENTER);
+        text(RTSstate.score, 670, 380);
+
+        pop()
     }
 }
 
 function drawStar(index, filledIn) {
-    switch(index) {
-        case 1: 
-        image(filledIn ? end.star : end.emptyStar, 485, 274, 140, 140)
-        break;
-        case 2: 
-        image(filledIn ? end.star : end.emptyStar, 543, 254, 140, 140)
-        break
-        case 3: 
-        image(filledIn ? end.star : end.emptyStar, 602, 246, 140, 140)
-        break
-        case 4: 
-        image(filledIn ? end.star : end.emptyStar, 661, 254, 140, 140)
-        break
-        case 5: 
-        image(filledIn ? end.star : end.emptyStar, 720, 269, 140, 140)
-        break
+    switch (index) {
+        case 1:
+            image(filledIn ? end.star : end.emptyStar, 485, 274, 140, 140)
+            break;
+        case 2:
+            image(filledIn ? end.star : end.emptyStar, 543, 254, 140, 140)
+            break
+        case 3:
+            image(filledIn ? end.star : end.emptyStar, 602, 246, 140, 140)
+            break
+        case 4:
+            image(filledIn ? end.star : end.emptyStar, 661, 254, 140, 140)
+            break
+        case 5:
+            image(filledIn ? end.star : end.emptyStar, 720, 269, 140, 140)
+            break
     }
 }
 
