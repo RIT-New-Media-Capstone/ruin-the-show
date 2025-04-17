@@ -293,6 +293,7 @@ window.setup = async function () {
     syncStateLoop();
 }
 
+//pulling game state 
 const syncStateLoop = async () => {
     try {
         const res = await fetch('/getState');
