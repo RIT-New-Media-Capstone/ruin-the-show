@@ -1190,7 +1190,7 @@ function drawStar(index, filledIn) {
 function spotlight() {
     let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
     if (assets.spotlight) {
-        backgroundLayer.image(assets.spotlight, newJoystickPosition, 100, width / 2, height)
+        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
     }
     console.log("Light pos", newJoystickPosition);
 }
