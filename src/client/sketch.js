@@ -430,14 +430,15 @@ window.draw = function () {
 
         if (RTSstate.cues.APPLAUSE_CUE){
             showApplause();
-        } else if(!RTSstate.cues.APPLAUSE_CUE_CUE){
+            console.log("showing applause")
+        } else if(!RTSstate.cues.APPLAUSE_CUE){
             hideApplause();
         }
         drawApplause();
         //drawApplauseON();
 
-        drawHands();
-       // drawAudience();
+        //drawHands();
+        drawAudience();
 
         drawHUD();
 
@@ -467,7 +468,7 @@ function showApplause(){
 }
     function hideApplause() {
     applauseVis = false;
-    drawAudience();
+    
 }
 
 
