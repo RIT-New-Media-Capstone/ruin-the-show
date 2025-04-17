@@ -381,22 +381,22 @@ window.draw = function () {
             hidePod2Cue();
             console.log("hiding podium")
         }
-        /*
+        
         if (RTSstate.cues.PODIUM_3_CUE){
             showPod3Cue();
-            console.log("showing podium 3 ")
+            console.log("RED showing podium 3 ")
         } else if(!RTSstate.cues.PODIUM_3_CUE){
-            showPod3Cue();
+            hidePod3Cue();
             console.log("hiding podium 3")
         }
 
         if (RTSstate.cues.PODIUM_4_CUE) {
             showPod4Cue();
-            console.log("showing podium 4 ")
+            console.log("BLUE showing podium 4 ")
         } else if (!RTSstate.cues.PODIUM_4_CUE) {
             hidePod4Cue();
             console.log("hiding podium 4")
-        }*/
+        }
 
         //podiumLight1();
         //podiumLight2();
@@ -549,7 +549,7 @@ function hidePod3Cue() {
 
 function showPod4Cue() {
     podLitVis4 = true;
-    //podiumLight3();
+    podiumLight3();
 }
 
 function hidePod4Cue() {
