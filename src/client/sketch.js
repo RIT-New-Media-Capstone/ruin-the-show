@@ -131,6 +131,7 @@ let podLitVis3 = false;
 let podLitVis4 = false;
 let applauseVis = false;
 let leverVis = false;
+let spotlitVis = false;
 
 const assets = {
     audience: "",
@@ -405,7 +406,14 @@ window.draw = function () {
         //podiumLight2();
         //podiumLight3();
        // podiumLight4();
-        spotlight();
+       if (RTSstate.cues.JOYSTICK_CUE) {
+        showJoyStkCue();
+        console.log("spotlight on  ")
+        } else if (!RTSstate.cues.PODIUM_4_CUE) {
+        hideJoyStkCue();
+        console.log("hiding spotlit")
+        }
+       // spotlight();
 
         //drawHost("al");
         //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
@@ -576,6 +584,16 @@ function showLever(){
 
 function hideLever(){
     leverVis = false;
+}
+
+function showJoyStkCue(){
+    spotlitVis = true;
+    spotlight()
+}
+
+function hideJoyStkCue(){
+    spotlitVis = false;
+
 }
 //FEEDBACK will go here 
 
