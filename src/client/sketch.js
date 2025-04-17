@@ -1038,51 +1038,57 @@ function drawScore() {
         // change values based on score 
         if (RTSstate.score > 250) {
             image(end.success, 0, 0, width, height)
-            drawStar(1, true)
-            drawStar(2, true)
-            drawStar(3, true)
-            drawStar(4, true)
-            drawStar(5, true)
+
+            for (let i = 1; i <= 5; i++) {
+                setTimeout(() => {
+                    drawStar(i, i <= 5)
+                }, 100 * i)
+            }
         }
         else if (RTSstate.score > 200) {
             image(end.success, 0, 0, width, height)
-            drawStar(1, true)
-            drawStar(2, true)
-            drawStar(3, true)
-            drawStar(4, true)
-            drawStar(5, false)
+            
+            for (let i = 1; i <= 5; i++) {
+                setTimeout(() => {
+                    drawStar(i, i <= 4)
+                }, 100 * i)
+            }
         }
         else if (RTSstate.score > 150) {
             image(end.middle, 0, 0, width, height)
-            drawStar(1, true)
-            drawStar(2, true)
-            drawStar(3, true)
-            drawStar(4, false)
-            drawStar(5, false)
+            
+            for (let i = 1; i <= 5; i++) {
+                setTimeout(() => {
+                    drawStar(i, i <= 3)
+                }, 100 * i)
+            }
         }
         else if (RTSstate.score > 100) {
             image(end.middle, 0, 0, width, height)
-            drawStar(1, true)
-            drawStar(2, true)
-            drawStar(3, false)
-            drawStar(4, false)
-            drawStar(5, false)
+            
+            for (let i = 1; i <= 5; i++) {
+                setTimeout(() => {
+                    drawStar(i, i <= 2)
+                }, 100 * i)
+            }
         }
         else if (RTSstate.score > 50) {
             image(end.fail, 0, 0, width, height)
-            drawStar(1, true)
-            drawStar(2, false)
-            drawStar(3, false)
-            drawStar(4, false)
-            drawStar(5, false)
+            
+            for (let i = 1; i <= 5; i++) {
+                setTimeout(() => {
+                    drawStar(i, i <= 1)
+                }, 100 * i)
+            }
         }
         else {
             image(end.fail, 0, 0, width, height)
-            drawStar(1, false)
-            drawStar(2, false)
-            drawStar(3, false)
-            drawStar(4, false)
-            drawStar(5, false)
+            
+            for (let i = 1; i <= 5; i++) {
+                setTimeout(() => {
+                    drawStar(i, i <= 0)
+                }, 100 * i)
+            }
         }
 
         // Draw numerical value 
