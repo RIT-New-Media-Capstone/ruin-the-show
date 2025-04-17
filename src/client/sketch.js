@@ -429,11 +429,16 @@ window.draw = function () {
             hideCheat();
         }
 
+        if (RTSstate.cues.APPLAUSE_CUE){
+            showApplause();
+        } else if(!RTSstate.cues.APPLAUSE_CUE_CUE){
+            hideApplause();
+        }
         drawApplause();
-        drawApplauseON();
+        //drawApplauseON();
 
         drawHands();
-        drawAudience();
+       // drawAudience();
 
         drawHUD();
 
@@ -447,7 +452,7 @@ window.draw = function () {
     }
 }
 
-//
+// Show and Hide Cues
 function showCheat(){
     cheatVis = true;
     drawCheat();
@@ -455,6 +460,20 @@ function showCheat(){
     function hideCheat() {
     cheatVis = false;
 }
+
+
+function showApplause(){
+    applauseVis = true;
+    drawApplauseON();
+}
+    function hideApplause() {
+    applauseVis = false;
+    drawAudience();
+}
+
+
+//FEEDBACK will go here 
+
 
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
     let amount = timer / duration
