@@ -1,3 +1,5 @@
+"use strict";
+
 let RTSstate = { // Initial Values Based on Start of State Machine
     score: 0,
     state: 'IDLE',
@@ -142,7 +144,7 @@ const assets = {
 }
 
 const idleOnboarding = {
-    idle: "",
+    idle: null,
     onboarding: "",
     onboarding_playing: false,
     easy: "",
@@ -165,7 +167,7 @@ window.preload = function () {
     idleOnboarding.easy = loadImage('/Assets/Idle_Onboarding/LevelSelections_EASY.png');
     idleOnboarding.medium = loadImage('/Assets/Idle_Onboarding/LevelSelections_MED.png');
     idleOnboarding.hard = loadImage('/Assets/Idle_Onboarding/LevelSelections_HARD.png');
-    idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif')
+    idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
 
     //BACKGROUND
     assets.background = loadImage('/Assets/Background/MainBackground.png');
@@ -313,22 +315,12 @@ const syncStateLoop = async () => {
 }
 
 window.draw = function () {
-    console.log(RTSstate);
+    //console.log(RTSstate);
     backgroundLayer.background(255);
     if (RTSstate.state === 'IDLE') {
-        idleOnboarding.onboarding.stop()
-        idleGraphicsLayer.image(idleOnboarding.idle, 0, 0, width, height);
-
-        image(idleGraphicsLayer, 0, 0)
+        showIdleGif();
     } else if (RTSstate.state === 'ONBOARDING') {
-        if (!idleOnboarding.onboarding_playing) {
-            idleOnboarding.onboarding.play()
-            idleOnboarding.onboarding_playing = true
-        }
-
-        onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
-
-        image(onboardingGraphicsLayer, 0, 0)
+        hideIdleGif();
     } else if (RTSstate.state === 'PLAYING') {
         idleOnboarding.onboarding.stop()
         drawBackground();
@@ -430,6 +422,20 @@ window.draw = function () {
 
         drawCurtainClose()
         drawScore()
+    }
+}
+
+function showIdleGif() {
+    if (!idleOnboarding.idle) {
+        idleOnboarding.idle = createImg('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
+        idleOnboarding.idle.size(width, height);
+    }
+}
+
+function hideIdleGif() {
+    if (idleOnboarding.idle) {
+        idleOnboarding.idle.remove();
+        idleOnboarding.idle = null;
     }
 }
 

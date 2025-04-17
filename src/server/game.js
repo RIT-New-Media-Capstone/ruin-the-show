@@ -698,10 +698,10 @@ const awake = () => {
     //moveToPlaying(machine);
 
 
-    // Simulate an RFID scan after 5 seconds
-    setTimeout(() => {
-        machine.addEvent('rfid-scan');
-    }, 5000);
+    // Simulate an RFID scan after 20 seconds
+    //setTimeout(() => {
+        //machine.addEvent('rfid-scan');
+    //}, 20000);
 };
 
 export { awake, machine }
