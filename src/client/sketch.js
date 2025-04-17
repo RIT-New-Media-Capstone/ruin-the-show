@@ -361,6 +361,38 @@ window.draw = function () {
         //drawRWLight();
         drawPodiums();
 
+        if (RTSstate.cues.PODIUM_1_CUE){
+            showPod1Cue();
+            console.log("showing podium 1 lit")
+        } else if(!RTSstate.cues.PODIUM_1_CUE){
+            hidePod1Cue();
+            console.log("hiding podium 1")
+        }
+
+        if (RTSstate.cues.PODIUM_2_CUE){
+            showPod2Cue();
+            console.log("showing podium 2 ")
+        } else if(!RTSstate.cues.PODIUM_2_CUE){
+            hidePod2Cue();
+            console.log("hiding podium")
+        }
+
+        if (RTSstate.cues.PODIUM_3_CUE){
+            showPod3Cue();
+            console.log("showing podium 3 ")
+        } else if(!RTSstate.cues.PODIUM_3_CUE){
+            showPod3Cue();
+            console.log("hiding podium 3")
+        }
+
+        if (RTSstate.cues.PODIUM_4_CUE){
+            showPod4Cue();
+            console.log("showing podium 4 ")
+        } else if(!RTSstate.cues.PODIUM_4_CUE){
+            hidePod4Cue();
+            console.log("hiding podium 4")
+        }
+        
         podiumLight1();
         //podiumLight2();
         //podiumLight3();
@@ -440,37 +472,6 @@ window.draw = function () {
             console.log("hiding")
         }
 
-        if (RTSstate.cues.PODIUM_1_CUE){
-            showPod1Cue();
-            console.log("showing podium 1 lit")
-        } else if(!RTSstate.cues.PODIUM_1_CUE){
-            hidePod1Cue();
-            console.log("hiding podium 1")
-        }
-
-        if (RTSstate.cues.PODIUM_2_CUE){
-            showPod2Cue();
-            console.log("showing podium 2 ")
-        } else if(!RTSstate.cues.PODIUM_2_CUE){
-            hidePod2Cue();
-            console.log("hiding podium")
-        }
-
-        if (RTSstate.cues.PODIUM_3_CUE){
-            showPod3Cue();
-            console.log("showing podium 3 ")
-        } else if(!RTSstate.cues.PODIUM_3_CUE){
-            showPod3Cue();
-            console.log("hiding podium 3")
-        }
-
-        if (RTSstate.cues.PODIUM_4_CUE){
-            showPod4Cue();
-            console.log("showing podium 4 ")
-        } else if(!RTSstate.cues.PODIUM_4_CUE){
-            hidePod4Cue();
-            console.log("hiding podium 4")
-        }
         
         //drawApplauseON();
 
