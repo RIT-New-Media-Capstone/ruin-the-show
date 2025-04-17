@@ -1173,6 +1173,8 @@ function spotlight() {
     if (assets.spotlight) {
         backgroundLayer.image(assets.spotlight, RTSstate.feedback.JOYSTICK_POS, 100, width / 2, height)
     }
+
+    console.log("Light pos", RTSstate.feedback.JOYSTICK_POS)
 }
 
 function podiumLight1() {
