@@ -393,7 +393,7 @@ window.draw = function () {
             console.log("hiding podium 4")
         }
         
-        podiumLight1();
+        //podiumLight1();
         //podiumLight2();
         //podiumLight3();
         //podiumLight4();
