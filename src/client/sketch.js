@@ -1,5 +1,6 @@
 "use strict";
 
+let lastRTSstate;
 let RTSstate = { // Initial Values Based on Start of State Machine
     score: 0,
     state: 'IDLE',
@@ -313,6 +314,8 @@ const syncStateLoop = async () => {
     try {
         const res = await fetch('/getState');
         const state = await res.json();
+
+        lastRTSstate = RTSstate;
         RTSstate = state.state;
     } catch (err) {
         console.error('Error syncing state:', err);
