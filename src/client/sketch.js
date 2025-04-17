@@ -361,7 +361,7 @@ window.draw = function () {
         //drawRWLight();
         drawPodiums();
 
-        //podiumLight1();
+        podiumLight1();
         //podiumLight2();
         //podiumLight3();
         //podiumLight4();
