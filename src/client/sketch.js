@@ -439,6 +439,38 @@ window.draw = function () {
             hideApplause();
             console.log("hiding")
         }
+
+        if (RTSstate.cues.PODIUM_1_CUE){
+            showPod1Cue();
+            console.log("showing podium 1 lit")
+        } else if(!RTSstate.cues.PODIUM_1_CUE){
+            hidePod1Cue();
+            console.log("hiding podium 1")
+        }
+
+        if (RTSstate.cues.PODIUM_2_CUE){
+            showApplause();
+            console.log("showing podium 2 ")
+        } else if(!RTSstate.cues.PODIUM_2_CUE){
+            hideApplause();
+            console.log("hiding podium")
+        }
+
+        if (RTSstate.cues.PODIUM_3_CUE){
+            showApplause();
+            console.log("showing podium 3 ")
+        } else if(!RTSstate.cues.PODIUM_3_CUE){
+            hideApplause();
+            console.log("hiding podium 3")
+        }
+
+        if (RTSstate.cues.PODIUM_4_CUE){
+            showApplause();
+            console.log("showing podium 4 ")
+        } else if(!RTSstate.cues.PODIUM_4_CUE){
+            hideApplause();
+            console.log("hiding podium 4")
+        }
         
         //drawApplauseON();
 
@@ -471,11 +503,50 @@ function showApplause(){
     applauseVis = true;
     drawApplauseON();
 }
-    function hideApplause() {
+function hideApplause() {
     applauseVis = false;
     
 }
 
+function showPod1Cue(){
+    podLitVis1 = true;
+    podiumLight1();
+}
+
+function hidePod1Cue() {
+    podLitVis1 = false;
+    
+}
+
+function showPod2Cue(){
+    podLitVis2 = true;
+    podiumLight2();
+}
+
+function hidePod2Cue() {
+    podLitVis2 = false;
+    
+}
+
+function showPod3Cue(){
+    podLitVis3 = true;
+    podiumLight3();
+}
+
+function hidePod3Cue() {
+    podLitVis3 = false;
+    
+}
+
+function showPod4Cue(){
+    podLitVis4 = true;
+    podiumLight4();
+}
+
+function hidePod4Cue() {
+    podLitVis4 = false;
+    
+}
 
 //FEEDBACK will go here 
 
