@@ -429,17 +429,21 @@ window.draw = function () {
             hideCheat();
         }
 
+        drawApplause();
+        drawAudience();
+
         if (RTSstate.cues.APPLAUSE_CUE){
             showApplause();
             console.log("showing applause")
         } else if(!RTSstate.cues.APPLAUSE_CUE){
             hideApplause();
+            console.log("hiding")
         }
-        drawApplause();
+        
         //drawApplauseON();
 
         //drawHands();
-        drawAudience();
+        
 
         drawHUD();
 
