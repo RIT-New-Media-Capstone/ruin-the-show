@@ -116,6 +116,7 @@ const frameHeightRW = 4324 / numRowsRW;
 const frameWidthAL = 4802 / numCols;
 const frameHeightAL = 4324 / numRows;
 const frameWidthCurtains = 9604 / numCols
+const frameHeightCurtains = 2162 / numRowsCurtains
 
 //Countdown Timer (Possibly Temporary)
 let countdownFont;
@@ -930,7 +931,9 @@ function drawCurtainClose() {
     // if the curtains aren't closed, draw the animation 
     if (!end.curtainsClosed) {
         sx = (currentFrameCurtains % numCols) * frameWidthCurtains;
-        sy = Math.floor(currentFrameCurtains / numCols) * frameHeight;
+        sy = Math.floor(currentFrameCurtains / numCols) * frameHeightCurtains;
+
+        console.log(currentFrameCurtains)
 
         if (frameCount % frameDelay === 0) {
             currentFrameCurtains = (currentFrameCurtains + 1) % totalFramesCurtains;
