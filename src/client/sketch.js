@@ -149,6 +149,7 @@ const assets = {
     stagelights: "",
     stars: "",
     timer: "",
+    levercamera:"",
 }
 
 const idleOnboarding = {
@@ -281,6 +282,7 @@ window.preload = function () {
     assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
     assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
     assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
+    assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature.png')
 
     //FEEEDBACK
     assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
@@ -440,9 +442,10 @@ window.draw = function () {
         //drawHostTurnLF()
         //drawHostTurnFR()
         //drawHostTurnRF()
-
+        
         drawHostTalk()
 
+        drawLeverCue()
         // TODO: when zoom change event trigger, set zoomTimer to 0
         if (zoomedIn) {
             if (zoomTimer <= zoomDuration) {
@@ -569,6 +572,7 @@ function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHe
     return { x, y, w, h }
 }
 
+
 function drawBackground() {
     if (assets.background) {
         backgroundLayer.image(assets.background, 0, 0, width, height);
@@ -579,6 +583,10 @@ function drawBackground() {
     if (assets.stagelights) {
         backgroundLayer.image(assets.stagelights, 0, -45, width, height / 3);
     }
+}
+
+function drawLeverCue(){
+    backgroundLayer.image(assets.levercamera, 0, 0, width, height);
 }
 
 function drawAudience() {
