@@ -377,13 +377,13 @@ window.draw = function () {
             console.log("hiding podium")
         }
 
-        if (RTSstate.cues.PODIUM_3_CUE){
+        /*if (RTSstate.cues.PODIUM_3_CUE){
             showPod3Cue();
             console.log("showing podium 3 ")
         } else if(!RTSstate.cues.PODIUM_3_CUE){
             showPod3Cue();
             console.log("hiding podium 3")
-        }
+        }*/
 
         if (RTSstate.cues.PODIUM_4_CUE){
             showPod4Cue();
