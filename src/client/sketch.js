@@ -133,6 +133,9 @@ let applauseVis = false;
 let leverVis = false;
 let spotlitVis = false;
 
+//display feedback
+let appFBVis = false;
+
 const assets = {
     audience: "",
     background: "",
@@ -362,9 +365,19 @@ window.draw = function () {
 
         }*/
 
-        //drawContestant();
+           //TODO add variables dec lare, add fucntions  
+        if(RTSstate.feedback.PODIUM_1_GOOD){
+            // show contestat
+            //show light 
+        } else if(RTSstate.feedback.PODIUM_1_BAD){
+            //show contestant wrong 
+            //show red light 
+        } else{
+            drawContestant();
+        }
+        
 
-        drawContestantR();
+        //drawContestantR();
         //drawRWLight();
         drawPodiums();
 
@@ -456,7 +469,7 @@ window.draw = function () {
 
         if (RTSstate.cues.LEVER_CUE) {
             showLever();
-            console.log("showing lever onnn")
+            console.log("showing lever on")
         } else if (!RTSstate.cues.LEVER_CUE) {
             hideLever();
             console.log("hiding lever")
@@ -504,6 +517,8 @@ window.draw = function () {
             hideApplause();
             console.log("FEEDBACK hiding")
         }
+
+
 
         //drawApplauseON();
 
