@@ -381,7 +381,7 @@ class GameMachine {
                 const podiumNum = event.data.num
                 if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, 8, "Podium");
-                    this.this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
+                    this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
                 } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, -8, "Podium");
                 }
