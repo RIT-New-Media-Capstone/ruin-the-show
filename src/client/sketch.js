@@ -121,6 +121,14 @@ let countdownFont;
 let countdown = 60;
 let countdownTimer;
 
+// display cues 
+let cheatVis = false;
+let podLitVis1 = false;
+let podLitVis2 = false;
+let podLitVis3 = false;
+let podLitVis4 = false;
+let applauseVis = false;
+
 const assets = {
     audience: "",
     background: "",
@@ -142,7 +150,7 @@ const assets = {
 }
 
 const idleOnboarding = {
-    idle: null,
+    idle: "",
     onboarding: "",
     onboarding_playing: false,
     easy: "",
@@ -316,9 +324,16 @@ window.draw = function () {
     //console.log(RTSstate);
     backgroundLayer.background(255);
     if (RTSstate.state === 'IDLE') {
-        showIdleGif();
+        idleOnboarding.onboarding.stop()
+        idleGraphicsLayer.image(idleOnboarding.idle, 0, 0, width, height);
+        image(idleGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'ONBOARDING') {
-        hideIdleGif();
+        if (!idleOnboarding.onboarding_playing) {
+            idleOnboarding.onboarding.play()
+            idleOnboarding.onboarding_playing = true
+        }
+        onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
+        image(onboardingGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'PLAYING') {
         idleOnboarding.onboarding.stop()
         drawBackground();
@@ -403,7 +418,12 @@ window.draw = function () {
 
         image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
 
-        drawCheat();
+
+        if (RTSstate.cues.CHEAT_CUE){
+            showCheat();
+        } else if(!RTSstate.cues.CHEAT_CUE){
+            hideCheat();
+        }
 
         drawApplause();
         drawApplauseON();
@@ -423,19 +443,14 @@ window.draw = function () {
     }
 }
 
-function showIdleGif() {
-    if (!idleOnboarding.idle) {
-        idleOnboarding.idle = createImg('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
-        idleOnboarding.idle.size(width, height);
-    }
+function showCheat(){
+    cheatVis = true;
+    drawCheat();
+}
+    function hideCheat() {
+    cheatVis = false;
 }
 
-function hideIdleGif() {
-    if (idleOnboarding.idle) {
-        idleOnboarding.idle.remove();
-        idleOnboarding.idle = null;
-    }
-}
 
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
     let amount = timer / duration
