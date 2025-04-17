@@ -406,6 +406,7 @@ window.draw = function () {
         //podiumLight2();
         //podiumLight3();
        // podiumLight4();
+        RTSstate.feedback.JOYSTICK_POS = mapRange(0, -50,50,0, width);
        if (RTSstate.cues.JOYSTICK_CUE) {
         showJoyStkCue();
         console.log("spotlight on  ")
@@ -1177,6 +1178,9 @@ function spotlight() {
     console.log("Light pos", RTSstate.feedback.JOYSTICK_POS)
 }
 
+function mapRange(number, inMin, inMax, outMin, outMax){
+    return (number-inMin)*(outMax -outMin)/(inMax - inMin) + outMin;
+}
 function podiumLight1() {
     if (assets.podiumlit1) {
         backgroundLayer.image(assets.podiumlit1, 345, -50, width / 3, height)
