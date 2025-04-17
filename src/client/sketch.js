@@ -168,6 +168,7 @@ const end = {
     fail: "",
     curtains: "",
     curtainsClosed: false,
+    scoreVis: false,
 }
 
 window.preload = function () {
@@ -448,7 +449,10 @@ window.draw = function () {
         idleOnboarding.onboarding.stop()
 
         drawCurtainClose()
-        drawScore()
+        if (end.curtainsClosed && !end.scoreVis) {
+            drawScore()
+            end.scoreVis = true
+        }
     }
 }
 
@@ -952,9 +956,34 @@ function drawCurtainClose() {
 function drawScore() {
     if(RTSstate.score) {
         // change values based on score 
-        if(RTSstate.score > 0) {
+        if(RTSstate.score > 250) {
             image(end.success, 0, 0, width, height)
+            drawStar(1)
+            drawStar(2)
+            drawStar(3)
+            drawStar(4)
+            drawStar(5)
         }
+    }
+}
+
+function drawStar(index) {
+    switch(index) {
+        case 1: 
+        image(end.star, 485, 274, 140, 140)
+        break;
+        case 2: 
+        image(end.star, 543, 254, 140, 140)
+        break
+        case 3: 
+        image(end.star, 602, 246, 140, 140)
+        break
+        case 4: 
+        image(end.star, 661, 254, 140, 140)
+        break
+        case 5: 
+        image(end.star, 720, 269, 140, 140)
+        break
     }
 }
 
