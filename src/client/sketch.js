@@ -135,6 +135,11 @@ let spotlitVis = false;
 
 //display feedback
 let appFBVis = false;
+let pod1FB = false;
+let pod2FB = false;
+let pod3FB = false;
+let pod4FB = false;
+
 
 const assets = {
     audience: "",
@@ -365,13 +370,42 @@ window.draw = function () {
 
         }*/
 
-           //TODO add variables dec lare, add fucntions  
+           //TODO add variables declare, add fucntions  
         if(RTSstate.feedback.PODIUM_1_GOOD){
-            // show contestat
-            //show light 
+             showPod1FB()  // show contestant + light 
+        } else if(!RTSstate.feedback.PODIUM_1_GOOD){
+            hidePod1FB()
         } else if(RTSstate.feedback.PODIUM_1_BAD){
-            //show contestant wrong 
-            //show red light 
+            showPod1FbBad() 
+        } else if(!RTSstate.feedback.PODIUM_1_BAD){
+            hidePod1FbBad()
+        } else if (RTSstate.feedback.PODIUM_2_GOOD){
+            // show contestant + light 
+             showPod2FB()
+        } else if(!RTSstate.feedback.PODIUM_2_GOOD){
+            hidePod2FB()
+        } else if(RTSstate.feedback.PODIUM_2_BAD){
+            showPod2FbBad() 
+        } else if(!RTSstate.feedback.PODIUM_2_BAD){
+            hidePod2FbBad()
+        } else if (RTSstate.feedback.PODIUM_3_GOOD){
+            // show contestant + light 
+             showPod3FB()
+        } else if(!RTSstate.feedback.PODIUM_3_GOOD){
+            hidePod3FB()
+        } else if(RTSstate.feedback.PODIUM_3_BAD){
+            showPod3FbBad() 
+        } else if(!RTSstate.feedback.PODIUM_3_BAD){
+            hidePod3FbBad()
+        }  else if (RTSstate.feedback.PODIUM_4_GOOD){
+            // show contestant + light 
+             showPod4FB()
+        } else if(!RTSstate.feedback.PODIUM_4_GOOD){
+            hidePod4FB()
+        } else if(RTSstate.feedback.PODIUM_4_BAD){
+            showPod4FbBad() 
+        } else if(!RTSstate.feedback.PODIUM_4_BAD){
+            hidePod4FbBad()
         } else{
             drawContestant();
         }
@@ -570,6 +604,9 @@ function hideApplauseFB(){
     appFBVis = false;
 }
 
+
+
+/// PODIUM 1 | CUE  |  GOOD FB |  BAD FB
 function showPod1Cue() {
     podLitVis1 = true;
     podiumLight2();
@@ -592,6 +629,19 @@ function hidePod1FB(){
     
 }
 
+function showPod1FbBad(){
+    pod1FbBad = true;
+    drawWLight(243);
+}
+
+function hidePod1FbBad(){
+    pod1FbBad = false;
+
+}
+
+
+/// PODIUM 2 | CUE  |  GOOD FB |  BAD FB
+
 function showPod2Cue() {
     podLitVis2 = true;
     podiumLight1();
@@ -605,13 +655,25 @@ function showPod2FB(){
     pod2FB = true;
     drawRLight(393);
 
-      
 }
 
 function hidePod2FB(){
     pod2FB = false;
     
 }
+
+function showPod2FbBad(){
+    pod2FbBad = true;
+    drawWLight(393);
+}
+
+function hidePod2FbBad(){
+    pod2FbBad = false;
+
+}
+
+
+/// PODIUM 3 | CUE  |  GOOD FB |  BAD FB
 
 function showPod3Cue() {
     podLitVis3 = true;
@@ -626,8 +688,6 @@ function hidePod3Cue() {
 function showPod3FB(){
     pod3FB = true;
     drawRLight(563);
-
-      
 }
 
 function hidePod3FB(){
@@ -635,6 +695,17 @@ function hidePod3FB(){
     
 }
 
+function showPod3FbBad(){
+    pod3FbBad = true;
+    drawWLight(563);
+}
+
+function hidePod3FbBad(){
+    pod3FbBad = false;
+
+}
+
+/// PODIUM 4 | CUE  |  GOOD FB |  BAD FB
 
 function showPod4Cue() {
     podLitVis4 = true;
@@ -643,20 +714,26 @@ function showPod4Cue() {
 
 function hidePod4Cue() {
     podLitVis4 = false;
-
 }
 
 function showPod4FB(){
     pod4FB = true;
-    drawRLight(707);
-
-      
+    drawRLight(707);   
 }
 
 function hidePod4FB(){
     pod4FB = false;
-    
 }
+
+function showPod4FbBad(){
+    pod4FbBad = true;
+    drawWLight(707);
+}
+
+function hidePod4FbBad(){
+    pod4FbBad = false;
+}
+
 
 function showLever(){
     leverVis = true;
@@ -851,7 +928,7 @@ function updateCountdown() {
 function drawRLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
-    image(assets.rightLit, x, 100, width / 3, height / 1.5);
+    backgroundLayer.image(assets.rightLit, x, 100, width / 3, height / 1.5);
     
 
 }
@@ -859,7 +936,7 @@ function drawRLight(x) {
 function drawWLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
-     image(assets.wrongLit, x, 123, width / 3, height / 1.5);
+    backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
 
 }
 
