@@ -580,6 +580,18 @@ function hidePod1Cue() {
 
 }
 
+function showPod1FB(){
+    pod1FB = true;
+    drawRLight(243);
+
+      
+}
+
+function hidePod1FB(){
+    pod1FB = false;
+    
+}
+
 function showPod2Cue() {
     podLitVis2 = true;
     podiumLight1();
@@ -588,6 +600,17 @@ function showPod2Cue() {
 function hidePod2Cue() {
     podLitVis2 = false;
 
+}
+function showPod2FB(){
+    pod2FB = true;
+    drawRLight(393);
+
+      
+}
+
+function hidePod2FB(){
+    pod2FB = false;
+    
 }
 
 function showPod3Cue() {
@@ -600,6 +623,19 @@ function hidePod3Cue() {
 
 }
 
+function showPod3FB(){
+    pod3FB = true;
+    drawRLight(563);
+
+      
+}
+
+function hidePod3FB(){
+    pod3FB = false;
+    
+}
+
+
 function showPod4Cue() {
     podLitVis4 = true;
     podiumLight3();
@@ -608,6 +644,18 @@ function showPod4Cue() {
 function hidePod4Cue() {
     podLitVis4 = false;
 
+}
+
+function showPod4FB(){
+    pod4FB = true;
+    drawRLight(707);
+
+      
+}
+
+function hidePod4FB(){
+    pod4FB = false;
+    
 }
 
 function showLever(){
@@ -800,11 +848,18 @@ function updateCountdown() {
 }
 
 //display right wrong light
-function drawRWLight(x, y) {
+function drawRLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
-    image(assets.rightLit, 393, 100, width / 3, height / 1.5);
-    image(assets.wrongLit, 243, 123, width / 3, height / 1.5);
+    image(assets.rightLit, x, 100, width / 3, height / 1.5);
+    
+
+}
+
+function drawWLight(x) {
+    //X-Coordinates for each podium
+    //(243), (393), (563), (707)
+     image(assets.wrongLit, x, 123, width / 3, height / 1.5);
 
 }
 
@@ -833,7 +888,6 @@ function drawHands() {
 }
 
 /*
-
 function drawSpritesHost(sx,sy) {
     let hostX = 100;
     const hostY = 100;
