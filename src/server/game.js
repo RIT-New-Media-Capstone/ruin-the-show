@@ -1,7 +1,8 @@
 import panel, { turnOnCheatLED, turnOffCheatLED, turnOnApplauseLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
-import pkg from "osc";
-const osc = pkg;
+// OSC for lighting - connects to resolume (needs to be running on same machine)
+import oscpkg from "osc";
+const osc = oscpkg;
 const oscClient = new osc.UDPPort({
     localAddress: "127.0.0.1",
     localPort: 3000,
@@ -9,6 +10,14 @@ const oscClient = new osc.UDPPort({
     remotePort: 7000
 });
 oscClient.open();
+
+// RFID 
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+const EventSource = require('eventsource').EventSource;
+
+const rfidEventSource = new EventSource('http://nm-rfid-5.new-media-metagame.com:8001/sse')
 
 const moveToPlaying = (machine) => {
     machine.state = 'PLAYING';
@@ -226,7 +235,7 @@ class GameMachine {
     step() {
         const event = this.eventQueue.shift();
         if (!event) return;
-        console.log(`Processing event: ${event.name} in state: ${this.state}`);
+        // console.log(`Processing event: ${event.name} in state: ${this.state}`);
 
         if (event.name === this.events.LEVER_MOVED) { //LEVER VALUE INITIALIZATION
             let position = event.data.value
@@ -545,7 +554,7 @@ class GameMachine {
             name: eventName,
             data: eventData
         });
-        console.log(`Event added: ${eventName}`);
+        // console.log(`Event added: ${eventName}`);
     }
 
     // Helper method to send cues to lighting 
@@ -682,10 +691,13 @@ const awake = () => {
     //moveToPlaying(machine);
 
 
-    // Simulate an RFID scan after 20 seconds
-    //setTimeout(() => {
-        //machine.addEvent('rfid-scan');
-    //}, 20000);
+    rfidEventSource.addEventListener('message', (event) => {
+        const data = event.data
+        if(data) {
+            machine.addEvent(machine.events.RFID_SCAN)
+        }
+    })
+    
 };
 
 export { awake, machine }
