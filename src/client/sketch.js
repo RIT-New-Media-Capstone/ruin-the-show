@@ -66,9 +66,7 @@ let alTurnR;
 let alWalkL;
 let alWalkR;
 
-
 let hostState; // idle, talkL, talkR, walkL, walkR, turnL, turnR
-
 
 //host animation 
 let host = {
@@ -139,7 +137,6 @@ let pod1FB = false;
 let pod2FB = false;
 let pod3FB = false;
 let pod4FB = false;
-
 
 const assets = {
     audience: "",
@@ -410,12 +407,9 @@ window.draw = function () {
             drawContestant();
         }
         
-
         //drawContestantR();
         //drawRWLight();
         drawPodiums();
-
-        
 
         if (RTSstate.cues.PODIUM_1_CUE) {
             showPod1Cue();
@@ -508,7 +502,6 @@ window.draw = function () {
             hideLever();
             console.log("hiding lever")
         }
-
         
         // TODO: when zoom change event trigger, set zoomTimer to 0
         if (zoomedIn) {
@@ -525,7 +518,6 @@ window.draw = function () {
         }
 
         image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
-
 
         if (RTSstate.cues.CHEAT_CUE) {
             showCheat();
@@ -552,12 +544,9 @@ window.draw = function () {
             console.log("FEEDBACK hiding")
         }
 
-
-
         //drawApplauseON();
 
         //drawHands();
-
 
         drawHUD();
 
@@ -583,7 +572,6 @@ function hideCheat() {
     cheatVis = false;
 }
 
-
 function showApplause() {
     applauseVis = true;
     drawApplauseON();
@@ -597,14 +585,11 @@ function hideApplause() {
 function showApplauseFB(){
     appFBVis = true;
     drawHands();
-
 }
 
 function hideApplauseFB(){
     appFBVis = false;
 }
-
-
 
 /// PODIUM 1 | CUE  |  GOOD FB |  BAD FB
 function showPod1Cue() {
@@ -614,19 +599,16 @@ function showPod1Cue() {
 
 function hidePod1Cue() {
     podLitVis1 = false;
-
 }
 
 function showPod1FB(){
     pod1FB = true;
     drawRLight(243);
-
-      
 }
 
 function hidePod1FB(){
     pod1FB = false;
-    
+
 }
 
 function showPod1FbBad(){
@@ -638,7 +620,6 @@ function hidePod1FbBad(){
     pod1FbBad = false;
 
 }
-
 
 /// PODIUM 2 | CUE  |  GOOD FB |  BAD FB
 
@@ -671,7 +652,6 @@ function hidePod2FbBad(){
     pod2FbBad = false;
 
 }
-
 
 /// PODIUM 3 | CUE  |  GOOD FB |  BAD FB
 
@@ -734,7 +714,6 @@ function hidePod4FbBad(){
     pod4FbBad = false;
 }
 
-
 function showLever(){
     leverVis = true;
     drawLeverCue()
@@ -755,7 +734,6 @@ function hideJoyStkCue(){
 }
 //FEEDBACK will go here 
 
-
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
     let amount = timer / duration
     let x = lerp(oldX, newX, amount)
@@ -764,7 +742,6 @@ function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHe
     let h = lerp(oldHeight, newHeight, amount)
     return { x, y, w, h }
 }
-
 
 function drawBackground() {
     if (assets.background) {
@@ -918,6 +895,7 @@ function drawCountdown() {
     textAlign(CENTER, CENTER);
     text(timeString, 112, 148);
 }
+
 function updateCountdown() {
     if (countdownTimer > 0) {
         countdownTimer -= 1; // Decrease by one second
@@ -929,15 +907,12 @@ function drawRLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
     backgroundLayer.image(assets.rightLit, x, 100, width / 3, height / 1.5);
-    
-
 }
 
 function drawWLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
     backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
-
 }
 
 // displays cheat asset
@@ -952,6 +927,7 @@ function drawApplause() {
         image(assets.applause, width / 2 - 150, -55, width / 4, height / 4);
     }
 }
+
 function drawApplauseON() {
     if (assets.applauseon) {
         image(assets.applauseon, width / 2 - 150, -55, width / 4, height / 4);
@@ -1070,8 +1046,8 @@ function drawHostTalk(sx, sy) {
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFrames;
     }
-
 }
+
 function drawHostTurnLF(sx, sy) {
     let x = 100;
     const y = height / 2;
@@ -1094,6 +1070,7 @@ function drawHostTurnLF(sx, sy) {
     }
 
 }
+
 function drawHostTurnFL(sx, sy) {
     let x = 100;
     const y = height / 2;
@@ -1116,6 +1093,7 @@ function drawHostTurnFL(sx, sy) {
     }
 
 }
+
 function drawHostTurnRF(sx, sy) {
     let x = 100;
     const y = height / 2;
@@ -1138,6 +1116,7 @@ function drawHostTurnRF(sx, sy) {
     }
 
 }
+
 function drawHostTurnFR(sx, sy) {
     let x = 100;
     const y = height / 2;
@@ -1158,7 +1137,6 @@ function drawHostTurnFR(sx, sy) {
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
     }
-
 }
 
 function drawHostWalkL(sx, sy) {
@@ -1341,9 +1319,6 @@ function spotlight() {
     console.log("Light pos", newJoystickPosition);
 }
 
-function mapRange(number, inMin, inMax, outMin, outMax){
-    return (number-inMin)*(outMax -outMin)/(inMax - inMin) + outMin;
-}
 function podiumLight1() {
     if (assets.podiumlit1) {
         backgroundLayer.image(assets.podiumlit1, 345, -50, width / 3, height)
