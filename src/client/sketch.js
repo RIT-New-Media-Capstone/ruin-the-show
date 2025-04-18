@@ -336,7 +336,7 @@ const syncStateLoop = async () => {
     } catch (err) {
         console.error('Error syncing state:', err);
     }
-    setTimeout(syncStateLoop, 1000);
+    setTimeout(syncStateLoop, 30);
 }
 
 window.draw = function () {

@@ -105,7 +105,7 @@ const sendLEDCommand = (component, state, extra = '') => {
             if (err) {
                 console.error('Error sending LED command:', err);
             } else {
-                //console.log(`Sent "${cmd.trim()}" to Arduino`);
+                console.log(`Sent "${cmd.trim()}" to Arduino`);
             }
         });
     } else {
