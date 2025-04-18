@@ -268,14 +268,17 @@ class GameMachine {
         }
 
         if (this.state === this.states.IDLE) {                                //IDLE STATE
-            if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
+            turnOnApplauseLED();
+            if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 // DEBUG Purposes, goes to onboarding
+                turnOffApplauseLED();
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 this.sendOscCue(this.lighting.ONBOARDING_START)
             }
             if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
+                turnOffApplauseLED();
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
                 this.sendOscCue(this.lighting.ONBOARDING_START)
@@ -284,11 +287,14 @@ class GameMachine {
                 return;
             }
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
+            turnOnApplauseLED();
             if (event.name === this.events.ONBOARDING_COMPLETE) {
+                turnOffApplauseLED();
                 moveToPlaying(this);
                 this.sendOscCue(this.lighting.START_GAME)
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                turnOffApplauseLED();
                 moveToPlaying(this);
                 this.sendOscCue(this.lighting.START_GAME)
             }
@@ -329,7 +335,6 @@ class GameMachine {
                 else this.sendOscCue(this.lighting.FAIL)
 
                 console.log(`State transition: PLAYING -> END`);
-                turnOnApplauseLED();
                 setTimeout(() => {
                     machine.addEvent(machine.events.RETURN_IDLE, {});
                 }, 15 * 1000);
@@ -508,6 +513,7 @@ class GameMachine {
                 }, 3 * 1000);
             }
         } else if (this.state === this.states.END) {                          //END STATE
+            turnOnApplauseLED();
             if (event.name === this.events.RETURN_IDLE) {
                 turnOffApplauseLED();
                 this.state = this.states.IDLE;
