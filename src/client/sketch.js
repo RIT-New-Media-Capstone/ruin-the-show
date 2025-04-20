@@ -91,59 +91,78 @@ const end = {
 }
 //      B. Sprite Sheets
 //              1. General
-const numRows = 4;
-const numCols = 5;
-const totalFrames = numRows * numCols;
-const frameWidth = 4802 / numCols;
-const frameHeight = 2162 / numRows;
-
-let currentFrameCurtains = 0;
-const numRowsCurtains = 2;
-const totalFramesCurtains = numRowsCurtains * numCols;
-const frameWidthCurtains = 9604 / numCols;
-const frameHeightCurtains = 2162 / numRowsCurtains;
-//              2. Host
-let currentFrameHost = 0;
-const host = {
-    idle: "",
-    talk: "",
-    turnFL: "",
-    turnLF: "",
-    turnFR: "",
-    turnRF: "",
-    walkL: "",
-    walkR: "",
+const defaultSpriteSheetConfig = {
+    totalColumns: 5,
+    totalRows: 4,
+    sheetWidth: 4082,
+    sheetHeight: 2162,
 };
-
-const frameWidthAL = 4802 / numCols;
-const frameHeightAL = 4324 / numRows;
-
-const numRowsLR = 2;
-const totalFramesLR = numRowsLR * numCols;
-const frameHeightLR = 1081 / numRowsLR;
+const smallSpriteSheetConfig = {
+    totalColumns: 5,
+    totalRows: 2,
+    sheetWidth: 4082,
+    sheetHeight: 1081,
+};
+const bigSpriteSheetConfig = {
+    totalColumns: 5,
+    totalRows: 8,
+    sheetWidth: 4082,
+    sheetHeight: 4324,
+};
+//              2. Host
+const host = {
+    idle: { file: "AL_idle", config: defaultSpriteSheetConfig },
+    talk: { file: "AL_Talk", config: defaultSpriteSheetConfig },
+    turnForLeft: { file: "AL_TurnF_to_L", config: smallSpriteSheetConfig },
+    turnForRight: { file: "AL_TurnF_to_R", config: smallSpriteSheetConfig },
+    turnLeftFor: { file: "AL_TurnL_to_F", config: smallSpriteSheetConfig },
+    turnRightFor: { file: "AL_TurnR_to_F", config: smallSpriteSheetConfig },
+    walkLeft: { file: "AL_Walk_L", config: bigSpriteSheetConfig },
+    walkRight: { file: "AL_Walk_R", config: bigSpriteSheetConfig }
+};
 //              3. Contestants
 const contestants = {
-    idle: "",
-    right: "",
-    wrong: "",
-}
-
-let currentFrameContestants = 0;
-let contestantFrames = [];
-let currentFrameContestantsR = 0;
-let contestantFramesR = [];
-let currentFrameContestantsW = 0;
-let contestantFramesW = [];
-
-const numRowsRW = 8;
-const totalFramesRW = numRowsRW * numCols;
-const frameHeightRW = 4324 / numRowsRW;
+    1: {
+      name: "P1",
+      animations: {
+        idle: { file: "P1_Idle", config: defaultSpriteSheetConfig },
+        right: { file: "P1_Right", config: bigSpriteSheetConfig },
+        wrong: { file: "P1_Wrong", config: bigSpriteSheetConfig }
+      }
+    },
+    2: {
+      name: "P2",
+      animations: {
+        idle: { file: "P2_Idle", config: defaultSpriteSheetConfig },
+        right: { file: "P2_Right", config: bigSpriteSheetConfig },
+        wrong: { file: "P2_Wrong", config: bigSpriteSheetConfig }
+      }
+    },
+    3: {
+      name: "P3",
+      animations: {
+        idle: { file: "P3_Idle", config: defaultSpriteSheetConfig },
+        right: { file: "P3_Right", config: bigSpriteSheetConfig },
+        wrong: { file: "P3_Wrong", config: bigSpriteSheetConfig }
+      }
+    },
+    4: {
+      name: "P4",
+      animations: {
+        idle: { file: "P4_Idle", config: defaultSpriteSheetConfig },
+        right: { file: "P4_Right", config: bigSpriteSheetConfig },
+        wrong: { file: "P4_Wrong", config: bigSpriteSheetConfig }
+      }
+    }
+};
 //      C. Global Variables
 //              1. Game States
+let previousState = RTSstate.state;
 let backgroundLayer;
 let idleGraphicsLayer;
 let onboardingGraphicsLayer;
-let frameDelay = 3;
+let currentFrame = 0;
+let frameDelay = 6;
 //              2. Zoom
 let zoomedIn = false;
 let zoom;
@@ -153,6 +172,13 @@ let zoomDuration = 30;
 let countdownFont;
 let countdown = 60;
 let countdownTimer;
+//              4. Podiums
+const podiumOffsets = {
+    1: 345,
+    2: 241,
+    3: 635,
+    4: 565,
+};
 
 
 // III. Preload ALL static assets & spritesheets 
@@ -192,25 +218,15 @@ window.preload = function () {
     assets.hands = loadImage('/Assets/Interactions/Applause/StaticApplause.png');
     assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
     //      4. Host (Sprite Sheets)
-    host.idle = loadImage('/Assets/SpriteSheets/Host/AL_idle.png');
-    host.talk = loadImage('/Assets/SpriteSheets/Host/AL_Talk.png');
-    host.turnFL = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_L.png');
-    host.turnFR = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_R.png');
-    host.turnLF = loadImage('/Assets/SpriteSheets/Host/AL_TurnL_to_F.png');
-    host.turnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_to_F.png');
-    host.walkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png');
-    host.walkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png');
-    //      5. Contestants (Sprite Sheets & Initialization)
-    const animationConfigs = [
-        { key: 'Idle', frameCount: totalFrames, height: frameHeight, collection: contestantFrames },
-        { key: 'Right', frameCount: totalFramesRW, height: frameHeightRW, collection: contestantFramesR },
-        { key: 'Wrong', frameCount: totalFramesRW, height: frameHeightRW, collection: contestantFramesW },
-    ];
-    for (const config of animationConfigs) {
-        contestants[`contestants${config.name}`] = [];
-        loadContestantAnimation(config.key, config.frameCount, config.height, config.collection);
-    }
-    
+    Object.entries(host).forEach(([key, anim]) => {
+        anim.image = loadImage(`/Assets/SpriteSheets/Host/${anim.file}.png`);
+    });
+    //      5. Contestants (Sprite Sheets)
+    Object.values(contestants).forEach(contestant => {
+        Object.values(contestant.animations).forEach(anim => {
+          anim.image = loadImage(`/Assets/SpriteSheets/${contestant.name}/${anim.file}.png`);
+        });
+    });
     // C. End
     end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
     end.star = loadImage('/Assets/EndState/SingleStar.png');
@@ -253,9 +269,17 @@ const syncStateLoop = async () => {
 }
 */
 
+
 // V. Draw depends on sync and utilizes functions below it to show game state
 window.draw = function () {
     backgroundLayer.background(255);
+    if (frameCount % frameDelay === 0) {
+        currentFrame++;
+    }
+    if (RTSstate.state === 'PLAYING' && previousState !== 'PLAYING') {
+        countdownTimer = countdown; // Reset to 60
+    }
+    previousState = RTSstate.state;
 
     //Debugging Playing State
     RTSstate.state = 'PLAYING'
@@ -279,12 +303,17 @@ window.draw = function () {
             updateCountdown();
         }
 
-        //Draw Podiums
+        //Contestant Animations should go HERE
+        drawSprite(contestants[1].animations.idle.image, contestants[1].animations.idle.config, backgroundLayer.width / 4, backgroundLayer.height / 2.2, { scale: 1 });
+
+        // Draw Podiums
         drawPodiums();
+
+        //Host Animations should go here?
         
         // Zoom Camera Transactions
         // TODO: when zoom change event trigger, set zoomTimer to 0
-        if (zoomedIn) {
+        /*if (zoomedIn) {
             if (zoomTimer <= zoomDuration) {
                 zoom = changeZoom(0, 0, 175, 125, width, width * 3 / 4, height, height * 3 / 4, zoomTimer, zoomDuration)
                 zoomTimer++
@@ -296,7 +325,8 @@ window.draw = function () {
                 zoomTimer++
             }
         }
-        image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
+        image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)*/
+        image(backgroundLayer, 0, 0); // Temporary
 
         // Applause Visuals & Feedback
         drawApplause();
@@ -304,7 +334,7 @@ window.draw = function () {
 
         //HUD & Debug Info
         drawHUD();
-        text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
+        text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150);
     } else if (RTSstate.state === 'END') { // C. End
         idleOnboarding.onboarding.stop()
         drawCurtainClose()
@@ -315,271 +345,7 @@ window.draw = function () {
     }
 }
 
-/*
 // VI. Functions below each responsible for particular asset
-
-function drawSpritesHost(sx,sy) {
-    let hostX = 100;
-    const hostY = 100;
-    let scaleFactor = 0.3;
-
-    switch (hostState) {
-        case "idle":
-            hostSpriteSheet = al;
-            scaleFactor = 0.5;
-            break;
-        case "talkL":
-            hostSpriteSheet = alTalkL;
-            break;
-        case "talkR":
-            hostSpriteSheet = alTalkR;
-            break;
-        case "walkL":
-            hostSpriteSheet = alWalkL;
-             hostX -= 0.1; // Walk left
-            break;
-        case "walkR":
-            hostSpriteSheet = alWalkR;
-            hostX += 0.1; // Walk right
-            break;
-        case "turnL":
-            hostSpriteSheet = alTurnL;
-            break;
-        case "turnR":
-            hostSpriteSheet = alTurnR;
-            break;
-    }
-
-    // Calculate frame for animation (loop through totalFrames)
-   // let row = Math.floor(currentFrameHost / numCols);
-    //let col = currentFrameHost % numCols;
-
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;
-
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightAL * scaleFactor;
-
-    image(
-        hostSpriteSheet,
-        hostX,
-        hostY,
-        alWidth,
-        alHeight,
-        sx,
-        sy,
-        frameWidthAL,
-        frameHeightAL
-    );
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFrames;
-    }
-}
-
-function drawHostIdle(sx, sy) {
-    //8*5
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.7;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightAL * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.idle, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFrames;
-    }
-}
-function drawHostTalk(sx, sy) {
-    //4*5
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.7;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightRW * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightRW;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.talk, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightRW);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFrames;
-    }
-}
-function drawHostTurnLF(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.32;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnLF, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-}
-function drawHostTurnFL(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnFL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-}
-function drawHostTurnRF(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnRF, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-}
-function drawHostTurnFR(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnFR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-}
-function drawHostWalkL(sx, sy) {
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.walkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-}
-function drawHostWalkR(sx, sy) {
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.walkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-    x += hostSpeed;
-
-    if (x + alWidth > width || x < 0) {
-        hostSpeed *= -1;
-    }
-}
-*/
-
-// PRELOAD Functions in order
-function loadContestantAnimation(type, frameCount, frameHeight, frameCollection) {
-    for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_${type}.png`);
-        contestants[`contestants${type}`]?.push(sheet);  // if collection exists
-        let frames = [];
-        for (let frame = 0; frame < frameCount; frame++) {
-            let row = Math.floor(frame / numCols);
-            let col = frame % numCols;
-            frames.push({
-                sx: col * frameWidth,
-                sy: row * frameHeight,
-                sheet,
-            });
-        }
-        frameCollection.push(frames);
-    }
-}
 
 // DRAW Functions (Playing)
 function drawBackground() {
@@ -634,13 +400,16 @@ function drawHUD() {
         fill('#d9d9d9')
         rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3)
         fill('#dc4042')
-        let ratings = 0
-        if (ratings > 250) ratings = 250
-        rect(x + 15, y + 70, ratings * 2 / 3, 50 * 2 / 3)
+        //Map the ranges here from 0-50
+        rect(x + 25, y + 70, RTSstate.score * 5/6, 50 * 2 / 3)
         image(assets.stars, x, y, width / 5, height / 5);
     }
     if (assets.score) {
         image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
+        fill('#000000');
+        textSize(60);
+        scale(1.3, 1);
+        text(nf(RTSstate.score, 4), width - 398.5, 60);
     }
 }
 function drawCountdown() {
@@ -670,7 +439,7 @@ function drawCheat() {
     }
 }
 // Joystick
-function spotlight() {
+function drawSpotlight() {
     let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
     if (assets.spotlight) {
         backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
@@ -682,24 +451,12 @@ function drawLeverCue(){
     backgroundLayer.image(assets.levercamera, 0, 0, width, height);
 }
 // Podiums
-function podiumLight1() {
-    if (assets.podiumlit1) {
-        backgroundLayer.image(assets.podiumlit1, 345, -50, width / 3, height)
-    }
-}
-function podiumLight2() {
-    if (assets.podiumlit2) {
-        backgroundLayer.image(assets.podiumlit2, 241, -50, width / 3, height)
-    }
-}
-function podiumLight3() {
-    if (assets.podiumlit3) {
-        backgroundLayer.image(assets.podiumlit3, 635, -50, width / 3, height)
-    }
-}
-function podiumLight4() {
-    if (assets.podiumlit4) {
-        backgroundLayer.image(assets.podiumlit4, 565, -50, width / 3, height)
+function drawPodiumLight(podiumNumber) {
+    const asset = assets[`podiumlit${podiumNumber}`];
+    const x = podiumOffsets[podiumNumber];
+
+    if (asset && x !== undefined) {
+        backgroundLayer.image(asset, x, -50, width / 3, height);
     }
 }
 
@@ -722,101 +479,70 @@ function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHe
     return { x, y, w, h }
 }
 // Podiums
-function drawRLight(x) {
+function drawRightLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
     backgroundLayer.image(assets.rightLit, x, 100, width / 3, height / 1.5);
 }
-function drawWLight(x) {
+function drawWrongLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
     backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
 }
 
-// Game (Playing State) Sprite Sheets
-// Host
-// Contestants
-function drawContestant() {
-    let x = 309;
-    const y = 290;
-    const spacing = 158;
-    let scaleFactor = 0.32;
+// DRAW Sprite Sheets
+function drawSprite(spriteImg, config, x, y, options = {}) {
+    if (!spriteImg || !config) return;
 
-    assets.contestants.forEach((sheet, index) => {
-        let frame = contestantFrames[index][currentFrameContestants];
+    const {
+        totalColumns,
+        totalRows,
+        sheetWidth,
+        sheetHeight,
+    } = config;
 
-        if (frame && frame.sheet) {
-            image(
-                frame.sheet,
-                x + index * spacing, y, // Destination position
-                frameWidth * scaleFactor, frameHeight * scaleFactor, // Destination size
-                frame.sx, frame.sy,
-                frameWidth, frameHeight // Source position & size from sprite sheet
-            );
-        }
-    });
+    const {
+        frame = 0,
+        scale = 1,
+        center = true,
+        loop = true,
+        tintColor = null,
+        alpha = 255,
+        flipH = false,
+        flipV = false,
+        layer = backgroundLayer
+    } = options;
 
-    // Update frame only every few draw cycles
-    if (frameCount % frameDelay === 0) {
-        currentFrameContestants = (currentFrameContestants + 1) % totalFrames;
+    const frameWidth = sheetWidth / totalColumns;
+    const frameHeight = sheetHeight / totalRows;
+    const totalFrames = totalColumns * totalRows;
+
+    let safeFrame = loop ? frame % totalFrames : Math.min(frame, totalFrames - 1);
+    const col = safeFrame % totalColumns;
+    const row = Math.floor(safeFrame / totalColumns);
+
+    const sx = col * frameWidth;
+    const sy = row * frameHeight;
+
+    let dx = center ? x - (frameWidth * scale) / 2 : x;
+    let dy = center ? y - (frameHeight * scale) / 2 : y;
+    const dWidth = frameWidth * scale;
+    const dHeight = frameHeight * scale;
+
+    push();
+    if (tintColor) tint(...tintColor);
+    if (alpha < 255) tint(255, alpha);
+    if (flipH || flipV) {
+        translate(dx + dWidth / 2, dy + dHeight / 2);
+        scale(flipH ? -1 : 1, flipV ? -1 : 1);
+        layer.image(spriteImg, sx, sy, frameWidth, frameHeight, -dWidth / 2, -dHeight / 2, dWidth, dHeight);
+    } else {
+        layer.image(spriteImg, sx, sy, frameWidth, frameHeight, dx, dy, dWidth, dHeight);
     }
-}
-function drawContestantW() {
-    let x = 309;
-    const y = 290;
-    const spacing = 158;
-    let scaleFactor = 0.32;
-
-    assets.contestantsW.forEach((frameW, index) => {
-        let frame = contestantFramesW[index][currentFrameContestantsW];
-
-        if (frame && frame.sheet) {
-            const drawWidth = frameWidth * scaleFactor;
-            const drawHeight = frameHeightRW * scaleFactor;
-
-            image(
-                frame.sheet,
-                x + index * spacing, y, // Destination position
-                drawWidth, drawHeight, // Destination size
-                frame.sx, frame.sy, frameWidth, frameHeightRW // Source position & size from sprite sheet
-            );
-        }
-    });
-
-    // Update frame only every few draw cycles
-    if (frameCount % frameDelay === 0) {
-        currentFrameContestantsW = (currentFrameContestantsW + 1) % totalFramesRW;
-    }
-}
-function drawContestantR() {
-    let x = 309;
-    const y = 290;
-    const spacing = 158;
-    let scaleFactor = 0.32;
-
-    assets.contestantsR.forEach((frameR, index) => {
-        let frame = contestantFramesR[index][currentFrameContestantsR];
-
-        if (frame && frame.sheet) {
-            const drawWidth = frameWidth * scaleFactor;
-            const drawHeight = frameHeightRW * scaleFactor;
-
-            backgroundLayer.image(
-                frame.sheet,
-                x + index * spacing, y, // Destination position
-                drawWidth, drawHeight, // Destination size
-                frame.sx, frame.sy, frameWidth, frameHeightRW // Source position & size from sprite sheet
-            );
-        }
-    });
-
-    // Update frame only every few draw cycles
-    if (frameCount % frameDelay === 0) {
-        currentFrameContestantsR = (currentFrameContestantsR + 1) % totalFramesRW;
-    }
+    pop();
 }
 
-// DRAW Functions in order (End)
+// DRAW Functions (End)
 function drawCurtainClose() {
     let x = 0;
     const y = 0;
