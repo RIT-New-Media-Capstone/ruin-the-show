@@ -1,7 +1,7 @@
 "use strict";
 
-let lastRTSstate;
-let RTSstate = { // Initial Values Based on Start of State Machine
+// I. Initialize "RTSstate" object for syncing //DONE ORGANIZING
+let RTSstate = {
     score: 0,
     state: 'IDLE',
     host: {
@@ -46,98 +46,20 @@ let RTSstate = { // Initial Values Based on Start of State Machine
     },
 };
 
-let backgroundLayer;
-let idleGraphicsLayer;
-let onboardingGraphicsLayer;
 
-let zoomedIn = false; // for lever
-let zoom;
-let zoomTimer = 0;
-let zoomDuration = 30
-
-//Sprite Sheet Animation Variables for Contestants
-let al;
-let alTalk;
-let alTurnFL;
-let alTurnFR;
-let alTurnLF;
-let alTurnRF;
-let alTurnR;
-let alWalkL;
-let alWalkR;
-
-let hostState; // idle, talkL, talkR, walkL, walkR, turnL, turnR
-
-//host animation 
-let host = {
-    idle: null,
-    talk: null,
-    turnFL: null,
-    turnLF: null,
-    turnFR: null,
-    turnRF: null,
-    walkL: null,
-    walkR: null,
-};
-
-//manage states
-let contestantStates = ['idle', 'right', 'wrong'];
-let currentContestantState = 'idle';
-
-let contestantFrames = [];
-let contestantFramesR = [];
-let contestantFramesW = [];
-
-let currentFrameHost = 0;
-let currentFrameContestants = 0;
-let currentFrameContestantsR = 0;
-let currentFrameContestantsW = 0;
-let currentFrameCurtains = 0;
-
-let frameDelay = 3; // Change frame every 3 draw cycles (for ~10fps)
-
-const numRows = 4;//4; // idle + al
-const numRowsLR = 2;
-const numRowsRW = 8; // number of rows for right + wrong
-const numCols = 5;
-const numRowsCurtains = 2
-
-const totalFrames = numRows * numCols;
-const totalFramesRW = numRowsRW * numCols;
-const totalFramesLR = numRowsLR * numCols;
-const totalFramesCurtains = numRowsCurtains * numCols
-
-const frameWidth = 4802 / numCols; // old dimensions (al) 7688/ 4 = 1920/2 = 960  7126
-const frameHeightLR = 1081 / numRowsLR;
-const frameHeight = 2162 / numRows; // idle->  2162 / numRows; // (al) 5410/5 = 1080/2 = 540
-const frameHeightRW = 4324 / numRowsRW;
-const frameWidthAL = 4802 / numCols;
-const frameHeightAL = 4324 / numRows;
-const frameWidthCurtains = 9604 / numCols
-const frameHeightCurtains = 2162 / numRowsCurtains
-
-//Countdown Timer (Possibly Temporary)
-let countdownFont;
-let countdown = 60;
-let countdownTimer;
-
-// display cues 
-let cheatVis = false;
-let podLitVis1 = false;
-let podLitVis2 = false;
-let podLitVis3 = false;
-let podLitVis4 = false;
-let applauseVis = false;
-let leverVis = false;
-let spotlitVis = false;
-
-//display feedback
-let appFBVis = false;
-let pod1FB = false;
-let pod2FB = false;
-let pod3FB = false;
-let pod4FB = false;
-
+// II. Initialize objects/variables for assets //DONE ORGANIZING
+// Tip for II-B: Spritesheets are calculated by a single frame's width & height, how many rows and columns a sheet has, and indexing the current frame
+//      A. Regular Assets
+//              1. Idle/Onboarding
+const idleOnboarding = {
+    idle: "",
+    onboarding: "",
+    onboarding_playing: false,
+    easy: "",
+    medium: "",
+    hard: "",
+}
+//              2. Playing 
 const assets = {
     audience: "",
     background: "",
@@ -158,16 +80,7 @@ const assets = {
     timer: "",
     levercamera:"",
 }
-
-const idleOnboarding = {
-    idle: "",
-    onboarding: "",
-    onboarding_playing: false,
-    easy: "",
-    medium: "",
-    hard: "",
-}
-
+//              3. End
 const end = {
     shadow: "",
     star: "",
@@ -179,34 +92,106 @@ const end = {
     curtainsClosed: false,
     scoreVis: false,
 }
+//      B. Sprite Sheets
+//              1. General
+const numRows = 4;
+const numCols = 5;
+const totalFrames = numRows * numCols;
+const frameWidth = 4802 / numCols;
+const frameHeight = 2162 / numRows;
 
+let currentFrameCurtains = 0;
+const numRowsCurtains = 2;
+const totalFramesCurtains = numRowsCurtains * numCols;
+const frameWidthCurtains = 9604 / numCols;
+const frameHeightCurtains = 2162 / numRowsCurtains;
+//              2. Host
+let currentFrameHost = 0;
+const host = {
+    idle: "",
+    talk: "",
+    turnFL: "",
+    turnLF: "",
+    turnFR: "",
+    turnRF: "",
+    walkL: "",
+    walkR: "",
+};
+
+const frameWidthAL = 4802 / numCols;
+const frameHeightAL = 4324 / numRows;
+
+const numRowsLR = 2;
+const totalFramesLR = numRowsLR * numCols;
+const frameHeightLR = 1081 / numRowsLR;
+//              3. Contestants
+let contestantStates = ['idle', 'right', 'wrong'];
+let currentContestantState = 'idle';
+
+let currentFrameContestants = 0;
+let contestantFrames = [];
+let currentFrameContestantsR = 0;
+let contestantFramesR = [];
+let currentFrameContestantsW = 0;
+let contestantFramesW = [];
+
+const numRowsRW = 8;
+const totalFramesRW = numRowsRW * numCols;
+const frameHeightRW = 4324 / numRowsRW;
+//      C. Global Variables
+//              1. Game States
+let backgroundLayer;
+let idleGraphicsLayer;
+let onboardingGraphicsLayer;
+let frameDelay = 3;
+//              2. Zoom
+let zoomedIn = false; // for lever
+let zoom;
+let zoomTimer = 0;
+let zoomDuration = 30;
+//              3. Timer
+let countdownFont;
+let countdown = 60;
+let countdownTimer;
+
+
+// III. Preload ALL static assets & spritesheets 
 window.preload = function () {
-    //IDLE & ONBOARDING
+    // A. Idle/Onboarding
     idleOnboarding.easy = loadImage('/Assets/Idle_Onboarding/LevelSelections_EASY.png');
     idleOnboarding.medium = loadImage('/Assets/Idle_Onboarding/LevelSelections_MED.png');
     idleOnboarding.hard = loadImage('/Assets/Idle_Onboarding/LevelSelections_HARD.png');
     idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
-
-    //BACKGROUND
+    // B. Playing
+    //      1. Background & Podiums
     assets.background = loadImage('/Assets/Background/MainBackground.png');
     assets.stage = loadImage('/Assets/Background/Stage.png');
     assets.stagelights = loadImage('/Assets/Background/StageLights.png');
     assets.audience = loadImage('/Assets/Background/Audience.png');
     assets.applause = loadImage('/Assets/Background/Applause_OFF.png');
-
-    //PODIUMS are in front of animated contestants
     assets.podium1 = loadImage('/Assets/Background/PodiumYellow_Resized0.png');
     assets.podium2 = loadImage('/Assets/Background/PodiumWhite_Resized0.png');
     assets.podium3 = loadImage('/Assets/Background/PodiumRed_Resized0.png');
     assets.podium4 = loadImage('/Assets/Background/PodiumBlue_Resized0.png');
-
-    //HUD (timer & score)
+    //      2. HUD
     assets.stars = loadImage('/Assets/Background/StarRatings.png');
     assets.timer = loadImage('/Assets/Background/Timer.png');
     assets.score = loadImage('/Assets/Background/PointTrack.png')
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
+    //      3. Cues & Feedback
+    assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
+    assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
+    assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
+    assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
+    assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
+    assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
+    assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature.png')
 
-    //AL 
+    assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
+    assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
+    assets.hands = loadImage('/Assets/Interactions/Applause/StaticApplause.png');
+    assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
+    //      4. Host (Sprite Sheets)
     host.idle = loadImage('/Assets/SpriteSheets/Host/AL_idle.png');
     host.talk = loadImage('/Assets/SpriteSheets/Host/AL_Talk.png');
     host.turnFL = loadImage('/Assets/SpriteSheets/Host/AL_TurnF_to_L.png');
@@ -215,60 +200,12 @@ window.preload = function () {
     host.turnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_to_F.png');
     host.walkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png');
     host.walkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png');
-
-    //CONTESTANT ANIMATIONS WRONG
-    assets.contestantsW = [];
-    contestantFramesW = [];
-
-    for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Wrong.png`);
-        assets.contestantsW.push(sheet);
-
-        // Preload frames for smoother animation
-        let framesW = [];
-        for (let frameW = 0; frameW < totalFramesRW; frameW++) {
-            let row = Math.floor(frameW / numCols);
-            let col = frameW % numCols;
-            framesW.push({
-                sx: col * frameWidth,
-                sy: row * frameHeightRW,
-                sheet,
-            });
-        }
-        contestantFramesW.push(framesW);
-    }
-
-    //CONTESTANT ANIMATIONS RIGHT
-    assets.contestantsR = [];
-    contestantFramesR = [];
-
-    for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
-        assets.contestantsR.push(sheet);
-
-        // Preload frames for smoother animation
-        let framesR = [];
-        for (let frameR = 0; frameR < totalFramesRW; frameR++) {
-            let row = Math.floor(frameR / numCols);
-            let col = frameR % numCols;
-            framesR.push({
-                sx: col * frameWidth,
-                sy: row * frameHeightRW,
-                sheet,
-            });
-        }
-        contestantFramesR.push(framesR);
-    }
-
-    // CONTESTANT IDLE // 
+    //      5. Contestants (Idle)
     assets.contestants = [];
     contestantFrames = [];
-
     for (let i = 1; i <= 4; i++) {
         let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
         assets.contestants.push(sheet);
-
-        // Preload frames for smoother animation
         let frames = [];
         for (let frame = 0; frame < totalFrames; frame++) {
             let row = Math.floor(frame / numCols);
@@ -281,32 +218,54 @@ window.preload = function () {
         }
         contestantFrames.push(frames);
     }
-
-    //CUE
-    assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
-    assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
-    assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
-    assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
-    assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
-    assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
-    assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature.png')
-
-    //FEEEDBACK
-    assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
-    assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
-    assets.hands = loadImage('/Assets/Interactions/Applause/StaticApplause.png');
-    assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
-
-    //END
+    //      6. Contestants (Right)
+    assets.contestantsR = [];
+    contestantFramesR = [];
+    for (let i = 1; i <= 4; i++) {
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
+        assets.contestantsR.push(sheet);
+        let framesR = [];
+        for (let frameR = 0; frameR < totalFramesRW; frameR++) {
+            let row = Math.floor(frameR / numCols);
+            let col = frameR % numCols;
+            framesR.push({
+                sx: col * frameWidth,
+                sy: row * frameHeightRW,
+                sheet,
+            });
+        }
+        contestantFramesR.push(framesR);
+    }
+    //      7. Contestants (Wrong)
+    assets.contestantsW = [];
+    contestantFramesW = [];
+    for (let i = 1; i <= 4; i++) {
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Wrong.png`);
+        assets.contestantsW.push(sheet);
+        let framesW = [];
+        for (let frameW = 0; frameW < totalFramesRW; frameW++) {
+            let row = Math.floor(frameW / numCols);
+            let col = frameW % numCols;
+            framesW.push({
+                sx: col * frameWidth,
+                sy: row * frameHeightRW,
+                sheet,
+            });
+        }
+        contestantFramesW.push(framesW);
+    }
+    // C. End
     end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
     end.star = loadImage('/Assets/EndState/SingleStar.png');
-    end.emptyStar = loadImage('/Assets/EndState/EmptyStar.png')
+    end.emptyStar = loadImage('/Assets/EndState/EmptyStar.png');
     end.success = loadImage('Assets/EndState/EndStates_NoStars-02.png');
     end.middle = loadImage('Assets/EndState/EndStates_NoStars-04.png');
     end.fail = loadImage('Assets/EndState/EndStates_NoStars-01.png');
-    end.curtains = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png')
+    end.curtains = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png');
 }
 
+
+// IV. Setup canvas, frame rate, timer, graphic layers, onboard video, and sync (30 ms) //DONE ORGANIZING
 window.setup = async function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
@@ -322,7 +281,6 @@ window.setup = async function () {
     syncStateLoop();
 }
 
-//pulling game state 
 const syncStateLoop = async () => {
     try {
         const res = await fetch('/getState');
@@ -336,6 +294,8 @@ const syncStateLoop = async () => {
     setTimeout(syncStateLoop, 30);
 }
 
+
+// V. Draw depends on sync and utilizes functions below it to show game state
 window.draw = function () {
     //console.log(RTSstate);
     backgroundLayer.background(255);
@@ -562,6 +522,7 @@ window.draw = function () {
         }
     }
 }
+// VI. Functions below each responsible for particular asset
 
 // INTERACTIONS
 function showCheat() {
