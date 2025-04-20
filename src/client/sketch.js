@@ -69,6 +69,10 @@ const assets = {
     podium2: "",
     podium3: "",
     podium4: "",
+    podiumlit1: "",
+    podiumlit2: "",
+    podiumlit3: "",
+    podiumlit4: "",
     score: "",
     spotlight: "",
     stage: "",
@@ -94,19 +98,19 @@ const end = {
 const defaultSpriteSheetConfig = {
     totalColumns: 5,
     totalRows: 4,
-    sheetWidth: 4082,
+    sheetWidth: 4802,
     sheetHeight: 2162,
 };
 const smallSpriteSheetConfig = {
     totalColumns: 5,
     totalRows: 2,
-    sheetWidth: 4082,
+    sheetWidth: 4802,
     sheetHeight: 1081,
 };
 const bigSpriteSheetConfig = {
     totalColumns: 5,
     totalRows: 8,
-    sheetWidth: 4082,
+    sheetWidth: 4802,
     sheetHeight: 4324,
 };
 //              2. Host
@@ -345,10 +349,10 @@ window.draw = function () {
     }
     previousState = RTSstate.state;
     const contestantXPositions = [
-        width / 4,
-        width / 2.6,
-        width / 1.8,
-        width / 1.3
+        width / 4.9,
+        width / 3.1,
+        width / 2.25,
+        width / 1.77
     ];
 
     //Debugging Playing State
