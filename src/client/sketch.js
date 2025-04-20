@@ -63,9 +63,6 @@ const idleOnboarding = {
 const assets = {
     audience: "",
     background: "",
-    contestants: "",
-    contestantsW: "",
-    contestantR: "",
     cheat: "",
     hands: "",
     podium1: "",
@@ -125,8 +122,11 @@ const numRowsLR = 2;
 const totalFramesLR = numRowsLR * numCols;
 const frameHeightLR = 1081 / numRowsLR;
 //              3. Contestants
-let contestantStates = ['idle', 'right', 'wrong'];
-let currentContestantState = 'idle';
+const contestants = {
+    idle: "",
+    right: "",
+    wrong: "",
+}
 
 let currentFrameContestants = 0;
 let contestantFrames = [];
@@ -145,7 +145,7 @@ let idleGraphicsLayer;
 let onboardingGraphicsLayer;
 let frameDelay = 3;
 //              2. Zoom
-let zoomedIn = false; // for lever
+let zoomedIn = false;
 let zoom;
 let zoomTimer = 0;
 let zoomDuration = 30;
@@ -200,60 +200,17 @@ window.preload = function () {
     host.turnRF = loadImage('/Assets/SpriteSheets/Host/AL_TurnR_to_F.png');
     host.walkL = loadImage('/Assets/SpriteSheets/Host/AL_Walk_L.png');
     host.walkR = loadImage('/Assets/SpriteSheets/Host/AL_Walk_R.png');
-    //      5. Contestants (Idle)
-    assets.contestants = [];
-    contestantFrames = [];
-    for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Idle.png`);
-        assets.contestants.push(sheet);
-        let frames = [];
-        for (let frame = 0; frame < totalFrames; frame++) {
-            let row = Math.floor(frame / numCols);
-            let col = frame % numCols;
-            frames.push({
-                sx: col * frameWidth,
-                sy: row * frameHeight,
-                sheet,
-            });
-        }
-        contestantFrames.push(frames);
+    //      5. Contestants (Sprite Sheets & Initialization)
+    const animationConfigs = [
+        { key: 'Idle', frameCount: totalFrames, height: frameHeight, collection: contestantFrames },
+        { key: 'Right', frameCount: totalFramesRW, height: frameHeightRW, collection: contestantFramesR },
+        { key: 'Wrong', frameCount: totalFramesRW, height: frameHeightRW, collection: contestantFramesW },
+    ];
+    for (const config of animationConfigs) {
+        contestants[`contestants${config.name}`] = [];
+        loadContestantAnimation(config.key, config.frameCount, config.height, config.collection);
     }
-    //      6. Contestants (Right)
-    assets.contestantsR = [];
-    contestantFramesR = [];
-    for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Right.png`);
-        assets.contestantsR.push(sheet);
-        let framesR = [];
-        for (let frameR = 0; frameR < totalFramesRW; frameR++) {
-            let row = Math.floor(frameR / numCols);
-            let col = frameR % numCols;
-            framesR.push({
-                sx: col * frameWidth,
-                sy: row * frameHeightRW,
-                sheet,
-            });
-        }
-        contestantFramesR.push(framesR);
-    }
-    //      7. Contestants (Wrong)
-    assets.contestantsW = [];
-    contestantFramesW = [];
-    for (let i = 1; i <= 4; i++) {
-        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_Wrong.png`);
-        assets.contestantsW.push(sheet);
-        let framesW = [];
-        for (let frameW = 0; frameW < totalFramesRW; frameW++) {
-            let row = Math.floor(frameW / numCols);
-            let col = frameW % numCols;
-            framesW.push({
-                sx: col * frameWidth,
-                sy: row * frameHeightRW,
-                sheet,
-            });
-        }
-        contestantFramesW.push(framesW);
-    }
+    
     // C. End
     end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
     end.star = loadImage('/Assets/EndState/SingleStar.png');
@@ -278,9 +235,10 @@ window.setup = async function () {
     idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding Thingy.mp4')
     idleOnboarding.onboarding.hide();
 
-    syncStateLoop();
+    //syncStateLoop();
 }
 
+/*
 const syncStateLoop = async () => {
     try {
         const res = await fetch('/getState');
@@ -293,11 +251,15 @@ const syncStateLoop = async () => {
     }
     setTimeout(syncStateLoop, 30);
 }
-
+*/
 
 // V. Draw depends on sync and utilizes functions below it to show game state
 window.draw = function () {
     backgroundLayer.background(255);
+
+    //Debugging Playing State
+    RTSstate.state = 'PLAYING'
+
     if (RTSstate.state === 'IDLE') { // A. Idle/Onboarding
         idleOnboarding.onboarding.stop()
         idleGraphicsLayer.image(idleOnboarding.idle, 0, 0, width, height);
@@ -317,114 +279,8 @@ window.draw = function () {
             updateCountdown();
         }
 
-        // Podium Feedback Display Logic (GOOD/BAD for each podium)
-        if(RTSstate.feedback.PODIUM_1_GOOD){
-             showPod1FB()
-        } else if(!RTSstate.feedback.PODIUM_1_GOOD){
-            hidePod1FB()
-        } else if(RTSstate.feedback.PODIUM_1_BAD){
-            showPod1FbBad() 
-        } else if(!RTSstate.feedback.PODIUM_1_BAD){
-            hidePod1FbBad()
-        } else if (RTSstate.feedback.PODIUM_2_GOOD){
-             showPod2FB()
-        } else if(!RTSstate.feedback.PODIUM_2_GOOD){
-            hidePod2FB()
-        } else if(RTSstate.feedback.PODIUM_2_BAD){
-            showPod2FbBad() 
-        } else if(!RTSstate.feedback.PODIUM_2_BAD){
-            hidePod2FbBad()
-        } else if (RTSstate.feedback.PODIUM_3_GOOD){
-             showPod3FB()
-        } else if(!RTSstate.feedback.PODIUM_3_GOOD){
-            hidePod3FB()
-        } else if(RTSstate.feedback.PODIUM_3_BAD){
-            showPod3FbBad() 
-        } else if(!RTSstate.feedback.PODIUM_3_BAD){
-            hidePod3FbBad()
-        }  else if (RTSstate.feedback.PODIUM_4_GOOD){
-             showPod4FB()
-        } else if(!RTSstate.feedback.PODIUM_4_GOOD){
-            hidePod4FB()
-        } else if(RTSstate.feedback.PODIUM_4_BAD){
-            showPod4FbBad() 
-        } else if(!RTSstate.feedback.PODIUM_4_BAD){
-            hidePod4FbBad()
-        } else{
-            drawContestant();
-        }
-        
         //Draw Podiums
         drawPodiums();
-
-        //Podium Cue Lights
-        if (RTSstate.cues.PODIUM_1_CUE) {
-            showPod1Cue();
-        } else if (!RTSstate.cues.PODIUM_1_CUE) {
-            hidePod1Cue();
-        }
-
-        if (RTSstate.cues.PODIUM_2_CUE) {
-            showPod2Cue();
-        } else if (!RTSstate.cues.PODIUM_2_CUE) {
-            hidePod2Cue();
-        }
-        
-        if (RTSstate.cues.PODIUM_3_CUE){
-            showPod3Cue();
-        } else if(!RTSstate.cues.PODIUM_3_CUE){
-            hidePod3Cue();
-        }
-
-        if (RTSstate.cues.PODIUM_4_CUE) {
-            showPod4Cue();
-        } else if (!RTSstate.cues.PODIUM_4_CUE) {
-            hidePod4Cue();
-        }
-
-
-       // Joystick Cue Indicator
-       if (RTSstate.cues.JOYSTICK_CUE) {
-        showJoyStkCue();
-        console.log("spotlight on  ")
-        } else if (!RTSstate.cues.PODIUM_4_CUE) {
-        hideJoyStkCue();
-        console.log("hiding spotlit")
-        }
-
-        if (hostState == "idle") {
-            drawHostIdle()
-        }
-        if (hostState == "talk") {
-            drawHostTalk()
-        }
-        if (hostState == "walkR") {
-            drawHostWalkR()
-        }
-        if (hostState == "walkL") {
-            drawHostWalkL()
-        }
-        if (hostState == "turnFL") {
-            drawHostTurnFL()
-        }
-        if (hostState == "turnLF") {
-            drawHostTurnLF()
-        }
-        if (hostState == "turnRF") {
-            drawHostTurnRF()
-        }
-        if (hostState == "turnFR") {
-            drawHostTurnFR()
-        }
-        drawHostTalk()
-
-
-        // Lever Cue Visual
-        if (RTSstate.cues.LEVER_CUE) {
-            showLever();
-        } else if (!RTSstate.cues.LEVER_CUE) {
-            hideLever();
-        }
         
         // Zoom Camera Transactions
         // TODO: when zoom change event trigger, set zoomTimer to 0
@@ -442,32 +298,9 @@ window.draw = function () {
         }
         image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
 
-        // Cheat Cue Visual
-        if (RTSstate.cues.CHEAT_CUE) {
-            showCheat();
-        } else if (!RTSstate.cues.CHEAT_CUE) {
-            hideCheat();
-        }
-
         // Applause Visuals & Feedback
         drawApplause();
         drawAudience();
-
-        if (RTSstate.cues.APPLAUSE_CUE) {
-            showApplause();
-        } else if (!RTSstate.cues.APPLAUSE_CUE) {
-            hideApplause();
-        }
-
-        if (RTSstate.feedback.APPLAUSE_GOOD) {
-            showApplauseFB();
-        } else if (!RTSstate.feedback.APPLAUSE_GOOD) {
-            hideApplause();
-        }
-
-        //drawApplauseON();
-
-        //drawHands();
 
         //HUD & Debug Info
         drawHUD();
@@ -484,155 +317,271 @@ window.draw = function () {
 
 /*
 // VI. Functions below each responsible for particular asset
-// A. General Interactions
-//      1. Cheat
-function showCheat() {
-    cheatVis = true;
-    drawCheat();
-}
-function hideCheat() {
-    cheatVis = false;
-}
-//      2. Applause
-function showApplause() {
-    applauseVis = true;
-    drawApplauseON();
-}
-function hideApplause() {
-    applauseVis = false;
-}
-//      3. Applause Feedback
-function showApplauseFB(){
-    appFBVis = true;
-    drawHands();
-}
-function hideApplauseFB(){
-    appFBVis = false;
-}
-//      4. Lever
-function showLever(){
-    leverVis = true;
-    drawLeverCue()
-}
-function hideLever(){
-    leverVis = false;
-}
-//      5. Joystick
-function showJoyStkCue(){
-    spotlitVis = true;
-    spotlight()
-}
-function hideJoyStkCue(){
-    spotlitVis = false;
 
-}
-// B. Podium Interactions
-//      1. Podium 1 (Yellow)
-function showPod1Cue() {
-    podLitVis1 = true;
-    podiumLight2();
-}
-function hidePod1Cue() {
-    podLitVis1 = false;
-}
-function showPod1FB(){
-    pod1FB = true;
-    drawRLight(243);
-}
-function hidePod1FB(){
-    pod1FB = false;
-}
-function showPod1FbBad(){
-    pod1FbBad = true;
-    drawWLight(243);
-}
-function hidePod1FbBad(){
-    pod1FbBad = false;
-}
-//      2. Podium 2 (White)
-function showPod2Cue() {
-    podLitVis2 = true;
-    podiumLight1();
-}
-function hidePod2Cue() {
-    podLitVis2 = false;
+function drawSpritesHost(sx,sy) {
+    let hostX = 100;
+    const hostY = 100;
+    let scaleFactor = 0.3;
 
-}
-function showPod2FB(){
-    pod2FB = true;
-    drawRLight(393);
+    switch (hostState) {
+        case "idle":
+            hostSpriteSheet = al;
+            scaleFactor = 0.5;
+            break;
+        case "talkL":
+            hostSpriteSheet = alTalkL;
+            break;
+        case "talkR":
+            hostSpriteSheet = alTalkR;
+            break;
+        case "walkL":
+            hostSpriteSheet = alWalkL;
+             hostX -= 0.1; // Walk left
+            break;
+        case "walkR":
+            hostSpriteSheet = alWalkR;
+            hostX += 0.1; // Walk right
+            break;
+        case "turnL":
+            hostSpriteSheet = alTurnL;
+            break;
+        case "turnR":
+            hostSpriteSheet = alTurnR;
+            break;
+    }
 
-}
-function hidePod2FB(){
-    pod2FB = false;
-    
-}
-function showPod2FbBad(){
-    pod2FbBad = true;
-    drawWLight(393);
-}
-function hidePod2FbBad(){
-    pod2FbBad = false;
+    // Calculate frame for animation (loop through totalFrames)
+   // let row = Math.floor(currentFrameHost / numCols);
+    //let col = currentFrameHost % numCols;
 
-}
-//      3. Podium 3 (Red)
-function showPod3Cue() {
-    podLitVis3 = true;
-    podiumLight4();
-}
-function hidePod3Cue() {
-    podLitVis3 = false;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;
 
-}
-function showPod3FB(){
-    pod3FB = true;
-    drawRLight(563);
-}
-function hidePod3FB(){
-    pod3FB = false;
-    
-}
-function showPod3FbBad(){
-    pod3FbBad = true;
-    drawWLight(563);
-}
-function hidePod3FbBad(){
-    pod3FbBad = false;
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightAL * scaleFactor;
 
-}
-//      4. Podium 4 (Blue)
-function showPod4Cue() {
-    podLitVis4 = true;
-    podiumLight3();
-}
-function hidePod4Cue() {
-    podLitVis4 = false;
-}
-function showPod4FB(){
-    pod4FB = true;
-    drawRLight(707);   
-}
-function hidePod4FB(){
-    pod4FB = false;
-}
-function showPod4FbBad(){
-    pod4FbBad = true;
-    drawWLight(707);
-}
-function hidePod4FbBad(){
-    pod4FbBad = false;
+    image(
+        hostSpriteSheet,
+        hostX,
+        hostY,
+        alWidth,
+        alHeight,
+        sx,
+        sy,
+        frameWidthAL,
+        frameHeightAL
+    );
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFrames;
+    }
 }
 
+function drawHostIdle(sx, sy) {
+    //8*5
+    //if host is in idle then call idle positions and state
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.7;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightAL * scaleFactor;
 
-function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
-    let amount = timer / duration
-    let x = lerp(oldX, newX, amount)
-    let y = lerp(oldY, newY, amount)
-    let w = lerp(oldWidth, newWidth, amount)
-    let h = lerp(oldHeight, newHeight, amount)
-    return { x, y, w, h }
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.idle, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFrames;
+    }
+}
+function drawHostTalk(sx, sy) {
+    //4*5
+    //if host is in idle then call idle positions and state
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.7;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightRW * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightRW;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.talk, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightRW);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFrames;
+    }
+}
+function drawHostTurnLF(sx, sy) {
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.32;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.turnLF, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+
+}
+function drawHostTurnFL(sx, sy) {
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.52;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.turnFL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+
+}
+function drawHostTurnRF(sx, sy) {
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.52;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.turnRF, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+
+}
+function drawHostTurnFR(sx, sy) {
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.52;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.turnFR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+}
+function drawHostWalkL(sx, sy) {
+    //if host is in idle then call idle positions and state
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.52;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.walkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+}
+function drawHostWalkR(sx, sy) {
+    //if host is in idle then call idle positions and state
+    let x = 100;
+    const y = height / 2;
+    //const spacing = 160;
+    let scaleFactor = 0.52;
+    let frameSpeed = 2
+    //const alY = height / 2.25
+    const alWidth = frameWidthAL * scaleFactor;
+    const alHeight = frameHeightLR * scaleFactor;
+
+    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
+    sx = (currentFrameHost % numCols) * frameWidthAL;
+    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
+
+    //anim
+    backgroundLayer.image(host.walkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
+
+    if (frameCount % frameDelay === 0) {
+        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
+    }
+
+    x += hostSpeed;
+
+    if (x + alWidth > width || x < 0) {
+        hostSpeed *= -1;
+    }
+}
+*/
+
+// PRELOAD Functions in order
+function loadContestantAnimation(type, frameCount, frameHeight, frameCollection) {
+    for (let i = 1; i <= 4; i++) {
+        let sheet = loadImage(`/Assets/SpriteSheets/p${i}/P${i}_${type}.png`);
+        contestants[`contestants${type}`]?.push(sheet);  // if collection exists
+        let frames = [];
+        for (let frame = 0; frame < frameCount; frame++) {
+            let row = Math.floor(frame / numCols);
+            let col = frame % numCols;
+            frames.push({
+                sx: col * frameWidth,
+                sy: row * frameHeight,
+                sheet,
+            });
+        }
+        frameCollection.push(frames);
+    }
 }
 
+// DRAW Functions (Playing)
 function drawBackground() {
     if (assets.background) {
         backgroundLayer.image(assets.background, 0, 0, width, height);
@@ -644,17 +593,149 @@ function drawBackground() {
         backgroundLayer.image(assets.stagelights, 0, -45, width, height / 3);
     }
 }
-
-function drawLeverCue(){
-    backgroundLayer.image(assets.levercamera, 0, 0, width, height);
+function updateCountdown() {
+    if (countdownTimer > 0) {
+        countdownTimer -= 1; // Decrease by one second
+    }
 }
-
+function drawPodiums() {
+    if (assets.podium1) {
+        backgroundLayer.image(assets.podium1, width / 4.5, height / 2 + 20, width / 4, height / 4);
+    }
+    if (assets.podium2) {
+        backgroundLayer.image(assets.podium2, width / 2.93, height / 2 + 20, width / 4, height / 4);
+    }
+    if (assets.podium3) {
+        backgroundLayer.image(assets.podium3, width / 2.16, height / 2 + 20, width / 4, height / 4);
+    }
+    if (assets.podium4) {
+        backgroundLayer.image(assets.podium4, width / 1.74, height / 2 + 20, width / 4, height / 4);
+    }
+}
+function drawApplause() {
+    if (assets.applause) {
+        image(assets.applause, width / 2 - 150, -55, width / 4, height / 4);
+    }
+}
 function drawAudience() {
     if (assets.audience) {
         image(assets.audience, 0, 100, width, height);
     }
 }
+function drawHUD() {
+    if (assets.timer) {
+        image(assets.timer, -20, 60, assets.timer.width / 5, assets.timer.height / 5);
+        drawCountdown();
+    }
+    if (assets.stars) {
+        let x = 10
+        let y = -10
 
+        fill('#d9d9d9')
+        rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3)
+        fill('#dc4042')
+        let ratings = 0
+        if (ratings > 250) ratings = 250
+        rect(x + 15, y + 70, ratings * 2 / 3, 50 * 2 / 3)
+        image(assets.stars, x, y, width / 5, height / 5);
+    }
+    if (assets.score) {
+        image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
+    }
+}
+function drawCountdown() {
+    let safeCountdown = countdownTimer || 0;
+    let minutes = Math.floor(safeCountdown / 60);
+    let seconds = safeCountdown % 60;
+    let timeString = nf(minutes, 2) + ':' + nf(seconds, 2);
+
+    fill('black');
+    textFont(countdownFont);
+    textSize(32);
+    textAlign(CENTER, CENTER);
+    text(timeString, 112, 148);
+}
+
+// Game (Playing State) Cues
+// Applause
+function drawApplauseON() {
+    if (assets.applauseon) {
+        image(assets.applauseon, width / 2 - 150, -55, width / 4, height / 4);
+    }
+}
+// Cheat
+function drawCheat() {
+    if (assets.cheat) {
+        image(assets.cheat, 0, 100, width / 3, height / 1.5);
+    }
+}
+// Joystick
+function spotlight() {
+    let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
+    if (assets.spotlight) {
+        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
+    }
+    console.log("Light pos", newJoystickPosition);
+}
+// Lever
+function drawLeverCue(){
+    backgroundLayer.image(assets.levercamera, 0, 0, width, height);
+}
+// Podiums
+function podiumLight1() {
+    if (assets.podiumlit1) {
+        backgroundLayer.image(assets.podiumlit1, 345, -50, width / 3, height)
+    }
+}
+function podiumLight2() {
+    if (assets.podiumlit2) {
+        backgroundLayer.image(assets.podiumlit2, 241, -50, width / 3, height)
+    }
+}
+function podiumLight3() {
+    if (assets.podiumlit3) {
+        backgroundLayer.image(assets.podiumlit3, 635, -50, width / 3, height)
+    }
+}
+function podiumLight4() {
+    if (assets.podiumlit4) {
+        backgroundLayer.image(assets.podiumlit4, 565, -50, width / 3, height)
+    }
+}
+
+// Game (Playing State) Feedback
+// Applause
+function drawHands() {
+    if (assets.hands) {
+        image(assets.hands, width / 10 - 150, height / 2 + 50, width, height / 2);
+    }
+}
+// Cheat: No Assets - Host is supposed to be happy/mad
+// Joystick: No Assets - Change color of spotlight to flash green/red for feedback?
+// Lever
+function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
+    let amount = timer / duration
+    let x = lerp(oldX, newX, amount)
+    let y = lerp(oldY, newY, amount)
+    let w = lerp(oldWidth, newWidth, amount)
+    let h = lerp(oldHeight, newHeight, amount)
+    return { x, y, w, h }
+}
+// Podiums
+function drawRLight(x) {
+    //X-Coordinates for each podium
+    //(243), (393), (563), (707)
+    backgroundLayer.image(assets.rightLit, x, 100, width / 3, height / 1.5);
+}
+function drawWLight(x) {
+    //X-Coordinates for each podium
+    //(243), (393), (563), (707)
+    backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
+}
+
+// Game (Playing State) Sprite Sheets
+// Host
+// Contestants
 function drawContestant() {
     let x = 309;
     const y = 290;
@@ -735,351 +816,7 @@ function drawContestantR() {
     }
 }
 
-function drawPodiums() {
-    if (assets.podium1) {
-        backgroundLayer.image(assets.podium1, width / 4.5, height / 2 + 20, width / 4, height / 4);
-    }
-    if (assets.podium2) {
-        backgroundLayer.image(assets.podium2, width / 2.93, height / 2 + 20, width / 4, height / 4);
-    }
-    if (assets.podium3) {
-        backgroundLayer.image(assets.podium3, width / 2.16, height / 2 + 20, width / 4, height / 4);
-    }
-    if (assets.podium4) {
-        backgroundLayer.image(assets.podium4, width / 1.74, height / 2 + 20, width / 4, height / 4);
-    }
-}
-
-// heads up display
-function drawHUD() {
-    if (assets.timer) {
-        image(assets.timer, -20, 60, assets.timer.width / 5, assets.timer.height / 5);
-        drawCountdown();
-    }
-    if (assets.stars) {
-        let x = 10
-        let y = -10
-
-        fill('#d9d9d9')
-        rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3)
-        fill('#dc4042')
-        let ratings = 0
-        if (ratings > 250) ratings = 250
-        rect(x + 15, y + 70, ratings * 2 / 3, 50 * 2 / 3)
-        image(assets.stars, x, y, width / 5, height / 5);
-    }
-    if (assets.score) {
-        image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
-    }
-}
-
-function drawCountdown() {
-    let safeCountdown = countdownTimer || 0;
-    let minutes = Math.floor(safeCountdown / 60);
-    let seconds = safeCountdown % 60;
-    let timeString = nf(minutes, 2) + ':' + nf(seconds, 2);
-
-    fill('black');
-    textFont(countdownFont);
-    textSize(32);
-    textAlign(CENTER, CENTER);
-    text(timeString, 112, 148);
-}
-
-function updateCountdown() {
-    if (countdownTimer > 0) {
-        countdownTimer -= 1; // Decrease by one second
-    }
-}
-
-//display right wrong light
-function drawRLight(x) {
-    //X-Coordinates for each podium
-    //(243), (393), (563), (707)
-    backgroundLayer.image(assets.rightLit, x, 100, width / 3, height / 1.5);
-}
-
-function drawWLight(x) {
-    //X-Coordinates for each podium
-    //(243), (393), (563), (707)
-    backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
-}
-
-// displays cheat asset
-function drawCheat() {
-    if (assets.cheat) {
-        image(assets.cheat, 0, 100, width / 3, height / 1.5);
-    }
-}
-
-function drawApplause() {
-    if (assets.applause) {
-        image(assets.applause, width / 2 - 150, -55, width / 4, height / 4);
-    }
-}
-
-function drawApplauseON() {
-    if (assets.applauseon) {
-        image(assets.applauseon, width / 2 - 150, -55, width / 4, height / 4);
-    }
-}
-
-function drawHands() {
-    if (assets.hands) {
-        image(assets.hands, width / 10 - 150, height / 2 + 50, width, height / 2);
-    }
-}
-
-function drawSpritesHost(sx,sy) {
-    let hostX = 100;
-    const hostY = 100;
-    let scaleFactor = 0.3;
-
-    switch (hostState) {
-        case "idle":
-            hostSpriteSheet = al;
-            scaleFactor = 0.5;
-            break;
-        case "talkL":
-            hostSpriteSheet = alTalkL;
-            break;
-        case "talkR":
-            hostSpriteSheet = alTalkR;
-            break;
-        case "walkL":
-            hostSpriteSheet = alWalkL;
-             hostX -= 0.1; // Walk left
-            break;
-        case "walkR":
-            hostSpriteSheet = alWalkR;
-            hostX += 0.1; // Walk right
-            break;
-        case "turnL":
-            hostSpriteSheet = alTurnL;
-            break;
-        case "turnR":
-            hostSpriteSheet = alTurnR;
-            break;
-    }
-
-    // Calculate frame for animation (loop through totalFrames)
-   // let row = Math.floor(currentFrameHost / numCols);
-    //let col = currentFrameHost % numCols;
-
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;
-
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightAL * scaleFactor;
-
-    image(
-        hostSpriteSheet,
-        hostX,
-        hostY,
-        alWidth,
-        alHeight,
-        sx,
-        sy,
-        frameWidthAL,
-        frameHeightAL
-    );
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFrames;
-    }
-}
-
-//draw host sprite and calls animations based of state
-function drawHostIdle(sx, sy) {
-    //8*5
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.7;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightAL * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightAL;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.idle, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightAL);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFrames;
-    }
-}
-function drawHostTalk(sx, sy) {
-    //4*5
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.7;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightRW * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightRW;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.talk, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightRW);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFrames;
-    }
-}
-
-function drawHostTurnLF(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.32;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnLF, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-}
-
-function drawHostTurnFL(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnFL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-}
-
-function drawHostTurnRF(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnRF, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-}
-
-function drawHostTurnFR(sx, sy) {
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.turnFR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-}
-
-function drawHostWalkL(sx, sy) {
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.walkL, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-}
-
-function drawHostWalkR(sx, sy) {
-    //if host is in idle then call idle positions and state
-    let x = 100;
-    const y = height / 2;
-    //const spacing = 160;
-    let scaleFactor = 0.52;
-    let frameSpeed = 2
-    //const alY = height / 2.25
-    const alWidth = frameWidthAL * scaleFactor;
-    const alHeight = frameHeightLR * scaleFactor;
-
-    ///currentFrame = Math.floor(frameCount / frameSpeed) % totalFrames;
-    sx = (currentFrameHost % numCols) * frameWidthAL;
-    sy = Math.floor(currentFrameHost / numCols) * frameHeightLR;//frameHeight;
-
-    //anim
-    backgroundLayer.image(host.walkR, x, y, alWidth, alHeight, sx, sy, frameWidthAL, frameHeightLR);
-
-    if (frameCount % frameDelay === 0) {
-        currentFrameHost = (currentFrameHost + 1) % totalFramesLR;
-    }
-
-    x += hostSpeed;
-
-    if (x + alWidth > width || x < 0) {
-        hostSpeed *= -1;
-    }
-}
-
+// DRAW Functions in order (End)
 function drawCurtainClose() {
     let x = 0;
     const y = 0;
@@ -1107,7 +844,6 @@ function drawCurtainClose() {
     //anim
     image(end.curtains, x, y, width, height, sx, sy, frameWidthCurtains, frameHeight);
 }
-
 function drawScore() {
     if (RTSstate.score) {
         image(end.shadow, 0, 0, width, height)
@@ -1179,7 +915,6 @@ function drawScore() {
         pop()
     }
 }
-
 function drawStar(index, filledIn) {
     switch (index) {
         case 1:
@@ -1199,33 +934,3 @@ function drawStar(index, filledIn) {
             break
     }
 }
-
-function spotlight() {
-    let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
-    if (assets.spotlight) {
-        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
-    }
-    console.log("Light pos", newJoystickPosition);
-}
-
-function podiumLight1() {
-    if (assets.podiumlit1) {
-        backgroundLayer.image(assets.podiumlit1, 345, -50, width / 3, height)
-    }
-}
-function podiumLight2() {
-    if (assets.podiumlit2) {
-        backgroundLayer.image(assets.podiumlit2, 241, -50, width / 3, height)
-    }
-}
-function podiumLight3() {
-    if (assets.podiumlit3) {
-        backgroundLayer.image(assets.podiumlit3, 635, -50, width / 3, height)
-    }
-}
-function podiumLight4() {
-    if (assets.podiumlit4) {
-        backgroundLayer.image(assets.podiumlit4, 565, -50, width / 3, height)
-    }
-}
-*/
