@@ -1,6 +1,6 @@
 "use strict";
 
-// I. Initialize "RTSstate" object for syncing //DONE ORGANIZING
+// I. Initialize "RTSstate" object for syncing
 let RTSstate = {
     score: 0,
     state: 'IDLE',
@@ -47,7 +47,7 @@ let RTSstate = {
 };
 
 
-// II. Initialize objects/variables for assets //DONE ORGANIZING
+// II. Initialize objects/variables for assets
 // Tip for II-B: Spritesheets are calculated by a single frame's width & height, how many rows and columns a sheet has, and indexing the current frame
 //      A. Regular Assets
 //              1. Idle/Onboarding
@@ -265,7 +265,7 @@ window.preload = function () {
 }
 
 
-// IV. Setup canvas, frame rate, timer, graphic layers, onboard video, and sync (30 ms) //DONE ORGANIZING
+// IV. Setup canvas, frame rate, timer, graphic layers, onboard video, and sync (30 ms)
 window.setup = async function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
@@ -297,9 +297,8 @@ const syncStateLoop = async () => {
 
 // V. Draw depends on sync and utilizes functions below it to show game state
 window.draw = function () {
-    //console.log(RTSstate);
     backgroundLayer.background(255);
-    if (RTSstate.state === 'IDLE') {
+    if (RTSstate.state === 'IDLE') { // A. Idle/Onboarding
         idleOnboarding.onboarding.stop()
         idleGraphicsLayer.image(idleOnboarding.idle, 0, 0, width, height);
         image(idleGraphicsLayer, 0, 0)
@@ -310,26 +309,17 @@ window.draw = function () {
         }
         onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
         image(onboardingGraphicsLayer, 0, 0)
-    } else if (RTSstate.state === 'PLAYING') {
+    } else if (RTSstate.state === 'PLAYING') { // B. Playing
+        // Background Setup & Countdown Logic
         idleOnboarding.onboarding.stop()
         drawBackground();
         if (frameCount % 30 === 0 && countdownTimer > 0) {
             updateCountdown();
         }
 
-        /*if( state.right){
-
-            // drawContestantR();
-            // draw light feedback?
-        } if(state.wrong){
-
-            //drawContestantW();
-
-        }*/
-
-           //TODO add variables declare, add fucntions  
+        // Podium Feedback Display Logic (GOOD/BAD for each podium)
         if(RTSstate.feedback.PODIUM_1_GOOD){
-             showPod1FB()  // show contestant + light 
+             showPod1FB()
         } else if(!RTSstate.feedback.PODIUM_1_GOOD){
             hidePod1FB()
         } else if(RTSstate.feedback.PODIUM_1_BAD){
@@ -337,7 +327,6 @@ window.draw = function () {
         } else if(!RTSstate.feedback.PODIUM_1_BAD){
             hidePod1FbBad()
         } else if (RTSstate.feedback.PODIUM_2_GOOD){
-            // show contestant + light 
              showPod2FB()
         } else if(!RTSstate.feedback.PODIUM_2_GOOD){
             hidePod2FB()
@@ -346,7 +335,6 @@ window.draw = function () {
         } else if(!RTSstate.feedback.PODIUM_2_BAD){
             hidePod2FbBad()
         } else if (RTSstate.feedback.PODIUM_3_GOOD){
-            // show contestant + light 
              showPod3FB()
         } else if(!RTSstate.feedback.PODIUM_3_GOOD){
             hidePod3FB()
@@ -355,7 +343,6 @@ window.draw = function () {
         } else if(!RTSstate.feedback.PODIUM_3_BAD){
             hidePod3FbBad()
         }  else if (RTSstate.feedback.PODIUM_4_GOOD){
-            // show contestant + light 
              showPod4FB()
         } else if(!RTSstate.feedback.PODIUM_4_GOOD){
             hidePod4FB()
@@ -367,46 +354,36 @@ window.draw = function () {
             drawContestant();
         }
         
-        //drawContestantR();
-        //drawRWLight();
+        //Draw Podiums
         drawPodiums();
 
+        //Podium Cue Lights
         if (RTSstate.cues.PODIUM_1_CUE) {
             showPod1Cue();
-            console.log("YELLOW showing podium 1 lit")
         } else if (!RTSstate.cues.PODIUM_1_CUE) {
             hidePod1Cue();
-            console.log("hiding podium 1")
         }
 
         if (RTSstate.cues.PODIUM_2_CUE) {
             showPod2Cue();
-            console.log("WHITE showing podium 2 ")
         } else if (!RTSstate.cues.PODIUM_2_CUE) {
             hidePod2Cue();
-            console.log("hiding podium")
         }
         
         if (RTSstate.cues.PODIUM_3_CUE){
             showPod3Cue();
-            console.log("RED showing podium 3 ")
         } else if(!RTSstate.cues.PODIUM_3_CUE){
             hidePod3Cue();
-            console.log("hiding podium 3")
         }
 
         if (RTSstate.cues.PODIUM_4_CUE) {
             showPod4Cue();
-            console.log("BLUE showing podium 4 ")
         } else if (!RTSstate.cues.PODIUM_4_CUE) {
             hidePod4Cue();
-            console.log("hiding podium 4")
         }
 
-        //podiumLight1();
-        //podiumLight2();
-        //podiumLight3();
-       // podiumLight4();
+
+       // Joystick Cue Indicator
        if (RTSstate.cues.JOYSTICK_CUE) {
         showJoyStkCue();
         console.log("spotlight on  ")
@@ -414,10 +391,6 @@ window.draw = function () {
         hideJoyStkCue();
         console.log("hiding spotlit")
         }
-       // spotlight();
-
-        //drawHost("al");
-        //drawSpriteAnimation(al, currentFrameHost, frameWidthAL, frameHeightAL, 100, 100);
 
         if (hostState == "idle") {
             drawHostIdle()
@@ -434,7 +407,6 @@ window.draw = function () {
         if (hostState == "turnFL") {
             drawHostTurnFL()
         }
-
         if (hostState == "turnLF") {
             drawHostTurnLF()
         }
@@ -444,25 +416,17 @@ window.draw = function () {
         if (hostState == "turnFR") {
             drawHostTurnFR()
         }
-
-        //drawSpritesHost(hostState)
-        //drawHostWalkR()
-        //drawHostWalkL()
-        //drawHostTurnFL()
-        //drawHostTurnLF()
-        //drawHostTurnFR()
-        //drawHostTurnRF()
-        
         drawHostTalk()
 
+
+        // Lever Cue Visual
         if (RTSstate.cues.LEVER_CUE) {
             showLever();
-            console.log("showing lever on")
         } else if (!RTSstate.cues.LEVER_CUE) {
             hideLever();
-            console.log("hiding lever")
         }
         
+        // Zoom Camera Transactions
         // TODO: when zoom change event trigger, set zoomTimer to 0
         if (zoomedIn) {
             if (zoomTimer <= zoomDuration) {
@@ -476,45 +440,40 @@ window.draw = function () {
                 zoomTimer++
             }
         }
-
         image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)
 
+        // Cheat Cue Visual
         if (RTSstate.cues.CHEAT_CUE) {
             showCheat();
         } else if (!RTSstate.cues.CHEAT_CUE) {
             hideCheat();
         }
 
+        // Applause Visuals & Feedback
         drawApplause();
         drawAudience();
 
         if (RTSstate.cues.APPLAUSE_CUE) {
             showApplause();
-            console.log("showing applause")
         } else if (!RTSstate.cues.APPLAUSE_CUE) {
             hideApplause();
-            console.log("hiding")
         }
 
         if (RTSstate.feedback.APPLAUSE_GOOD) {
             showApplauseFB();
-            console.log("FEEDBACK showing applause")
         } else if (!RTSstate.feedback.APPLAUSE_GOOD) {
             hideApplause();
-            console.log("FEEDBACK hiding")
         }
 
         //drawApplauseON();
 
         //drawHands();
 
+        //HUD & Debug Info
         drawHUD();
-
         text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150); //FPS ON SCREEN
-        //image(assets.curtains, 0, 0, width, height)
-    } else if (RTSstate.state === 'END') {
+    } else if (RTSstate.state === 'END') { // C. End
         idleOnboarding.onboarding.stop()
-
         drawCurtainClose()
         if (end.curtainsClosed && !end.scoreVis) {
             drawScore()
@@ -522,9 +481,11 @@ window.draw = function () {
         }
     }
 }
-// VI. Functions below each responsible for particular asset
 
-// INTERACTIONS
+/*
+// VI. Functions below each responsible for particular asset
+// A. General Interactions
+//      1. Cheat
 function showCheat() {
     cheatVis = true;
     drawCheat();
@@ -532,63 +493,67 @@ function showCheat() {
 function hideCheat() {
     cheatVis = false;
 }
-
+//      2. Applause
 function showApplause() {
     applauseVis = true;
     drawApplauseON();
 }
 function hideApplause() {
     applauseVis = false;
-
 }
-
-//feedback
+//      3. Applause Feedback
 function showApplauseFB(){
     appFBVis = true;
     drawHands();
 }
-
 function hideApplauseFB(){
     appFBVis = false;
 }
+//      4. Lever
+function showLever(){
+    leverVis = true;
+    drawLeverCue()
+}
+function hideLever(){
+    leverVis = false;
+}
+//      5. Joystick
+function showJoyStkCue(){
+    spotlitVis = true;
+    spotlight()
+}
+function hideJoyStkCue(){
+    spotlitVis = false;
 
-/// PODIUM 1 | CUE  |  GOOD FB |  BAD FB
+}
+// B. Podium Interactions
+//      1. Podium 1 (Yellow)
 function showPod1Cue() {
     podLitVis1 = true;
     podiumLight2();
 }
-
 function hidePod1Cue() {
     podLitVis1 = false;
 }
-
 function showPod1FB(){
     pod1FB = true;
     drawRLight(243);
 }
-
 function hidePod1FB(){
     pod1FB = false;
-
 }
-
 function showPod1FbBad(){
     pod1FbBad = true;
     drawWLight(243);
 }
-
 function hidePod1FbBad(){
     pod1FbBad = false;
-
 }
-
-/// PODIUM 2 | CUE  |  GOOD FB |  BAD FB
-
+//      2. Podium 2 (White)
 function showPod2Cue() {
     podLitVis2 = true;
     podiumLight1();
 }
-
 function hidePod2Cue() {
     podLitVis2 = false;
 
@@ -598,102 +563,66 @@ function showPod2FB(){
     drawRLight(393);
 
 }
-
 function hidePod2FB(){
     pod2FB = false;
     
 }
-
 function showPod2FbBad(){
     pod2FbBad = true;
     drawWLight(393);
 }
-
 function hidePod2FbBad(){
     pod2FbBad = false;
 
 }
-
-/// PODIUM 3 | CUE  |  GOOD FB |  BAD FB
-
+//      3. Podium 3 (Red)
 function showPod3Cue() {
     podLitVis3 = true;
     podiumLight4();
 }
-
 function hidePod3Cue() {
     podLitVis3 = false;
 
 }
-
 function showPod3FB(){
     pod3FB = true;
     drawRLight(563);
 }
-
 function hidePod3FB(){
     pod3FB = false;
     
 }
-
 function showPod3FbBad(){
     pod3FbBad = true;
     drawWLight(563);
 }
-
 function hidePod3FbBad(){
     pod3FbBad = false;
 
 }
-
-/// PODIUM 4 | CUE  |  GOOD FB |  BAD FB
-
+//      4. Podium 4 (Blue)
 function showPod4Cue() {
     podLitVis4 = true;
     podiumLight3();
 }
-
 function hidePod4Cue() {
     podLitVis4 = false;
 }
-
 function showPod4FB(){
     pod4FB = true;
     drawRLight(707);   
 }
-
 function hidePod4FB(){
     pod4FB = false;
 }
-
 function showPod4FbBad(){
     pod4FbBad = true;
     drawWLight(707);
 }
-
 function hidePod4FbBad(){
     pod4FbBad = false;
 }
 
-function showLever(){
-    leverVis = true;
-    drawLeverCue()
-}
-
-function hideLever(){
-    leverVis = false;
-}
-
-function showJoyStkCue(){
-    spotlitVis = true;
-    spotlight()
-}
-
-function hideJoyStkCue(){
-    spotlitVis = false;
-
-}
-//FEEDBACK will go here 
 
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
     let amount = timer / duration
@@ -901,7 +830,6 @@ function drawHands() {
     }
 }
 
-/*
 function drawSpritesHost(sx,sy) {
     let hostX = 100;
     const hostY = 100;
@@ -959,7 +887,7 @@ function drawSpritesHost(sx,sy) {
     if (frameCount % frameDelay === 0) {
         currentFrameHost = (currentFrameHost + 1) % totalFrames;
     }
-}*/
+}
 
 //draw host sprite and calls animations based of state
 function drawHostIdle(sx, sy) {
@@ -1300,3 +1228,4 @@ function podiumLight4() {
         backgroundLayer.image(assets.podiumlit4, 565, -50, width / 3, height)
     }
 }
+*/
