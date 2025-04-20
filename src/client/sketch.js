@@ -405,9 +405,8 @@ window.draw = function () {
         drawApplause();
         drawAudience();
 
-        //HUD & Debug Info
+        //HUD
         drawHUD();
-        text(`FPS: ${frameRate().toFixed(2)}`, width - 120, 150);
     } else if (RTSstate.state === 'END') { // C. End
         idleOnboarding.onboarding.stop()
         drawCurtainClose()
@@ -562,13 +561,6 @@ function drawWrongLight(x) {
     //X-Coordinates for each podium
     //(243), (393), (563), (707)
     backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
-}
-
-// Draw Sprite Animations
-function drawSprite(animations, x, y, scale = 1, frameIndex) {
-    const anim = animations;
-    const [sx, sy, sw, sh] = anim.frames[frameIndex];
-    image(anim.image, x, y, sw * scale, sh * scale, sx, sy, sw, sh);
 }
 
 // DRAW Functions (End)
