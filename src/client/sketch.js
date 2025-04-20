@@ -111,47 +111,47 @@ const bigSpriteSheetConfig = {
 };
 //              2. Host
 const host = {
-    idle: { file: "AL_idle", config: defaultSpriteSheetConfig },
-    talk: { file: "AL_Talk", config: defaultSpriteSheetConfig },
-    turnForLeft: { file: "AL_TurnF_to_L", config: smallSpriteSheetConfig },
-    turnForRight: { file: "AL_TurnF_to_R", config: smallSpriteSheetConfig },
-    turnLeftFor: { file: "AL_TurnL_to_F", config: smallSpriteSheetConfig },
-    turnRightFor: { file: "AL_TurnR_to_F", config: smallSpriteSheetConfig },
-    walkLeft: { file: "AL_Walk_L", config: bigSpriteSheetConfig },
-    walkRight: { file: "AL_Walk_R", config: bigSpriteSheetConfig }
+    idle: { file: "AL_idle", config: bigSpriteSheetConfig, frames: []},
+    talk: { file: "AL_Talk", config: defaultSpriteSheetConfig, frames: []},
+    turnForLeft: { file: "AL_TurnF_to_L", config: smallSpriteSheetConfig, frames: []},
+    turnForRight: { file: "AL_TurnF_to_R", config: smallSpriteSheetConfig, frames: []},
+    turnLeftFor: { file: "AL_TurnL_to_F", config: smallSpriteSheetConfig, frames: []},
+    turnRightFor: { file: "AL_TurnR_to_F", config: smallSpriteSheetConfig, frames: []},
+    walkLeft: { file: "AL_Walk_L", config: smallSpriteSheetConfig, frames: []},
+    walkRight: { file: "AL_Walk_R", config: smallSpriteSheetConfig, frames: []}
 };
 //              3. Contestants
 const contestants = {
     1: {
       name: "P1",
       animations: {
-        idle: { file: "P1_Idle", config: defaultSpriteSheetConfig },
-        right: { file: "P1_Right", config: bigSpriteSheetConfig },
-        wrong: { file: "P1_Wrong", config: bigSpriteSheetConfig }
+        idle: { file: "P1_Idle", config: defaultSpriteSheetConfig, frames: []},
+        right: { file: "P1_Right", config: bigSpriteSheetConfig, frames: []},
+        wrong: { file: "P1_Wrong", config: bigSpriteSheetConfig, frames: []}
       }
     },
     2: {
       name: "P2",
       animations: {
-        idle: { file: "P2_Idle", config: defaultSpriteSheetConfig },
-        right: { file: "P2_Right", config: bigSpriteSheetConfig },
-        wrong: { file: "P2_Wrong", config: bigSpriteSheetConfig }
+        idle: { file: "P2_Idle", config: defaultSpriteSheetConfig, frames: []},
+        right: { file: "P2_Right", config: bigSpriteSheetConfig, frames: []},
+        wrong: { file: "P2_Wrong", config: bigSpriteSheetConfig, frames: []}
       }
     },
     3: {
       name: "P3",
       animations: {
-        idle: { file: "P3_Idle", config: defaultSpriteSheetConfig },
-        right: { file: "P3_Right", config: bigSpriteSheetConfig },
-        wrong: { file: "P3_Wrong", config: bigSpriteSheetConfig }
+        idle: { file: "P3_Idle", config: defaultSpriteSheetConfig, frames: []},
+        right: { file: "P3_Right", config: bigSpriteSheetConfig, frames: []},
+        wrong: { file: "P3_Wrong", config: bigSpriteSheetConfig,frames: []},
       }
     },
     4: {
       name: "P4",
       animations: {
-        idle: { file: "P4_Idle", config: defaultSpriteSheetConfig },
-        right: { file: "P4_Right", config: bigSpriteSheetConfig },
-        wrong: { file: "P4_Wrong", config: bigSpriteSheetConfig }
+        idle: { file: "P4_Idle", config: defaultSpriteSheetConfig, frames: []},
+        right: { file: "P4_Right", config: bigSpriteSheetConfig, frames: []},
+        wrong: { file: "P4_Wrong", config: bigSpriteSheetConfig, frames: []},
       }
     }
 };
@@ -179,6 +179,56 @@ const podiumOffsets = {
     3: 635,
     4: 565,
 };
+//      D. Classes
+//              1. Sprite Animator
+class SpriteAnimator {
+    constructor(animations, defaultAnim = 'idle', frameDelay = 3) {
+        this.animations = animations;
+        this.currentAnim = defaultAnim;
+        this.frameDelay = frameDelay;
+        this.currentFrame = 0;
+        this.lastSwitchFrame = 0;
+        this.isPlaying = true;
+    }
+    setAnimation(name, frameDelay = null, loop = true, onComplete = null) {
+        if (this.currentAnim !== name || !this.isPlaying) {
+            this.currentAnim = name;
+            this.currentFrame = 0;
+            this.lastSwitchFrame = frameCount;
+            if (frameDelay !== null) this.frameDelay = frameDelay;
+            this.isPlaying = loop;
+            this.onComplete = onComplete;
+        }
+    }
+    play() {
+        this.isPlaying = true;
+    }
+    stop() {
+        this.isPlaying = false;
+    }
+    update() {
+        if (!this.isPlaying) return;
+        const anim = this.animations[this.currentAnim];
+        if (!anim || anim.frames.length === 0) return;
+        const totalFrames = anim.frames.length;
+        if ((frameCount - this.lastSwitchFrame) % this.frameDelay === 0) {
+            if (this.currentFrame < totalFrames - 1) {
+                this.currentFrame++;
+            } else if (this.isPlaying) {
+                this.currentFrame = 0;
+            } else {
+                this.stop();
+                if (this.onComplete) this.onComplete();
+            }
+        }
+    }
+    draw(x, y, scale = 1) {
+        const anim = this.animations[this.currentAnim];
+        const frame = anim.frames[this.currentFrame];
+        const [sx, sy, sw, sh] = frame;
+        backgroundLayer.image(anim.image, x, y, sw * scale, sh * scale, sx, sy, sw, sh);
+    }
+}
 
 
 // III. Preload ALL static assets & spritesheets 
@@ -220,12 +270,18 @@ window.preload = function () {
     //      4. Host (Sprite Sheets)
     Object.entries(host).forEach(([key, anim]) => {
         anim.image = loadImage(`/Assets/SpriteSheets/Host/${anim.file}.png`);
+        populateFrames(anim.config, anim.frames);
     });
+    host.animator = new SpriteAnimator(host);
+    host.animator.setAnimation("idle");
     //      5. Contestants (Sprite Sheets)
     Object.values(contestants).forEach(contestant => {
         Object.values(contestant.animations).forEach(anim => {
           anim.image = loadImage(`/Assets/SpriteSheets/${contestant.name}/${anim.file}.png`);
+          populateFrames(anim.config, anim.frames);
         });
+        contestant.animator = new SpriteAnimator(contestant.animations);
+        contestant.animator.setAnimation("idle");
     });
     // C. End
     end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
@@ -235,6 +291,17 @@ window.preload = function () {
     end.middle = loadImage('Assets/EndState/EndStates_NoStars-04.png');
     end.fail = loadImage('Assets/EndState/EndStates_NoStars-01.png');
     end.curtains = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png');
+}
+
+function populateFrames(animConfig, framesArray) {
+    const { totalColumns, totalRows, sheetWidth, sheetHeight } = animConfig;
+    const frameWidth = sheetWidth / totalColumns;
+    const frameHeightAnim = sheetHeight / totalRows;
+    for (let row = 0; row < totalRows; row++) {
+        for (let col = 0; col < totalColumns; col++) {
+            framesArray.push([col * frameWidth, row * frameHeightAnim, frameWidth, frameHeightAnim]);
+        }
+    }
 }
 
 
@@ -273,13 +340,16 @@ const syncStateLoop = async () => {
 // V. Draw depends on sync and utilizes functions below it to show game state
 window.draw = function () {
     backgroundLayer.background(255);
-    if (frameCount % frameDelay === 0) {
-        currentFrame++;
-    }
     if (RTSstate.state === 'PLAYING' && previousState !== 'PLAYING') {
         countdownTimer = countdown; // Reset to 60
     }
     previousState = RTSstate.state;
+    const contestantXPositions = [
+        width / 4,
+        width / 2.6,
+        width / 1.8,
+        width / 1.3
+    ];
 
     //Debugging Playing State
     RTSstate.state = 'PLAYING'
@@ -303,8 +373,11 @@ window.draw = function () {
             updateCountdown();
         }
 
-        //Contestant Animations should go HERE
-        drawSprite(contestants[1].animations.idle.image, contestants[1].animations.idle.config, backgroundLayer.width / 4, backgroundLayer.height / 2.2, { scale: 1 });
+        //Contestant Idle Animations
+        Object.values(contestants).forEach((contestant, index) => {
+            contestant.animator.update();
+            contestant.animator.draw(contestantXPositions[index], height/3, 0.4);
+        });
 
         // Draw Podiums
         drawPodiums();
@@ -398,18 +471,19 @@ function drawHUD() {
         let y = -10
 
         fill('#d9d9d9')
-        rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3)
+        rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3);
         fill('#dc4042')
-        //Map the ranges here from 0-50
-        rect(x + 25, y + 70, RTSstate.score * 5/6, 50 * 2 / 3)
+        //Map the ranges here from 0-250
+        rect(x + 25, y + 70, RTSstate.score * 5/6, 50 * 2 / 3);
         image(assets.stars, x, y, width / 5, height / 5);
     }
     if (assets.score) {
         image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
+        //Let's make this look better
         fill('#000000');
         textSize(60);
         scale(1.3, 1);
-        text(nf(RTSstate.score, 4), width - 398.5, 60);
+        text(nf(RTSstate.score * 10, 4), width - 398.5, 60);
     }
 }
 function drawCountdown() {
@@ -490,56 +564,11 @@ function drawWrongLight(x) {
     backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
 }
 
-// DRAW Sprite Sheets
-function drawSprite(spriteImg, config, x, y, options = {}) {
-    if (!spriteImg || !config) return;
-
-    const {
-        totalColumns,
-        totalRows,
-        sheetWidth,
-        sheetHeight,
-    } = config;
-
-    const {
-        frame = 0,
-        scale = 1,
-        center = true,
-        loop = true,
-        tintColor = null,
-        alpha = 255,
-        flipH = false,
-        flipV = false,
-        layer = backgroundLayer
-    } = options;
-
-    const frameWidth = sheetWidth / totalColumns;
-    const frameHeight = sheetHeight / totalRows;
-    const totalFrames = totalColumns * totalRows;
-
-    let safeFrame = loop ? frame % totalFrames : Math.min(frame, totalFrames - 1);
-    const col = safeFrame % totalColumns;
-    const row = Math.floor(safeFrame / totalColumns);
-
-    const sx = col * frameWidth;
-    const sy = row * frameHeight;
-
-    let dx = center ? x - (frameWidth * scale) / 2 : x;
-    let dy = center ? y - (frameHeight * scale) / 2 : y;
-    const dWidth = frameWidth * scale;
-    const dHeight = frameHeight * scale;
-
-    push();
-    if (tintColor) tint(...tintColor);
-    if (alpha < 255) tint(255, alpha);
-    if (flipH || flipV) {
-        translate(dx + dWidth / 2, dy + dHeight / 2);
-        scale(flipH ? -1 : 1, flipV ? -1 : 1);
-        layer.image(spriteImg, sx, sy, frameWidth, frameHeight, -dWidth / 2, -dHeight / 2, dWidth, dHeight);
-    } else {
-        layer.image(spriteImg, sx, sy, frameWidth, frameHeight, dx, dy, dWidth, dHeight);
-    }
-    pop();
+// Draw Sprite Animations
+function drawSprite(animations, x, y, scale = 1, frameIndex) {
+    const anim = animations;
+    const [sx, sy, sw, sh] = anim.frames[frameIndex];
+    image(anim.image, x, y, sw * scale, sh * scale, sx, sy, sw, sh);
 }
 
 // DRAW Functions (End)
