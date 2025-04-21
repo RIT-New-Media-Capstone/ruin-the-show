@@ -176,8 +176,9 @@ let zoomDuration = 30;
 let dialRotation = 0
 // -Timer
 let countdownFont;
-let countdown = 60;
-let countdownTimer;
+let timerDuration = 60000; // 60 seconds
+let timerStart;
+let timerActive = false;
 // -Podiums
 const podiumOffsets = {
     1: 241,
@@ -331,7 +332,6 @@ window.setup = async function () {
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
     angleMode(DEGREES)
-    countdownTimer = countdown;
     backgroundLayer = createGraphics(width, height);
     onboardingGraphicsLayer = createGraphics(width, height)
 
@@ -380,7 +380,8 @@ function changeAnimations(message) {
 window.draw = function () {
     backgroundLayer.background(255);
     if (RTSstate.state === 'PLAYING' && previousState !== 'PLAYING') {
-        countdownTimer = countdown; // Reset to 60
+        timerStart = millis();
+        timerActive = true;
     }
     previousState = RTSstate.state;
 
@@ -418,9 +419,6 @@ window.draw = function () {
         idleOnboarding.onboarding_playing = false
         idleOnboarding.onboarding.volume(0)
         drawBackground();
-        if (frameCount % 30 === 0 && countdownTimer > 0) {
-            updateCountdown();
-        }
 
         // Contestant Idle Animations
         Object.values(contestants).forEach((contestant, index) => {
@@ -582,16 +580,25 @@ function drawHUD() {
     }
 }
 function drawCountdown() {
-    let safeCountdown = countdownTimer || 0;
-    let minutes = Math.floor(safeCountdown / 60);
-    let seconds = safeCountdown % 60;
-    let timeString = nf(minutes, 2) + ':' + nf(seconds, 2);
-
-    fill('black');
-    textFont(countdownFont);
-    textSize(32);
-    textAlign(CENTER, CENTER);
-    text(timeString, 112, 148);
+    if (timerActive) {
+        let remaining = getTimeRemaining();
+        let seconds = floor(remaining / 1000);
+        fill('black');
+        textFont(countdownFont);
+        textSize(32);
+        textAlign(CENTER, CENTER);
+        text(seconds, 112, 148);
+    
+        if (remaining === 0) {
+          timerActive = false;
+          // trigger timeout behavior
+        }
+    }
+}
+function getTimeRemaining() {
+    if (!timerActive) return timerDuration;
+    let elapsed = millis() - timerStart;
+    return max(0, timerDuration - elapsed);
 }
 
 // Game (Playing State) Cues
