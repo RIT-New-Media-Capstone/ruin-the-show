@@ -274,7 +274,7 @@ class GameMachine {
             } else {
                 const walkDir = this.host.DIRECTION > 0 ? 'walkRight' : 'walkLeft'
                 machine.messages_for_frontend.push({
-                    name: 'turnForRight',
+                    name: walkDir,
                     target: 'al'
                  })
             }
