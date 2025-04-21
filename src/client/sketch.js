@@ -297,7 +297,8 @@ window.preload = function () {
     end.curtains.idle.image = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png');
     populateFrames(smallSpriteSheetConfig, end.curtains.idle.frames)
     end.curtains.animator = new SpriteAnimator({idle: end.curtains.idle})
-    end.curtains.animator.setAnimation("idle", null, false, () => { end.curtainsClosed = true })
+    // end.curtains.animator.setAnimation("idle", null, false, () => { end.curtainsClosed = true })
+    end.curtains.animator.setAnimation("idle")
 }
 
 function populateFrames(animConfig, framesArray) {
@@ -419,7 +420,7 @@ window.draw = function () {
 
         // Close curtains 
         end.curtains.animator.update();
-        end.curtains.animator.draw(0, 0, 0.5);
+        end.curtains.animator.draw(0, 0);
 
         image(backgroundLayer, 0, 0);
 
