@@ -571,7 +571,7 @@ function drawCountdown() {
 // Applause
 function drawApplauseON() {
     if (assets.applauseon) {
-        image(assets.applauseon, width / 2 - 150, -55, width / 4, height / 4);
+        image(assets.applauseon, width / 2 - 148, -50, width / 4, height / 4);
     }
 }
 // Cheat
