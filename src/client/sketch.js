@@ -568,12 +568,12 @@ window.draw = function () {
             assets.hands.animator.setAnimation("idle", null, false);
             assets.hands.animator.play();
             assets.hands.animator.update();
-            assets.hands.animator.draw(width / 2, height - 50, 10, 10);
+            assets.hands.animator.draw(width / 2, height - 50, 1, width);
         } else if (applause.shouldStars) {
             assets.handstars.animator.setAnimation("idle", null, false);
             assets.handstars.animator.play();
             assets.handstars.animator.update();
-            assets.handstars.animator.draw(width / 2, height - 50, 10, 10);
+            assets.handstars.animator.draw(width / 2, height - 50, 1, width);
         }
 
         // Audience Heads
