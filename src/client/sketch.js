@@ -176,10 +176,10 @@ let countdown = 60;
 let countdownTimer;
 // -Podiums
 const podiumOffsets = {
-    1: 345,
-    2: 241,
-    3: 635,
-    4: 565,
+    1: 241,
+    2: 345,
+    3: 565,
+    4: 635,
 };
 // Classes
 // -Sprite Animator
@@ -266,10 +266,10 @@ window.preload = function () {
     // -Cues & Feedback
     assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
     assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
-    assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
-    assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
-    assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
-    assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
+    assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
+    assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
+    assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
+    assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
     assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature.png')
 
     assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
@@ -356,16 +356,16 @@ window.draw = function () {
         countdownTimer = countdown; // Reset to 60
     }
     previousState = RTSstate.state;
-    //previousState is IMPORTANT!!!!
+    
     const contestantXPositions = [
-        width / 4.9,
-        width / 3.1,
+        width / 5,
+        width / 3.14,
         width / 2.25,
-        width / 1.77
+        width / 1.78
     ];
 
-    //Debugging Playing State
-    //RTSstate.state = 'END'
+    //Debugging Particular States
+    //RTSstate.state = 'PLAYING'
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
@@ -388,16 +388,29 @@ window.draw = function () {
             updateCountdown();
         }
 
-        //Contestant Idle Animations
+        // Contestant Idle Animations
         Object.values(contestants).forEach((contestant, index) => {
             contestant.animator.update();
-            contestant.animator.draw(contestantXPositions[index], height / 3, 0.4);
+            contestant.animator.draw(contestantXPositions[index], height / 3.1, 0.4);
         });
 
         // Draw Podiums
         drawPodiums();
 
+        // Podium Cue
+        for(let i = 1; i <= 4; i++) {
+            if (RTSstate.cues[`PODIUM_${i}_CUE`]) {
+                drawPodiumLight(i);
+            }
+        }
+
         //Host Animations should go here?
+
+
+        // Spotlight Cue
+        if (RTSstate.cues.JOYSTICK_CUE) {
+            drawSpotlight();
+        }
 
         // Zoom Camera Transactions
         // TODO: when zoom change event trigger, set zoomTimer to 0
@@ -416,9 +429,26 @@ window.draw = function () {
         image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)*/
         image(backgroundLayer, 0, 0); // Temporary
 
-        // Applause Visuals & Feedback
+        // Applause Visuals
         drawApplause();
+
+        // Applause Cue
+        if (RTSstate.cues.APPLAUSE_CUE) {
+            drawApplauseON();
+        }
+
+        // Audience Heads
         drawAudience();
+
+        // Cheat Cue
+        if (RTSstate.cues.CHEAT_CUE) {
+            drawCheat();
+        }
+
+        // Zoom Cue
+        if (RTSstate.cues.LEVER_CUE) {
+            drawLeverCue();
+        }
 
         //HUD
         drawHUD();
@@ -542,11 +572,12 @@ function drawSpotlight() {
     if (assets.spotlight) {
         backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
     }
-    console.log("Light pos", newJoystickPosition);
 }
 // Lever
 function drawLeverCue() {
-    backgroundLayer.image(assets.levercamera, 0, 0, width, height);
+    if (assets.levercamera) {
+        backgroundLayer.image(assets.levercamera, 0, 0, width, height);
+    }
 }
 // Podiums
 function drawPodiumLight(podiumNumber) {
