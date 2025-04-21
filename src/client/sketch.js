@@ -360,7 +360,7 @@ window.draw = function () {
         idleOnboarding.onboarding.stop()
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
-        idleOnboarding.onboarding.volume(100)
+        idleOnboarding.onboarding.volume(1)
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
             idleOnboarding.onboarding_playing = true
