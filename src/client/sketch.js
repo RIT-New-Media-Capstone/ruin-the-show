@@ -528,7 +528,7 @@ function drawHUD() {
         rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3);
         fill('#dc4042')
         //Map the ranges here from 0-250
-        rect(x + 25, y + 70, RTSstate.score * 5 / 6, 50 * 2 / 3);
+        rect(x + 25, y + 70, min(RTSstate.score * 5 / 6, 250), 50 * 2 / 3);
         image(assets.stars, x, y, width / 5, height / 5);
     }
     if (assets.score) {
