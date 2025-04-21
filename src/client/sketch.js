@@ -401,6 +401,7 @@ function changeAnimations(message) {
                 console.log("Invalid podium: ", message.location)
                 return
             }
+            pos = width / 2
             if (animation === 'green') drawRightLight(pos);
             else if (animation === 'red') drawWrongLight(pos);
         }
