@@ -546,7 +546,7 @@ class GameMachine {
                         name: 'idle',
                         target: podiumNum
                     })
-                }, 1000);
+                }, 4 * 1000);
             }
             if (event.name === this.feedback.PODIUM_BAD) {
                 const podiumNum = event.data.podiumNum
@@ -565,7 +565,7 @@ class GameMachine {
                         name: 'idle',
                         target: podiumNum
                     })
-                }, 1000);
+                }, 4 * 1000);
             }
         } else if (this.state === this.states.END) {                          //END STATE
             turnOnApplauseLED();

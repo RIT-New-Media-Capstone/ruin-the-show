@@ -478,13 +478,13 @@ window.draw = function () {
                 drawRightLight(i);
                 setTimeout(() => {
                     podiumLights[i].shouldGreen = false
-                }, 1000) // turn off after 1 second 
+                }, 4 * 1000) // turn off after 4 second 
             }
             else if (podiumLights[i].shouldRed) {
                 drawWrongLight(i);
                 setTimeout(() => {
                     podiumLights[i].shouldRed = false
-                }, 1000) // turn off after 1 second 
+                }, 4 * 1000) // turn off after 4 second 
             }
         }
 
