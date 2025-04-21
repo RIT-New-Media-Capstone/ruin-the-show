@@ -355,7 +355,7 @@ const syncStateLoop = async () => {
     } catch (err) {
         console.error('Error syncing state:', err);
     }
-    setTimeout(syncStateLoop, 30);
+    setTimeout(syncStateLoop, 50);
 }
 
 function changeAnimations(message) {
