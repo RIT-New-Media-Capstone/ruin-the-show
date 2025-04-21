@@ -359,7 +359,8 @@ window.draw = function () {
         idleOnboarding.onboarding.stop()
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
-        idleOnboarding.onboarding.volume(1)
+        // TODO: find a way to let audio play without triggering browser-side autoblock 
+        // idleOnboarding.onboarding.volume(1)
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
             idleOnboarding.onboarding_playing = true
