@@ -48,9 +48,8 @@ let RTSstate = {
 
 
 // II. Initialize objects/variables for assets
-// Tip for II-B: Spritesheets are calculated by a single frame's width & height, how many rows and columns a sheet has, and indexing the current frame
-//      A. Sprite Sheets
-//              1. General
+// *Sprite Sheets are calculated by a single frame's width & height, how many rows and columns a sheet has, and indexing the current frame
+// -Sprite Sheets*
 const defaultSpriteSheetConfig = {
     totalColumns: 5,
     totalRows: 4,
@@ -69,8 +68,8 @@ const bigSpriteSheetConfig = {
     sheetWidth: 4802,
     sheetHeight: 4324,
 };
-//      B. Regular Assets
-//              1. Idle/Onboarding
+// Regular Assets
+// -Idle/Onboarding
 const idleOnboarding = {
     idle: "",
     onboarding: "",
@@ -79,7 +78,7 @@ const idleOnboarding = {
     medium: "",
     hard: "",
 }
-//              2. Playing 
+// Playing 
 const assets = {
     audience: "",
     background: "",
@@ -101,7 +100,7 @@ const assets = {
     timer: "",
     levercamera: "",
 }
-//              3. End
+// -End
 const end = {
     shadow: "",
     star: "",
@@ -113,7 +112,7 @@ const end = {
     curtainsClosed: false,
     scoreVis: false,
 }
-//              2. Host
+// -Host
 const host = {
     idle: { file: "AL_idle", config: bigSpriteSheetConfig, frames: [] },
     talk: { file: "AL_Talk", config: defaultSpriteSheetConfig, frames: [] },
@@ -124,7 +123,7 @@ const host = {
     walkLeft: { file: "AL_Walk_L", config: smallSpriteSheetConfig, frames: [] },
     walkRight: { file: "AL_Walk_R", config: smallSpriteSheetConfig, frames: [] }
 };
-//              3. Contestants
+// -Contestants
 const contestants = {
     1: {
         name: "P1",
@@ -159,31 +158,31 @@ const contestants = {
         }
     }
 };
-//      C. Global Variables
-//              1. Game States
+// Global Variables
+// -Game States
 let previousState = RTSstate.state;
 let backgroundLayer;
 let onboardingGraphicsLayer;
 let currentFrame = 0;
 let frameDelay = 6;
-//              2. Zoom
+// -Zoom
 let zoomedIn = false;
 let zoom;
 let zoomTimer = 0;
 let zoomDuration = 30;
-//              3. Timer
+// -Timer
 let countdownFont;
 let countdown = 60;
 let countdownTimer;
-//              4. Podiums
+// -Podiums
 const podiumOffsets = {
     1: 345,
     2: 241,
     3: 635,
     4: 565,
 };
-//      D. Classes
-//              1. Sprite Animator
+// Classes
+// -Sprite Animator
 class SpriteAnimator {
     constructor(animations, defaultAnim = 'idle', frameDelay = 3) {
         this.animations = animations;
@@ -243,13 +242,13 @@ class SpriteAnimator {
 
 // III. Preload ALL static assets & spritesheets 
 window.preload = function () {
-    // A. Idle/Onboarding
+    // Idle/Onboarding
     idleOnboarding.easy = loadImage('/Assets/Idle_Onboarding/LevelSelections_EASY.png');
     idleOnboarding.medium = loadImage('/Assets/Idle_Onboarding/LevelSelections_MED.png');
     idleOnboarding.hard = loadImage('/Assets/Idle_Onboarding/LevelSelections_HARD.png');
     idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
-    // B. Playing
-    //      1. Background & Podiums
+    // Playing
+    // -Background & Podiums
     assets.background = loadImage('/Assets/Background/MainBackground.png');
     assets.stage = loadImage('/Assets/Background/Stage.png');
     assets.stagelights = loadImage('/Assets/Background/StageLights.png');
@@ -259,12 +258,12 @@ window.preload = function () {
     assets.podium2 = loadImage('/Assets/Background/PodiumWhite_Resized0.png');
     assets.podium3 = loadImage('/Assets/Background/PodiumRed_Resized0.png');
     assets.podium4 = loadImage('/Assets/Background/PodiumBlue_Resized0.png');
-    //      2. HUD
+    // -HUD
     assets.stars = loadImage('/Assets/Background/StarRatings.png');
     assets.timer = loadImage('/Assets/Background/Timer.png');
     assets.score = loadImage('/Assets/Background/PointTrack.png')
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
-    //      3. Cues & Feedback
+    // -Cues & Feedback
     assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
     assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
     assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
@@ -277,14 +276,14 @@ window.preload = function () {
     assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
     assets.hands = loadImage('/Assets/Interactions/Applause/StaticApplause.png');
     assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
-    //      4. Host (Sprite Sheets)
+    // -Host (Sprite Sheets)
     Object.entries(host).forEach(([key, anim]) => {
         anim.image = loadImage(`/Assets/SpriteSheets/Host/${anim.file}.png`);
         populateFrames(anim.config, anim.frames);
     });
     host.animator = new SpriteAnimator(host);
     host.animator.setAnimation("idle");
-    //      5. Contestants (Sprite Sheets)
+    // -Contestants (Sprite Sheets)
     Object.values(contestants).forEach(contestant => {
         Object.values(contestant.animations).forEach(anim => {
             anim.image = loadImage(`/Assets/SpriteSheets/${contestant.name}/${anim.file}.png`);
@@ -293,7 +292,7 @@ window.preload = function () {
         contestant.animator = new SpriteAnimator(contestant.animations);
         contestant.animator.setAnimation("idle");
     });
-    // C. End
+    // End
     end.shadow = loadImage('/Assets/EndState/EndStates_Shadow.png');
     end.star = loadImage('/Assets/EndState/SingleStar.png');
     end.emptyStar = loadImage('/Assets/EndState/EmptyStar.png');
@@ -368,7 +367,7 @@ window.draw = function () {
     //Debugging Playing State
     //RTSstate.state = 'END'
 
-    if (RTSstate.state === 'IDLE') { // A. Idle/Onboarding
+    if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
@@ -380,7 +379,7 @@ window.draw = function () {
         }
         onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
         image(onboardingGraphicsLayer, 0, 0)
-    } else if (RTSstate.state === 'PLAYING') { // B. Playing
+    } else if (RTSstate.state === 'PLAYING') { // Playing
         // Background Setup & Countdown Logic
         idleOnboarding.onboarding.stop()
         idleOnboarding.onboarding.volume(0)
@@ -423,7 +422,7 @@ window.draw = function () {
 
         //HUD
         drawHUD();
-    } else if (RTSstate.state === 'END') { // C. End
+    } else if (RTSstate.state === 'END') { // End
         idleOnboarding.onboarding.stop()
 
         // TESTING only 
