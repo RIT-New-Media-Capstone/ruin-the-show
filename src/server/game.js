@@ -691,6 +691,10 @@ const awake = () => {
     // Start the state machine
     machine.run();
 
+    // DEBUG: Set starting state
+    // machine.state = machine.states.END
+    // machine.score = 240
+
     console.log('Current state:', machine.state);
 
     //DEBUG PURPOSES: START AT PLAYING STATE

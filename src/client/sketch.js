@@ -206,7 +206,7 @@ class SpriteAnimator {
             if (frameDelay !== null) this.frameDelay = frameDelay;
             this.isPlaying = true;
             this.shouldLoop = loop
-            this.onComplete = onComplete; 
+            this.onComplete = onComplete;
         }
     }
     play() {
@@ -302,9 +302,9 @@ window.preload = function () {
 
     end.curtains.idle.image = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png');
     populateFrames(end.curtains.idle.config, end.curtains.idle.frames)
-    end.curtains.animator = new SpriteAnimator({idle: end.curtains.idle})
-    end.curtains.animator.setAnimation("idle", null, false, () => { 
-        end.curtainsClosed = true 
+    end.curtains.animator = new SpriteAnimator({ idle: end.curtains.idle })
+    end.curtains.animator.setAnimation("idle", null, false, () => {
+        end.curtainsClosed = true
     })
 }
 
@@ -356,7 +356,7 @@ window.draw = function () {
         countdownTimer = countdown; // Reset to 60
     }
     previousState = RTSstate.state;
-    
+
     const contestantXPositions = [
         width / 5,
         width / 3.14,
@@ -365,7 +365,7 @@ window.draw = function () {
     ];
 
     //Debugging Particular States
-    //RTSstate.state = 'PLAYING'
+    // RTSstate.state = 'END'
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
@@ -398,7 +398,7 @@ window.draw = function () {
         drawPodiums();
 
         // Podium Cue
-        for(let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 4; i++) {
             if (RTSstate.cues[`PODIUM_${i}_CUE`]) {
                 drawPodiumLight(i);
             }
@@ -455,14 +455,14 @@ window.draw = function () {
     } else if (RTSstate.state === 'END') { // End
         idleOnboarding.onboarding.stop()
 
-        // TESTING only 
-        drawBackground()
-
         // Close curtains 
-        end.curtains.animator.update();
-        end.curtains.animator.draw(0, 0, 1, width, height);
-
-        image(backgroundLayer, 0, 0);
+        if (!end.curtainsClosed) {
+            // TESTING only 
+            drawBackground()
+            end.curtains.animator.update();
+            end.curtains.animator.draw(0, 0, 1, width, height);
+            image(backgroundLayer, 0, 0);
+        }
 
         // When curtains are closed, draw score 
         if (end.curtainsClosed && !end.scoreVis) {
