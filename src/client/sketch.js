@@ -398,6 +398,7 @@ function changeAnimations(message) {
             contestants[4].animator.setAnimation(animation)
         }
         else if (target === 'podium') {
+            console.log(message)
             if (animation === 'green') podiumLights[message.location].shouldGreen = true
             else if (animation === 'red') podiumLights[message.location].shouldRed = true
         }
@@ -461,16 +462,6 @@ window.draw = function () {
             contestant.animator.draw(contestantXPositions[index], height / 3.1, 0.4);
         });
 
-        // Draw Podiums
-        drawPodiums();
-
-        // Podium Cue
-        for (let i = 1; i <= 4; i++) {
-            if (RTSstate.cues[`PODIUM_${i}_CUE`]) {
-                drawPodiumLight(i);
-            }
-        }
-
         // Podium Feedback 
         for (let i = 1; i <= 4; i++) {
             if (podiumLights[i].shouldGreen) {
@@ -484,6 +475,16 @@ window.draw = function () {
                 setTimeout(() => {
                     podiumLights[i].shouldRed = false
                 }, 1000) // turn off after 1 second 
+            }
+        }
+
+        // Draw Podiums
+        drawPodiums();
+
+        // Podium Cue
+        for (let i = 1; i <= 4; i++) {
+            if (RTSstate.cues[`PODIUM_${i}_CUE`]) {
+                drawPodiumLight(i);
             }
         }
 
