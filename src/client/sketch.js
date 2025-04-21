@@ -552,8 +552,8 @@ window.draw = function () {
 
         // Applause Feedback
         assets.hands.animator.play();
-        assets.animator.update();
-        assets.animator.draw(width/2, height-50, 10, 10);
+        assets.hands.animator.update();
+        assets.hands.animator.draw(width/2, height-50, 10, 10);
 
         // Audience Heads
         drawAudience();
