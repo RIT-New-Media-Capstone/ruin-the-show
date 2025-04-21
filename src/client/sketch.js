@@ -359,6 +359,7 @@ const syncStateLoop = async () => {
 }
 
 function changeAnimations(message) {
+    console.log(message)
     const target = message.target
     const animation = message.name
     if (target && animation) {
@@ -441,7 +442,7 @@ window.draw = function () {
         //Host Animations should go here?
         host.animator.play()
         host.animator.update();
-        host.animator.draw(RTSstate.host.POSITION, height / 3, 0.4);
+        host.animator.draw(RTSstate.host.POSITION, height * 3 / 4, 2);
 
         // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
