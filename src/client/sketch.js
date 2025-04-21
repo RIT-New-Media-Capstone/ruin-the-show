@@ -417,6 +417,9 @@ window.draw = function () {
     } else if (RTSstate.state === 'END') { // C. End
         idleOnboarding.onboarding.stop()
 
+        // TESTING only 
+        drawBackground()
+
         // Close curtains 
         end.curtains.animator.update();
         end.curtains.animator.draw(0, 0, 1, width, height);
