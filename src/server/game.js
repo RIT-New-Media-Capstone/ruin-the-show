@@ -700,7 +700,7 @@ const updateHostPosition = () => {
 
     // 80% chance to move
     if (Math.random() < 0.8) {
-        const steps = 2;
+        const steps = 1;
         machine.addEvent(machine.events.HOST_MOVED, { steps });
     }
 
