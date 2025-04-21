@@ -398,7 +398,10 @@ function changeAnimations(message) {
     const animation = message.name
     if (target && animation) {
         if (target === 'al') {
-            if (animation === 'happy' || animation === 'pissed') console.log("Need spritesheet: ", animation)
+            if (animation === 'happy' || animation === 'pissed') {
+                console.log("Need spritesheet: ", animation)
+                return
+            }
             host.animator.setAnimation(animation)
         }
         else if (target === 1) {
