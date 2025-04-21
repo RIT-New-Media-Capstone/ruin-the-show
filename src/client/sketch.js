@@ -742,7 +742,7 @@ function drawScore() {
         textFont(countdownFont);
         textSize(64);
         textAlign(CENTER, CENTER);
-        text(RTSstate.score, 670, 380);
+        text(RTSstate.score * 10, 670, 380);
 
         pop()
     }
