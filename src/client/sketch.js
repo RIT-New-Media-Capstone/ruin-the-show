@@ -369,7 +369,7 @@ window.draw = function () {
     ];
 
     //Debugging Particular States
-    RTSstate.state = 'PLAYING'
+    // RTSstate.state = 'PLAYING'
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
