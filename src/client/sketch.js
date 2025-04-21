@@ -591,8 +591,6 @@ window.draw = function () {
 
         // Close curtains 
         if (!end.curtainsClosed) {
-            // TESTING only 
-            drawBackground()
             end.curtains.animator.play()
             end.curtains.animator.update();
             end.curtains.animator.draw(0, 0, 1, width, height);
