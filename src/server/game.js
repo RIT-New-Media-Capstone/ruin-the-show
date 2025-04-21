@@ -409,11 +409,13 @@ class GameMachine {
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data.num
                 if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
+                    console.log("Trigger Good")
                     scoreChange(this, 8, "Podium");
                     this.addEvent(this.feedback.PODIUM_GOOD, {podiumNum});
                     this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
                 } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, -8, "Podium");
+                    console.log("Trigger Bad")
                     this.addEvent(this.feedback.PODIUM_BAD, {podiumNum}); 
                 }
                 clearTimeout(this.podiumTimer);
