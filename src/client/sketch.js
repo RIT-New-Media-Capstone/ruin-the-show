@@ -582,7 +582,7 @@ function drawSpotlight() {
 // Lever
 function drawLeverCue() {
     if (assets.levercamera) {
-        backgroundLayer.image(assets.levercamera, 0, 0, width, height);
+        image(assets.levercamera, 0, 0, width, height);
     }
 }
 // Podiums
