@@ -304,7 +304,10 @@ window.preload = function () {
     end.curtains.idle.image = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png');
     populateFrames(end.curtains.idle.config, end.curtains.idle.frames)
     end.curtains.animator = new SpriteAnimator({idle: end.curtains.idle})
-    end.curtains.animator.setAnimation("idle", null, false, () => { end.curtainsClosed = true })
+    end.curtains.animator.setAnimation("idle", null, false, () => { 
+        console.log("curtains closed")
+        end.curtainsClosed = true 
+    })
 }
 
 function populateFrames(animConfig, framesArray) {
