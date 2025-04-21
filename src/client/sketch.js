@@ -203,6 +203,11 @@ class SpriteAnimator {
             this.isPlaying = true;
             this.shouldLoop = loop
             this.onComplete = onComplete;
+        } else {
+            if (frameDelay !== null) this.frameDelay = frameDelay;
+            this.isPlaying = true;
+            this.shouldLoop = loop
+            this.onComplete = onComplete; 
         }
     }
     play() {
