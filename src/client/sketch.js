@@ -319,6 +319,8 @@ window.setup = async function () {
 
     idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding Thingy.mp4')
     idleOnboarding.onboarding.hide();
+    idleOnboarding.onboarding.volume(0);
+    idleOnboarding.onboarding.size(width, height)
 
     //syncStateLoop();
 }
@@ -354,7 +356,7 @@ window.draw = function () {
     ];
 
     //Debugging Playing State
-    RTSstate.state = 'IDLE'
+    // RTSstate.state = 'ONBOARDING'
 
     if (RTSstate.state === 'IDLE') { // A. Idle/Onboarding
         idleOnboarding.onboarding.stop()
