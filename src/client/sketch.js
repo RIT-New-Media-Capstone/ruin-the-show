@@ -163,7 +163,6 @@ const contestants = {
 //              1. Game States
 let previousState = RTSstate.state;
 let backgroundLayer;
-let idleGraphicsLayer;
 let onboardingGraphicsLayer;
 let currentFrame = 0;
 let frameDelay = 6;
@@ -316,7 +315,6 @@ window.setup = async function () {
     frameRate(30);
     countdownTimer = countdown;
     backgroundLayer = createGraphics(width, height);
-    idleGraphicsLayer = createGraphics(width, height);
     onboardingGraphicsLayer = createGraphics(width, height)
 
     idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding Thingy.mp4')
@@ -356,12 +354,11 @@ window.draw = function () {
     ];
 
     //Debugging Playing State
-    RTSstate.state = 'PLAYING'
+    RTSstate.state = 'IDLE'
 
     if (RTSstate.state === 'IDLE') { // A. Idle/Onboarding
         idleOnboarding.onboarding.stop()
-        idleGraphicsLayer.image(idleOnboarding.idle, 0, 0, width, height);
-        image(idleGraphicsLayer, 0, 0)
+        image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
