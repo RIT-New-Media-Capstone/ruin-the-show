@@ -298,7 +298,6 @@ window.preload = function () {
     populateFrames(end.curtains.idle.config, end.curtains.idle.frames)
     end.curtains.animator = new SpriteAnimator({idle: end.curtains.idle})
     end.curtains.animator.setAnimation("idle", null, false, () => { end.curtainsClosed = true })
-    // end.curtains.animator.setAnimation("idle")
 }
 
 function populateFrames(animConfig, framesArray) {
