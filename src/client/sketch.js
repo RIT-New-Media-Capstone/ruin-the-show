@@ -366,7 +366,7 @@ window.draw = function () {
     ];
 
     //Debugging Playing State
-    RTSstate.state = 'END'
+    //RTSstate.state = 'END'
 
     if (RTSstate.state === 'IDLE') { // A. Idle/Onboarding
         idleOnboarding.onboarding.stop()
