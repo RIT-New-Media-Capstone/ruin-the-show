@@ -440,6 +440,8 @@ window.draw = function () {
 
         //Host Animations should go here?
         host.animator.play()
+        host.animator.update();
+        host.animator.draw(RTSstate.host.POSITION, height / 3, 0.4);
 
         // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
