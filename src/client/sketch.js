@@ -192,6 +192,7 @@ class SpriteAnimator {
         this.currentFrame = 0;
         this.lastSwitchFrame = 0;
         this.isPlaying = true;
+        this.shouldLoop = true
     }
     setAnimation(name, frameDelay = null, loop = true, onComplete = null) {
         if (this.currentAnim !== name || !this.isPlaying) {
@@ -199,7 +200,8 @@ class SpriteAnimator {
             this.currentFrame = 0;
             this.lastSwitchFrame = frameCount;
             if (frameDelay !== null) this.frameDelay = frameDelay;
-            this.isPlaying = loop;
+            this.isPlaying = true;
+            this.shouldLoop = loop
             this.onComplete = onComplete;
         }
     }
@@ -217,7 +219,7 @@ class SpriteAnimator {
         if ((frameCount - this.lastSwitchFrame) % this.frameDelay === 0) {
             if (this.currentFrame < totalFrames - 1) {
                 this.currentFrame++;
-            } else if (this.isPlaying) {
+            } else if (this.shouldLoop) {
                 this.currentFrame = 0;
             } else {
                 this.stop();
