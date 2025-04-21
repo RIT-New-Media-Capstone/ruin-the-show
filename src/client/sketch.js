@@ -322,7 +322,7 @@ window.setup = async function () {
     idleOnboarding.onboarding.volume(0);
     idleOnboarding.onboarding.size(width, height)
 
-    //syncStateLoop();
+    syncStateLoop();
 }
 
 /*
@@ -362,6 +362,7 @@ window.draw = function () {
         idleOnboarding.onboarding.stop()
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
+        idleOnboarding.onboarding.volume(100)
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
             idleOnboarding.onboarding_playing = true
@@ -371,6 +372,7 @@ window.draw = function () {
     } else if (RTSstate.state === 'PLAYING') { // B. Playing
         // Background Setup & Countdown Logic
         idleOnboarding.onboarding.stop()
+        idleOnboarding.onboarding.volume(0)
         drawBackground();
         if (frameCount % 30 === 0 && countdownTimer > 0) {
             updateCountdown();
