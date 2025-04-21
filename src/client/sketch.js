@@ -439,7 +439,7 @@ window.draw = function () {
         }
 
         //Host Animations should go here?
-
+        host.animator.play()
 
         // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
@@ -702,7 +702,7 @@ function drawCurtainClose() {
     image(end.curtains, x, y, width, height, sx, sy, frameWidthCurtains, frameHeight);
 }
 function drawScore() {
-    if (RTSstate.score) {
+    if (RTSstate.score >= 0) {
         image(end.shadow, 0, 0, width, height)
         // change values based on score 
         if (RTSstate.score > 250) {
