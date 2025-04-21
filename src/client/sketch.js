@@ -222,7 +222,7 @@ class SpriteAnimator {
             } else if (this.shouldLoop) {
                 this.currentFrame = 0;
             } else {
-                this.stop();
+                this.currentFrame = totalFrames
                 if (this.onComplete) this.onComplete();
             }
         }
