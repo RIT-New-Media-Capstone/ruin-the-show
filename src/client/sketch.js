@@ -369,6 +369,11 @@ window.draw = function () {
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
+        idleOnboarding.onboarding_playing = false
+
+        end.curtainsClosed = false,
+        end.scoreVis = false,
+
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
         // TODO: find a way to let audio play without triggering browser-side autoblock 
@@ -382,6 +387,7 @@ window.draw = function () {
     } else if (RTSstate.state === 'PLAYING') { // Playing
         // Background Setup & Countdown Logic
         idleOnboarding.onboarding.stop()
+        idleOnboarding.onboarding_playing = false
         idleOnboarding.onboarding.volume(0)
         drawBackground();
         if (frameCount % 30 === 0 && countdownTimer > 0) {
