@@ -325,7 +325,6 @@ window.setup = async function () {
     syncStateLoop();
 }
 
-/*
 const syncStateLoop = async () => {
     try {
         const res = await fetch('/getState');
@@ -338,7 +337,6 @@ const syncStateLoop = async () => {
     }
     setTimeout(syncStateLoop, 30);
 }
-*/
 
 
 // V. Draw depends on sync and utilizes functions below it to show game state
