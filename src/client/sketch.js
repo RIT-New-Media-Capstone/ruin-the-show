@@ -70,6 +70,12 @@ const bigSpriteSheetConfig = {
     sheetWidth: 4802,
     sheetHeight: 4324,
 };
+const starSpriteSheetConfig = {
+    totalColumns: 5,
+    totalRows: 7,
+    sheetWidth: 1880,
+    sheetHeight: 2640
+}
 // Regular Assets
 // -Idle/Onboarding
 const idleOnboarding = {
@@ -85,7 +91,8 @@ const assets = {
     audience: "",
     background: "",
     cheat: "",
-    hands: "",
+    hands: { idle: {file: "Audience Reaction", config: bigSpriteSheetConfig, frames: [] } },
+    handstars: { idle: {file: "RTS_Stars", config: starSpriteSheetConfig, frames: [] } },
     podium1: "",
     podium2: "",
     podium3: "",
@@ -299,7 +306,17 @@ window.preload = function () {
 
     assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
     assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
-    assets.hands = loadImage('/Assets/Interactions/Applause/StaticApplause.png');
+    
+    assets.hands.idle.image = loadImage('Assets/SpriteSheets/Misc/Audience Reaction.png');
+    populateFrames(assets.hands.idle.config, assets.hands.idle.frames);
+    assets.hands.animator = new SpriteAnimator({ idle: assets.hands.idle });
+    assets.hands.animator.setAnimation("idle", null, false);
+
+    assets.handstars.idle.image = loadImage('Assets/SpriteSheets/Misc/RTS_Stars.png');
+    populateFrames(assets.handstars.idle.config, assets.handstars.idle.frames);
+    assets.handstars.animator = new SpriteAnimator({ idle: assets.handstars.idle });
+    assets.handstars.animator.setAnimation("idle", null, false);
+
     assets.spotlight = loadImage('/Assets/Interactions/Joystick/HostSpotlight.png');
     // -Host (Sprite Sheets)
     Object.entries(host).forEach(([key, anim]) => {
@@ -487,7 +504,7 @@ window.draw = function () {
             }
         }
 
-        //Host Animations should go here?
+        //Host Animations
         host.animator.play()
         host.animator.update();
         host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, -300, width - 500), height / 2.4, 0.75);
@@ -521,6 +538,11 @@ window.draw = function () {
         if (RTSstate.cues.APPLAUSE_CUE) {
             drawApplauseON();
         }
+
+        // Applause Feedback
+        assets.hands.animator.play();
+        assets.animator.update();
+        assets.animator.draw(width/2, height-50, 10, 10);
 
         // Audience Heads
         drawAudience();
