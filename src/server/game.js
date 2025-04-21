@@ -369,11 +369,13 @@ class GameMachine {
                 if (this.cues.CHEAT_CUE) {
                     scoreChange(this, 15, "Cheat");
                     clearTimeout(this.cheatTimer);
+                    this.addEvent(this.feedback.CHEAT_GOOD, { });
                     this.addEvent(this.events.TURN_OFF_CHEAT);
                     this.sendOscCue(this.lighting.CHEAT)
                     this.sendOscCue(this.lighting.IDLE)
                 } else if (!this.cues.CHEAT_CUE) {
                     scoreChange(this, -15, "Cheat");
+                    this.addEvent(this.feedback.CHEAT_BAD, { });
                 }
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
@@ -579,6 +581,18 @@ class GameMachine {
                 machine.messages_for_frontend.push({
                     name: 'hands',
                     target: 'audience'
+                })
+            }
+            if (event.name === this.feedback.CHEAT_GOOD) {
+                machine.messages_for_frontend.push({
+                    name: 'happy',
+                    target: 'al'
+                })
+            }
+            if (event.name === this.feedback.CHEAT_BAD) {
+                machine.messages_for_frontend.push({
+                    name: 'pissed',
+                    target: 'al'
                 })
             }
         } else if (this.state === this.states.END) {                          //END STATE
