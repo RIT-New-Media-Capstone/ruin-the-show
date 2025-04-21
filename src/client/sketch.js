@@ -295,10 +295,10 @@ window.preload = function () {
     end.fail = loadImage('Assets/EndState/EndStates_NoStars-01.png');
 
     end.curtains.idle.image = loadImage('Assets/SpriteSheets/Misc/CurtainsClose.png');
-    populateFrames(smallSpriteSheetConfig, end.curtains.idle.frames)
+    populateFrames(end.curtains.idle.config, end.curtains.idle.frames)
     end.curtains.animator = new SpriteAnimator({idle: end.curtains.idle})
-    // end.curtains.animator.setAnimation("idle", null, false, () => { end.curtainsClosed = true })
-    end.curtains.animator.setAnimation("idle")
+    end.curtains.animator.setAnimation("idle", null, false, () => { end.curtainsClosed = true })
+    // end.curtains.animator.setAnimation("idle")
 }
 
 function populateFrames(animConfig, framesArray) {
