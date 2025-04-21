@@ -286,6 +286,9 @@ class GameMachine {
                 turnOffApplauseLED();
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
+                setTimeout(() => {
+                    machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
+                }, 30 * 1000);
                 this.sendOscCue(this.lighting.ONBOARDING_START)
             }
             if (event.name === this.events.RFID_SCAN) {
@@ -293,6 +296,9 @@ class GameMachine {
                 turnOffApplauseLED();
                 this.state = this.states.ONBOARDING;
                 console.log(`State transition: IDLE -> ONBOARDING`);
+                setTimeout(() => {
+                    machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
+                }, 30 * 1000);
                 this.sendOscCue(this.lighting.ONBOARDING_START)
             }
             else {
