@@ -419,7 +419,7 @@ window.draw = function () {
 
         // Close curtains 
         end.curtains.animator.update();
-        end.curtains.animator.draw(0, 0);
+        end.curtains.animator.draw(0, 0, 0.5);
 
         image(backgroundLayer, 0, 0);
 
