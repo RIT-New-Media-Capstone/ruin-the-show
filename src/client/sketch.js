@@ -359,7 +359,6 @@ const syncStateLoop = async () => {
 }
 
 function changeAnimations(message) {
-    console.log(message)
     const target = message.target
     const animation = message.name
     if (target && animation) {
@@ -442,7 +441,6 @@ window.draw = function () {
         //Host Animations should go here?
         host.animator.play()
         host.animator.update();
-        console.log(RTSstate.host.POSITION)
         host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, -300, width - 500), height / 2.4, 0.75);
 
         // Spotlight Cue
@@ -688,8 +686,6 @@ function drawCurtainClose() {
     if (!end.curtainsClosed) {
         sx = (currentFrameCurtains % numCols) * frameWidthCurtains;
         sy = Math.floor(currentFrameCurtains / numCols) * frameHeightCurtains;
-
-        console.log(currentFrameCurtains)
 
         if (frameCount % frameDelay === 0) {
             currentFrameCurtains = (currentFrameCurtains + 1) % totalFramesCurtains;
