@@ -188,8 +188,8 @@ class GameMachine {
         APPLAUSE_BAD: false, //Boos
         CHEAT_GOOD: false, // Host Animate (Happy)
         CHEAT_BAD: false, // Host Animate (Mad)
-        PODIUM_GOOD: false, // Green Light & Contestant (Happy)
-        PODIUM_BAD: false, // Red Light Contestant (Sad)
+        PODIUM_GOOD: 'podium-good', // Green Light & Contestant (Happy)
+        PODIUM_BAD: 'podium-bad', // Red Light Contestant (Sad)
         LEVER_INITIAL: null,
         LEVER_POS: null, // Zoom Dial Rotating
         JOYSTICK_POS: 0,
@@ -531,7 +531,6 @@ class GameMachine {
             }
             // Set feedback 
             if (event.name === this.feedback.PODIUM_GOOD) {
-                console.log("trigger good")
                 const podiumNum = event.data.podiumNum
                 machine.messages_for_frontend.push({
                     name: 'right',
@@ -544,7 +543,6 @@ class GameMachine {
                  })
             }
             if (event.name === this.feedback.PODIUM_BAD) {
-                console.log("trigger bad")
                 const podiumNum = event.data.podiumNum
                 machine.messages_for_frontend.push({
                     name: 'wrong',
