@@ -333,7 +333,7 @@ window.setup = async function () {
     backgroundLayer = createGraphics(width, height);
     onboardingGraphicsLayer = createGraphics(width, height)
 
-    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/Full Onboarding Thingy.mp4')
+    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/NEW ONBOARDING.mp4')
     idleOnboarding.onboarding.hide();
     idleOnboarding.onboarding.volume(0);
     idleOnboarding.onboarding.size(width, height)
@@ -382,7 +382,7 @@ window.draw = function () {
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
         // TODO: find a way to let audio play without triggering browser-side autoblock 
-        // idleOnboarding.onboarding.volume(1)
+         idleOnboarding.onboarding.volume(1)
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
             idleOnboarding.onboarding_playing = true
