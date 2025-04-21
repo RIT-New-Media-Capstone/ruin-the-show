@@ -366,6 +366,44 @@ function changeAnimations(message) {
             host.animator.setAnimation(animation)
             return
         }
+        else if (target === 1) {
+            contestants[1].animator.setAnimation(animation)
+        }
+        else if (target === 2) {
+            contestants[2].animator.setAnimation(animation)
+        }
+        else if (target === 3) {
+            contestants[3].animator.setAnimation(animation)
+        }
+        else if (target === 4) {
+            contestants[4].animator.setAnimation(animation)
+        }
+        else if (target === 'podium') {
+            let pos = 0
+            switch (message.location) {
+                case 1: 
+                pos = 243
+                break;
+
+                case 2: 
+                pos = 393
+                break;
+
+                case 3: 
+                pos = 563
+                break; 
+
+                case 4: 
+                pos = 707
+                break;
+
+                default: 
+                console.log("Invalid podium: ", message.location)
+                return
+            }
+            if (animation === 'green') drawRightLight(pos);
+            else if (animation === 'red') drawWrongLight(pos);
+        }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
         }

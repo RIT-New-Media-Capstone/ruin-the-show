@@ -188,14 +188,8 @@ class GameMachine {
         APPLAUSE_BAD: false, //Boos
         CHEAT_GOOD: false, // Host Animate (Happy)
         CHEAT_BAD: false, // Host Animate (Mad)
-        PODIUM_1_GOOD: false, // Green Light & Contestant (Happy)
-        PODIUM_1_BAD: false, // Red Light Contestant (Sad)
-        PODIUM_2_GOOD: false,
-        PODIUM_2_BAD: false,
-        PODIUM_3_GOOD: false,
-        PODIUM_3_BAD: false,
-        PODIUM_4_GOOD: false,
-        PODIUM_4_BAD: false, // ^^^
+        PODIUM_GOOD: false, // Green Light & Contestant (Happy)
+        PODIUM_BAD: false, // Red Light Contestant (Sad)
         LEVER_INITIAL: null,
         LEVER_POS: null, // Zoom Dial Rotating
         JOYSTICK_POS: 0,
@@ -416,9 +410,11 @@ class GameMachine {
                 const podiumNum = event.data.num
                 if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, 8, "Podium");
+                    this.addEvent(this.feedback.PODIUM_GOOD, {podiumNum});
                     this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
                 } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, -8, "Podium");
+                    this.addEvent(this.feedback.PODIUM_BAD, {podiumNum}); 
                 }
                 clearTimeout(this.podiumTimer);
                 this.addEvent(this.events.TURN_OFF_PODIUM, { num: podiumNum });
@@ -532,6 +528,31 @@ class GameMachine {
                 this.podiumTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_PODIUM, { num: podiumToTrigger });
                 }, 3 * 1000);
+            }
+            // Set feedback 
+            if (event.name === this.feedback.PODIUM_GOOD) {
+                const podiumNum = event.data.podiumNum
+                machine.messages_for_frontend.push({
+                    name: 'right',
+                    target: podiumNum
+                 })
+                 machine.messages_for_frontend.push({
+                    name: 'green',
+                    target: 'podium',
+                    location: podiumNum
+                 })
+            }
+            if (event.name === this.feedback.PODIUM_BAD) {
+                const podiumNum = event.data.podiumNum
+                machine.messages_for_frontend.push({
+                    name: 'wrong',
+                    target: podiumNum
+                 })
+                 machine.messages_for_frontend.push({
+                    name: 'red',
+                    target: 'podium',
+                    location: podiumNum
+                 })
             }
         } else if (this.state === this.states.END) {                          //END STATE
             turnOnApplauseLED();
