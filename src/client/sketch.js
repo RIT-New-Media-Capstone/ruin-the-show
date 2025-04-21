@@ -46,6 +46,8 @@ let RTSstate = {
     },
 };
 
+let RTSmessages = []
+
 
 // II. Initialize objects/variables for assets
 // *Sprite Sheets are calculated by a single frame's width & height, how many rows and columns a sheet has, and indexing the current frame
@@ -346,10 +348,31 @@ const syncStateLoop = async () => {
         const res = await fetch('/getState');
         const state = await res.json();
         RTSstate = state.state;
+        RTSmessages = state.messages
+        if(RTSmessages) {
+            RTSmessages.forEach(message => changeAnimations(message))
+        }
     } catch (err) {
         console.error('Error syncing state:', err);
     }
     setTimeout(syncStateLoop, 30);
+}
+
+function changeAnimations(message) {
+    const target = message.target
+    const animation = message.name
+    if (target && animation) {
+        if (target === 'al') {
+            host.animator.setAnimation(animation)
+            return
+        }
+        else {
+            console.log(`Target: ${target}, Animation: ${animation}`)
+        }
+    }
+    else {
+        console.log('Invalid message: ', message)
+    }
 }
 
 
@@ -382,7 +405,7 @@ window.draw = function () {
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
         // TODO: find a way to let audio play without triggering browser-side autoblock 
-         idleOnboarding.onboarding.volume(1)
+        idleOnboarding.onboarding.volume(1)
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
             idleOnboarding.onboarding_playing = true

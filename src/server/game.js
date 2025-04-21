@@ -257,7 +257,8 @@ class GameMachine {
                 newPos = this.host.MAX;
                 this.host.DIRECTION = -1; // Flip direction to left
                 machine.messages_for_frontend.push({
-                    name: 'turnForLeft'
+                    name: 'turnForLeft',
+                    target: 'al'
                  })
                 this.host.PAUSED = true;
                 setTimeout(() => { this.host.PAUSED = false; }, 500);
@@ -265,14 +266,16 @@ class GameMachine {
                 newPos = this.host.MIN;
                 this.host.DIRECTION = 1; // Flip direction to right
                 machine.messages_for_frontend.push({
-                    name: 'turnForRight'
+                    name: 'turnForRight',
+                    target: 'al'
                  })
                 this.host.PAUSED = true;
                 setTimeout(() => { this.host.PAUSED = false; }, 500);
             } else {
                 const walkDir = this.host.DIRECTION > 0 ? 'walkRight' : 'walkLeft'
                 machine.messages_for_frontend.push({
-                    name: 'turnForRight'
+                    name: 'turnForRight',
+                    target: 'al'
                  })
             }
 
@@ -687,7 +690,8 @@ const updateHostPosition = () => {
     if (Math.random() < 0.1) {
         host.PAUSED = true;
         machine.messages_for_frontend.push({
-           name: 'idle'
+           name: 'idle',
+           target: 'al'
         })
         setTimeout(() => {
             host.PAUSED = false;
