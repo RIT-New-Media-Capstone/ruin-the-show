@@ -126,6 +126,7 @@ class GameMachine {
     //Joystick Variables
     lastDir = null
     targetDir = null
+    messages_for_frontend = []
 
     states = {
         IDLE: 'IDLE',
@@ -255,13 +256,24 @@ class GameMachine {
             if (newPos >= this.host.MAX) {
                 newPos = this.host.MAX;
                 this.host.DIRECTION = -1; // Flip direction to left
+                machine.messages_for_frontend.push({
+                    name: 'turnForLeft'
+                 })
                 this.host.PAUSED = true;
                 setTimeout(() => { this.host.PAUSED = false; }, 500);
             } else if (newPos <= this.host.MIN) {
                 newPos = this.host.MIN;
                 this.host.DIRECTION = 1; // Flip direction to right
+                machine.messages_for_frontend.push({
+                    name: 'turnForRight'
+                 })
                 this.host.PAUSED = true;
                 setTimeout(() => { this.host.PAUSED = false; }, 500);
+            } else {
+                const walkDir = this.host.DIRECTION > 0 ? 'walkRight' : 'walkLeft'
+                machine.messages_for_frontend.push({
+                    name: 'turnForRight'
+                 })
             }
 
             this.host.POSITION = newPos;
@@ -660,16 +672,19 @@ const updateHostPosition = () => {
     const host = machine.host;
 
     // Skip if paused
-    if (host.paused) {
+    if (host.PAUSED) {
         setTimeout(updateHostPosition, 100);
         return;
     }
 
     // 10% chance to pause randomly for a short break mid-track
     if (Math.random() < 0.1) {
-        host.paused = true;
+        host.PAUSED = true;
+        machine.messages_for_frontend.push({
+           name: 'idle'
+        })
         setTimeout(() => {
-            host.paused = false;
+            host.PAUSED = false;
         }, 300); // brief pause
     }
 

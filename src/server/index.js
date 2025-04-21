@@ -23,8 +23,11 @@ app.get('/', (req, res) => {
 
 app.get('/getState', (req, res) => {
   res.json({
-    state: game.machine.getState()
+    state: game.machine.getState(),
+    messages: game.machine.messages_for_frontend
   });
+
+  game.machine.messages_for_frontend.length = 0;
 });
 
 app.listen(PORT, () => {
