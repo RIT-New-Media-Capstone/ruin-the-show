@@ -450,9 +450,11 @@ class GameMachine {
                     if (this.joystickTouched) {
                         if (diff <= 10) {
                             scoreChange(this, 10, "Joystick");
+                            this.addEvent(this.feedback.JOYSTICK_GOOD, {});
                             console.log("Joystick moved correctly to target. Score rewarded.")
                         } else {
                             scoreChange(this, -10, "Joystick");
+                            this.addEvent(this.feedback.JOYSTICK_BAD, {});
                             console.log("Joystick missed the target. Score penalized.")
                         }
                     } else {
@@ -593,6 +595,18 @@ class GameMachine {
                 machine.messages_for_frontend.push({
                     name: 'pissed',
                     target: 'al'
+                })
+            }
+            if (event.name === this.feedback.JOYSTICK_GOOD) {
+                machine.messages_for_frontend.push({
+                    name: 'green',
+                    target: 'light'
+                })
+            }
+            if (event.name === this.feedback.JOYSTICK_BAD) {
+                machine.messages_for_frontend.push({
+                    name: 'red',
+                    target: 'light'
                 })
             }
         } else if (this.state === this.states.END) {                          //END STATE

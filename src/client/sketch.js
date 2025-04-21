@@ -400,7 +400,6 @@ function changeAnimations(message) {
         if (target === 'al') {
             if (animation === 'happy' || animation === 'pissed') console.log("Need spritesheet: ", animation)
             host.animator.setAnimation(animation)
-            return
         }
         else if (target === 1) {
             contestants[1].animator.setAnimation(animation)
@@ -421,6 +420,10 @@ function changeAnimations(message) {
         else if (target === 'audience') {
             if (animation === 'stars') applause.shouldStars = true
             else if (animation === 'hands') applause.shouldHands = true
+        }
+        else if (target === 'light') {
+            if (animation === 'green') console.log("tint spotlight green")
+            else if (animation === 'red') console.log("tint spotlight red")
         }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
