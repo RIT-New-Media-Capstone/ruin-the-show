@@ -186,6 +186,25 @@ const podiumOffsets = {
     3: 565,
     4: 635,
 };
+
+const podiumLights = {
+    1: {
+        shouldGreen: false,
+        shouldRed: false
+    },
+    2: {
+        shouldGreen: false,
+        shouldRed: false
+    },
+    3: {
+        shouldGreen: false,
+        shouldRed: false
+    },
+    4: {
+        shouldGreen: false,
+        shouldRed: false
+    },
+}
 // Classes
 // -Sprite Animator
 class SpriteAnimator {
@@ -349,7 +368,7 @@ const syncStateLoop = async () => {
         const state = await res.json();
         RTSstate = state.state;
         RTSmessages = state.messages
-        if(RTSmessages) {
+        if (RTSmessages) {
             RTSmessages.forEach(message => changeAnimations(message))
         }
     } catch (err) {
@@ -379,31 +398,8 @@ function changeAnimations(message) {
             contestants[4].animator.setAnimation(animation)
         }
         else if (target === 'podium') {
-            let pos = 0
-            switch (message.location) {
-                case 1: 
-                pos = 243
-                break;
-
-                case 2: 
-                pos = 393
-                break;
-
-                case 3: 
-                pos = 563
-                break; 
-
-                case 4: 
-                pos = 707
-                break;
-
-                default: 
-                console.log("Invalid podium: ", message.location)
-                return
-            }
-            pos = width / 2
-            if (animation === 'green') drawRightLight(pos);
-            else if (animation === 'red') drawWrongLight(pos);
+            if (animation === 'green') podiumLights[message.location].shouldGreen = true
+            else if (animation === 'red') podiumLights[message.location].shouldRed = true
         }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
@@ -472,6 +468,22 @@ window.draw = function () {
         for (let i = 1; i <= 4; i++) {
             if (RTSstate.cues[`PODIUM_${i}_CUE`]) {
                 drawPodiumLight(i);
+            }
+        }
+
+        // Podium Feedback 
+        for (let i = 1; i <= 4; i++) {
+            if (podiumLights[i].shouldGreen) {
+                drawRightLight(i);
+                setTimeout(() => {
+                    podiumLights[i].shouldGreen = false
+                }, 1000) // turn off after 1 second 
+            }
+            else if (podiumLights[i].shouldRed) {
+                drawWrongLight(i);
+                setTimeout(() => {
+                    podiumLights[i].shouldRed = false
+                }, 1000) // turn off after 1 second 
             }
         }
 
@@ -628,10 +640,10 @@ function drawCountdown() {
         textSize(32);
         textAlign(CENTER, CENTER);
         text(seconds, 112, 148);
-    
+
         if (remaining === 0) {
-          timerActive = false;
-          // trigger timeout behavior
+            timerActive = false;
+            // trigger timeout behavior
         }
     }
 }
@@ -711,14 +723,46 @@ function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHe
     return { x, y, w, h }
 }
 // Podiums
-function drawRightLight(x) {
-    //X-Coordinates for each podium
-    //(243), (393), (563), (707)
+function drawRightLight(index) {
+    let x = 0
+    switch (index) {
+        case 1:
+            x = 243
+            break;
+
+        case 2:
+            x = 393
+            break;
+
+        case 3:
+            x = 563
+            break;
+
+        case 4:
+            x = 707
+            break;
+    }
     backgroundLayer.image(assets.rightLit, x, 100, width / 3, height / 1.5);
 }
-function drawWrongLight(x) {
-    //X-Coordinates for each podium
-    //(243), (393), (563), (707)
+function drawWrongLight(index) {
+    let x = 0
+    switch (index) {
+        case 1:
+            x = 243
+            break;
+
+        case 2:
+            x = 393
+            break;
+
+        case 3:
+            x = 563
+            break;
+
+        case 4:
+            x = 707
+            break;
+    }
     backgroundLayer.image(assets.wrongLit, x, 123, width / 3, height / 1.5);
 }
 
