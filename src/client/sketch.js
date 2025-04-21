@@ -24,26 +24,19 @@ let RTSstate = {
         JOYSTICK_CUE: false,
         JOYSTICK_TARGET: 0, // Host's position on screen
     },
-    feedback: {
-        // Call true then settimout false for how many seconds needed to animate?
-        APPLAUSE_GOOD: false, // Applause
-        APPLAUSE_BAD: false, // Boos
-        CHEAT_GOOD: false, // Host Animate (Happy)
-        CHEAT_BAD: false, // Host Animate (Mad)
-        PODIUM_1_GOOD: false, // Green Light & Contestant (Happy)
-        PODIUM_1_BAD: false, // Red Light Contestant (Sad)
-        PODIUM_2_GOOD: false,
-        PODIUM_2_BAD: false,
-        PODIUM_3_GOOD: false,
-        PODIUM_3_BAD: false,
-        PODIUM_4_GOOD: false,
-        PODIUM_4_BAD: false, // ^^^
+    feedback: { //Call true then settimout false for how many seconds needed to animate?
+        APPLAUSE_GOOD: 'applause-good', //Applause
+        APPLAUSE_BAD: 'applause-bad', //Boos
+        CHEAT_GOOD: 'cheat-good', // Host Animate (Happy)
+        CHEAT_BAD: 'cheat-bad', // Host Animate (Mad)
+        PODIUM_GOOD: 'podium-good', // Green Light & Contestant (Happy)
+        PODIUM_BAD: 'podium-bad', // Red Light Contestant (Sad)
         LEVER_INITIAL: null,
         LEVER_POS: null, // Zoom Dial Rotating
         JOYSTICK_POS: 0,
-        JOYSTICK_GOOD: false, // Spotlight is Green
-        JOYSTICK_BAD: false, // Spotlight is Red
-    },
+        JOYSTICK_GOOD: 'joystick-good', // Spotlight is Green
+        JOYSTICK_BAD: 'joystick-bad', // Spotlight is Red
+    }
 };
 
 let RTSmessages = []
