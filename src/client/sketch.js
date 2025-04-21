@@ -225,11 +225,11 @@ class SpriteAnimator {
             }
         }
     }
-    draw(x, y, scale = 1) {
+    draw(x, y, scale = 1, widthOverride = null, heightOverride = null) {
         const anim = this.animations[this.currentAnim];
         const frame = anim.frames[this.currentFrame];
         const [sx, sy, sw, sh] = frame;
-        backgroundLayer.image(anim.image, x, y, sw * scale, sh * scale, sx, sy, sw, sh);
+        backgroundLayer.image(anim.image, x, y, widthOverride ? widthOverride : sw * scale, heightOverride ? heightOverride : sh * scale, sx, sy, sw, sh);
     }
 }
 
@@ -419,7 +419,7 @@ window.draw = function () {
 
         // Close curtains 
         end.curtains.animator.update();
-        end.curtains.animator.draw(0, 0);
+        end.curtains.animator.draw(0, 0, 1, width, height);
 
         image(backgroundLayer, 0, 0);
 
