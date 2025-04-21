@@ -375,10 +375,11 @@ window.draw = function () {
         idleOnboarding.onboarding.stop()
         idleOnboarding.onboarding_playing = false
 
-        end.curtainsClosed = false,
-            end.scoreVis = false,
+        end.curtainsClosed = false
+        end.scoreVis = false
+        end.curtains.animator.currentFrame = 0
 
-            image(idleOnboarding.idle, 0, 0, width, height);
+        image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
         // TODO: find a way to let audio play without triggering browser-side autoblock 
         // idleOnboarding.onboarding.volume(1)
@@ -460,8 +461,8 @@ window.draw = function () {
 
         // Zoom Cue
         if (RTSstate.cues.LEVER_CUE) {
-        drawLeverCue();
-        drawLeverFeedback()
+            drawLeverCue();
+            drawLeverFeedback()
         }
 
     } else if (RTSstate.state === 'END') { // End
@@ -471,6 +472,7 @@ window.draw = function () {
         if (!end.curtainsClosed) {
             // TESTING only 
             drawBackground()
+            end.curtains.animator.play()
             end.curtains.animator.update();
             end.curtains.animator.draw(0, 0, 1, width, height);
             image(backgroundLayer, 0, 0);
@@ -540,7 +542,7 @@ function drawHUD() {
         rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3);
         fill('#dc4042')
         //Map the ranges here from 0-250
-        rect(x + 25, y + 70, min(RTSstate.score * 5 / 6, 250), 50 * 2 / 3);
+        rect(x + 25, y + 70, min(RTSstate.score * 5 / 6, 200), 50 * 2 / 3);
         image(assets.stars, x, y, width / 5, height / 5);
     }
     if (assets.score) {
