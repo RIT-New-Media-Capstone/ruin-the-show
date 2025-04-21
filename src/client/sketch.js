@@ -422,7 +422,7 @@ function changeAnimations(message) {
         }
         else if (target === 'audience') {
             if (animation === 'stars') applause.shouldStars = true
-            else if (animation === 'hands') applause.shouldHands = true
+            applause.shouldHands = true
         }
         else if (target === 'light') {
             if (animation === 'green') console.log("tint spotlight green")
