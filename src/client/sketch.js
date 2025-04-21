@@ -583,7 +583,7 @@ function drawCountdown() {
     if (timerActive) {
         let remaining = getTimeRemaining();
         let seconds = floor(remaining / 1000);
-        seconds = `0${seconds / 60}:${nf(seconds % 60, 2)}`
+        seconds = `0${floor(seconds / 60)}:${nf(seconds % 60, 2)}`
         fill('black');
         textFont(countdownFont);
         textSize(32);
