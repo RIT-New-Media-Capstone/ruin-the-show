@@ -425,6 +425,10 @@ function changeAnimations(message) {
             if (animation === 'green') console.log("tint spotlight green")
             else if (animation === 'red') console.log("tint spotlight red")
         }
+        else if (target === 'dial') {
+            if (animation === 'green') console.log("tint zoom dial green")
+            else if (animation === 'red') console.log("tint zoom dial red")
+        }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
         }

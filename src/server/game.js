@@ -192,6 +192,8 @@ class GameMachine {
         PODIUM_BAD: 'podium-bad', // Red Light Contestant (Sad)
         LEVER_INITIAL: null,
         LEVER_POS: null, // Zoom Dial Rotating
+        LEVER_GOOD: 'lever-good',
+        LEVER_BAD: 'lever-bad',
         JOYSTICK_POS: 0,
         JOYSTICK_GOOD: 'joystick-good', // Spotlight is Green
         JOYSTICK_BAD: 'joystick-bad', // Spotlight is Red
@@ -403,6 +405,7 @@ class GameMachine {
                     if (pos >= min && pos <= max) {
                         // Successful move
                         scoreChange(this, 7, "Lever");
+                        this.addEvent(this.feedback.LEVER_GOOD, { });
                         clearTimeout(this.leverTimer);
                         this.cues.LEVER_TARGET = null; // prevent double scoring
                         console.log("Lever moved correctly. Score rewarded.");
@@ -482,6 +485,7 @@ class GameMachine {
                         if (this.leverTouched) {
                             // Moved but failed to hit target
                             scoreChange(this, -7, "Lever");
+                            this.addEvent(this.feedback.LEVER_BAD, { });
                             console.log("Lever moved but missed target. Score penalized.");
                         } else {
                             console.log("Lever not touched. No penalty.");
@@ -607,6 +611,18 @@ class GameMachine {
                 machine.messages_for_frontend.push({
                     name: 'red',
                     target: 'light'
+                })
+            }
+            if (event.name === this.feedback.LEVER_GOOD) {
+                machine.messages_for_frontend.push({
+                    name: 'green',
+                    target: 'dial'
+                })
+            }
+            if (event.name === this.feedback.LEVER_BAD) {
+                machine.messages_for_frontend.push({
+                    name: 'red',
+                    target: 'dial'
                 })
             }
         } else if (this.state === this.states.END) {                          //END STATE
