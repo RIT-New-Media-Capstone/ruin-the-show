@@ -253,7 +253,7 @@ class GameMachine {
                 machine.messages_for_frontend.push({
                     name: 'turnForLeft',
                     target: 'al'
-                 })
+                })
                 this.host.PAUSED = true;
                 setTimeout(() => { this.host.PAUSED = false; }, 500);
             } else if (newPos <= this.host.MIN) {
@@ -262,7 +262,7 @@ class GameMachine {
                 machine.messages_for_frontend.push({
                     name: 'turnForRight',
                     target: 'al'
-                 })
+                })
                 this.host.PAUSED = true;
                 setTimeout(() => { this.host.PAUSED = false; }, 500);
             } else {
@@ -270,7 +270,7 @@ class GameMachine {
                 machine.messages_for_frontend.push({
                     name: walkDir,
                     target: 'al'
-                 })
+                })
             }
 
             this.host.POSITION = newPos;
@@ -410,11 +410,11 @@ class GameMachine {
                 const podiumNum = event.data.num
                 if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, 8, "Podium");
-                    this.addEvent(this.feedback.PODIUM_GOOD, {podiumNum});
+                    this.addEvent(this.feedback.PODIUM_GOOD, { podiumNum });
                     this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
                 } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
                     scoreChange(this, -8, "Podium");
-                    this.addEvent(this.feedback.PODIUM_BAD, {podiumNum}); 
+                    this.addEvent(this.feedback.PODIUM_BAD, { podiumNum });
                 }
                 clearTimeout(this.podiumTimer);
                 this.addEvent(this.events.TURN_OFF_PODIUM, { num: podiumNum });
@@ -535,24 +535,37 @@ class GameMachine {
                 machine.messages_for_frontend.push({
                     name: 'right',
                     target: podiumNum
-                 })
-                 machine.messages_for_frontend.push({
+                })
+                machine.messages_for_frontend.push({
                     name: 'green',
                     target: 'podium',
                     location: podiumNum
-                 })
+                })
+                setTimeout(() => {
+                    machine.messages_for_frontend.push({
+                        name: 'idle',
+                        target: podiumNum
+                    })
+                }, 1000);
             }
             if (event.name === this.feedback.PODIUM_BAD) {
                 const podiumNum = event.data.podiumNum
                 machine.messages_for_frontend.push({
                     name: 'wrong',
                     target: podiumNum
-                 })
-                 machine.messages_for_frontend.push({
+                })
+                machine.messages_for_frontend.push({
                     name: 'red',
                     target: 'podium',
                     location: podiumNum
-                 })
+                })
+
+                setTimeout(() => {
+                    machine.messages_for_frontend.push({
+                        name: 'idle',
+                        target: podiumNum
+                    })
+                }, 1000);
             }
         } else if (this.state === this.states.END) {                          //END STATE
             turnOnApplauseLED();
@@ -667,7 +680,7 @@ class GameMachine {
             address: `/composition/columns/${column}/connect`,  // selects whole column and plays all animations in column
             args: [{ type: "i", value: 1 }] // type: integer, value: boolean -> turns on column 
         });
-       
+
     }
 }
 
@@ -711,8 +724,8 @@ const updateHostPosition = () => {
     if (Math.random() < 0.1) {
         host.PAUSED = true;
         machine.messages_for_frontend.push({
-           name: 'idle',
-           target: 'al'
+            name: 'idle',
+            target: 'al'
         })
         setTimeout(() => {
             host.PAUSED = false;
@@ -749,11 +762,11 @@ const awake = () => {
 
     rfidEventSource.addEventListener('message', (event) => {
         const data = event.data
-        if(data) {
+        if (data) {
             machine.addEvent(machine.events.RFID_SCAN)
         }
     })
-    
+
 };
 
 export { awake, machine }
