@@ -99,6 +99,7 @@ const assets = {
     stars: "",
     timer: "",
     levercamera: "",
+    leverdial: "",
 }
 // -End
 const end = {
@@ -121,7 +122,7 @@ const host = {
     turnLeftFor: { file: "AL_TurnL_to_F", config: smallSpriteSheetConfig, frames: [] },
     turnRightFor: { file: "AL_TurnR_to_F", config: smallSpriteSheetConfig, frames: [] },
     walkLeft: { file: "AL_Walk_L", config: smallSpriteSheetConfig, frames: [] },
-    walkRight: { file: "AL_Walk_R", config: smallSpriteSheetConfig, frames: [] }
+    walkRight: { file: "AL_Walk_R", config: smallSpriteSheetConfig, frames: [] },
 };
 // -Contestants
 const contestants = {
@@ -170,6 +171,7 @@ let zoomedIn = false;
 let zoom;
 let zoomTimer = 0;
 let zoomDuration = 30;
+let dialRotation = 0
 // -Timer
 let countdownFont;
 let countdown = 60;
@@ -271,6 +273,7 @@ window.preload = function () {
     assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
     assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
     assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature.png')
+    assets.leverdial = loadImage('/Assets/Interactions/Lever/ZoomDial.png')
 
     assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
     assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
@@ -325,6 +328,7 @@ window.setup = async function () {
     // 16:9 aspect ratio with slight padding
     createCanvas(assets.background.width / 6, assets.background.height / 6);
     frameRate(30);
+    angleMode(DEGREES)
     countdownTimer = countdown;
     backgroundLayer = createGraphics(width, height);
     onboardingGraphicsLayer = createGraphics(width, height)
@@ -365,16 +369,16 @@ window.draw = function () {
     ];
 
     //Debugging Particular States
-    // RTSstate.state = 'END'
+    RTSstate.state = 'PLAYING'
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
         idleOnboarding.onboarding_playing = false
 
         end.curtainsClosed = false,
-        end.scoreVis = false,
+            end.scoreVis = false,
 
-        image(idleOnboarding.idle, 0, 0, width, height);
+            image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
         // TODO: find a way to let audio play without triggering browser-side autoblock 
         // idleOnboarding.onboarding.volume(1)
@@ -451,13 +455,15 @@ window.draw = function () {
             drawCheat();
         }
 
-        // Zoom Cue
-        if (RTSstate.cues.LEVER_CUE) {
-            drawLeverCue();
-        }
-
         //HUD
         drawHUD();
+
+        // Zoom Cue
+        if (RTSstate.cues.LEVER_CUE) {
+        drawLeverCue();
+        drawLeverFeedback()
+        }
+
     } else if (RTSstate.state === 'END') { // End
         idleOnboarding.onboarding.stop()
 
@@ -538,12 +544,14 @@ function drawHUD() {
         image(assets.stars, x, y, width / 5, height / 5);
     }
     if (assets.score) {
+        push()
         image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
         //Let's make this look better
         fill('#000000');
         textSize(60);
         scale(1.3, 1);
         text(nf(RTSstate.score * 10, 4), width - 398.5, 60);
+        pop()
     }
 }
 function drawCountdown() {
@@ -583,6 +591,21 @@ function drawSpotlight() {
 function drawLeverCue() {
     if (assets.levercamera) {
         image(assets.levercamera, 0, 0, width, height);
+    }
+}
+
+function drawLeverFeedback() {
+    if (assets.leverdial) {
+        push()
+        let x = width / 1.05;
+        let y = height / 2;
+
+        translate(x, y);
+        dialRotation = map(RTSstate.feedback.LEVER_POS, 1, 100, -45, 45)
+        rotate(dialRotation)
+        imageMode(CENTER)
+        image(assets.leverdial, 0, 0, assets.leverdial.width / 7, assets.leverdial.height / 7)
+        pop()
     }
 }
 // Podiums
