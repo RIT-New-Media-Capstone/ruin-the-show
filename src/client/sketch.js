@@ -443,7 +443,7 @@ window.draw = function () {
         host.animator.play()
         host.animator.update();
         console.log(RTSstate.host.POSITION)
-        host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, 0, width - 500), height / 2.4, 0.75);
+        host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, -200, width - 500), height / 2.4, 0.75);
 
         // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
