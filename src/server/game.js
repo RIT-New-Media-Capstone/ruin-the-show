@@ -359,8 +359,10 @@ class GameMachine {
                     scoreChange(this, 5, "Applause");
                     clearTimeout(this.applauseTimer);
                     this.addEvent(this.events.TURN_OFF_APPLAUSE);
+                    this.addEvent(this.feedback.APPLAUSE_GOOD, { });
                 } else if (!this.cues.APPLAUSE_CUE) {
                     scoreChange(this, -5, "Applause");
+                    this.addEvent(this.feedback.APPLAUSE_BAD, { });
                 }
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
@@ -566,6 +568,18 @@ class GameMachine {
                         target: podiumNum
                     })
                 }, 4 * 1000);
+            }
+            if (event.name === this.feedback.APPLAUSE_GOOD) {
+                machine.messages_for_frontend.push({
+                    name: 'stars',
+                    target: 'audience'
+                })
+            }
+            if (event.name === this.feedback.APPLAUSE_BAD) {
+                machine.messages_for_frontend.push({
+                    name: 'hands',
+                    target: 'audience'
+                })
             }
         } else if (this.state === this.states.END) {                          //END STATE
             turnOnApplauseLED();

@@ -84,8 +84,8 @@ const assets = {
     audience: "",
     background: "",
     cheat: "",
-    hands: { idle: {file: "Audience Reaction", config: bigSpriteSheetConfig, frames: [] } },
-    handstars: { idle: {file: "RTS_Stars", config: starSpriteSheetConfig, frames: [] } },
+    hands: { idle: { file: "Audience Reaction", config: bigSpriteSheetConfig, frames: [] } },
+    handstars: { idle: { file: "RTS_Stars", config: starSpriteSheetConfig, frames: [] } },
     podium1: "",
     podium2: "",
     podium3: "",
@@ -205,6 +205,12 @@ const podiumLights = {
         shouldRed: false
     },
 }
+
+// Applause 
+const applause = {
+    shouldHands: false,
+    shouldStars: false,
+}
 // Classes
 // -Sprite Animator
 class SpriteAnimator {
@@ -299,7 +305,7 @@ window.preload = function () {
 
     assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
     assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
-    
+
     assets.hands.idle.image = loadImage('Assets/SpriteSheets/Misc/Audience Reaction.png');
     populateFrames(assets.hands.idle.config, assets.hands.idle.frames);
     assets.hands.animator = new SpriteAnimator({ idle: assets.hands.idle });
@@ -408,9 +414,12 @@ function changeAnimations(message) {
             contestants[4].animator.setAnimation(animation)
         }
         else if (target === 'podium') {
-            console.log(message)
             if (animation === 'green') podiumLights[message.location].shouldGreen = true
             else if (animation === 'red') podiumLights[message.location].shouldRed = true
+        }
+        else if (target === 'audience') {
+            if (animation === 'stars') applause.shouldStars = true
+            else if (animation === 'hands') applause.shouldHands = true
         }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
@@ -544,9 +553,17 @@ window.draw = function () {
         }
 
         // Applause Feedback
-        assets.hands.animator.play();
-        assets.hands.animator.update();
-        assets.hands.animator.draw(width/2, height-50, 10, 10);
+        if (applause.shouldHands) {
+            assets.hands.animator.setAnimation("idle", null, false);
+            assets.hands.animator.play();
+            assets.hands.animator.update();
+            assets.hands.animator.draw(width / 2, height - 50, 10, 10);
+        } else if (applause.shouldStars) {
+            assets.handstars.animator.setAnimation("idle", null, false);
+            assets.handstars.animator.play();
+            assets.handstars.animator.update();
+            assets.handstars.animator.draw(width / 2, height - 50, 10, 10);
+        }
 
         // Audience Heads
         drawAudience();
