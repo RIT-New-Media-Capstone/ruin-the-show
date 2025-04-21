@@ -329,8 +329,6 @@ const syncStateLoop = async () => {
     try {
         const res = await fetch('/getState');
         const state = await res.json();
-
-        lastRTSstate = RTSstate;
         RTSstate = state.state;
     } catch (err) {
         console.error('Error syncing state:', err);
@@ -346,6 +344,7 @@ window.draw = function () {
         countdownTimer = countdown; // Reset to 60
     }
     previousState = RTSstate.state;
+    //previousState is IMPORTANT!!!!
     const contestantXPositions = [
         width / 4.9,
         width / 3.1,
