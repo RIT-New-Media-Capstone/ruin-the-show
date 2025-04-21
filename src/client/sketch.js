@@ -10,8 +10,7 @@ let RTSstate = {
         VELOCITY: 2,
         PAUSED: false,
         MAX: 50,
-        //MIN: -50,
-        MIN: 0
+        MIN: -50,
     },
     cues: {
         APPLAUSE_CUE: false,
@@ -444,7 +443,7 @@ window.draw = function () {
         host.animator.play()
         host.animator.update();
         console.log(RTSstate.host.POSITION)
-        host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, width / 3, width * 2 / 3), height / 2.5, 0.75);
+        host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, 0, 400), height / 2.5, 0.75);
 
         // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
