@@ -164,6 +164,7 @@ const contestants = {
 // Global Variables
 // -Game States
 let previousState = RTSstate.state;
+let previousCue = RTSstate.cues
 let backgroundLayer;
 let onboardingGraphicsLayer;
 let currentFrame = 0;
@@ -215,13 +216,10 @@ const applause = {
     applauseActive: false,
 }
 // -Light
-let flashCountdown = 0;
-let spotlightCueActive = false;
-let lastJoystickPos = null;
-let flashColor = null;
 const light = {
     shouldTintGreen: false,
     shouldTintRed: false,
+    isVisible: false
 }
 // Classes
 // -Sprite Animator
@@ -439,10 +437,11 @@ function changeAnimations(message) {
         else if (target === 'light') {
             if (animation === 'green') light.shouldTintGreen = true;
             else if (animation === 'red') light.shouldTintRed = true;
+            light.isVisible = true;
         }
         else if (target === 'dial') {
-            if (animation === 'green') light.shouldTintGreen = true;
-            else if (animation === 'red') light.shouldTintRed = true;
+            if (animation === 'green') dial.shouldTintGreen = true;
+            else if (animation === 'red') dial.shouldTintRed = true;
         }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
@@ -462,6 +461,7 @@ window.draw = function () {
         timerActive = true;
     }
     previousState = RTSstate.state;
+    previousCue = RTSstate.cues
 
     const contestantXPositions = [
         width / 5,
@@ -535,21 +535,17 @@ window.draw = function () {
         host.animator.update();
         host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, -300, width - 500), height / 2.4, 0.75);
 
-        // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
-            spotlightCueActive = true;
-            drawSpotlight();
-        } else if (spotlightCueActive) {
-            spotlightCueActive = false;
-            flashColor = light.shouldTintGreen ? 'green' : light.shouldTintRed ? 'red' : null;
-            flashCountdown = 5; // Lasts for 5 frames
-            light.shouldTintGreen = false;
-            light.shouldTintRed = false;
+            light.isVisible = true
         }
-        if (flashCountdown > 0) {
-            triggerFlash(lastJoystickPos, flashColor);
-            flashCountdown--;
-        }
+        // Spotlight Cue
+        // if (previousCue.JOYSTICK_CUE && !RTSstate.cues.JOYSTICK_CUE) {
+        //     setTimeout(() => {
+        //         light.isVisible = false
+        //     }, 1000);
+        // }
+
+        if (light.isVisible) drawSpotlight()
 
         // Applause Feedback (Could probably go in its own function)
         if (applause.shouldHands && !applause.applauseActive) {
@@ -748,29 +744,26 @@ function drawCheat() {
 // Joystick
 function drawSpotlight() {
     let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
-    lastJoystickPos = newJoystickPosition; // Save for flash
     if (assets.spotlight) {
         if (light.shouldTintGreen) {
-            tint(25, 161, 129);
+            backgroundLayer.tint(25, 161, 129);
+            setTimeout(() => { 
+                light.shouldTintGreen = false 
+                light.isVisible = false
+            }, 1000)
+            
         } else if (light.shouldTintRed) {
-            tint(213, 55, 50);
+            backgroundLayer.tint(213, 55, 50);
+            setTimeout(() => { 
+                light.shouldTintRed = false 
+                light.isVisible = false
+            }, 1000)
         } else {
-            noTint();
+            backgroundLayer.noTint();
         }
         backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
-        noTint();
+        backgroundLayer.noTint();
     }
-}
-
-function triggerFlash(position, color) {
-    if (!position || !color) return;
-
-    let alpha = map(flashCountdown, 0, 5, 0, 150); // Fades out
-    if (color === 'green') fill(25, 161, 129, alpha);
-    else if (color === 'red') fill(213, 55, 50, alpha);
-
-    noStroke();
-    backgroundLayer.rect(position - (width / 4), 100, width / 2, height);
 }
 // Lever
 function drawLeverCue() {
