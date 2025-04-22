@@ -437,8 +437,8 @@ function changeAnimations(message) {
             applause.shouldHands = true;
         }
         else if (target === 'light') {
-            if (animation === 'green') spotlight.shouldTintGreen = true;
-            else if (animation === 'red') spotlight.shouldTintRed = true;
+            if (animation === 'green') light.shouldTintGreen = true;
+            else if (animation === 'red') light.shouldTintRed = true;
         }
         else if (target === 'dial') {
             if (animation === 'green') light.shouldTintGreen = true;
@@ -541,10 +541,10 @@ window.draw = function () {
             drawSpotlight();
         } else if (spotlightCueActive) {
             spotlightCueActive = false;
-            flashColor = spotlight.shouldTintGreen ? 'green' : spotlight.shouldTintRed ? 'red' : null;
+            flashColor = light.shouldTintGreen ? 'green' : light.shouldTintRed ? 'red' : null;
             flashCountdown = 5; // Lasts for 5 frames
-            spotlight.shouldTintGreen = false;
-            spotlight.shouldTintRed = false;
+            light.shouldTintGreen = false;
+            light.shouldTintRed = false;
         }
         if (flashCountdown > 0) {
             triggerFlash(lastJoystickPos, flashColor);
