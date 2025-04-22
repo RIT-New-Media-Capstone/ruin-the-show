@@ -174,6 +174,10 @@ let zoom;
 let zoomTimer = 0;
 let zoomDuration = 30;
 let dialRotation = 0
+const dial = {
+    shouldTintGreen: false,
+    shouldTintRed: false,
+}
 // -Timer
 let countdownFont;
 let timerDuration = 60000; // 60 seconds
@@ -186,7 +190,6 @@ const podiumOffsets = {
     3: 565,
     4: 635,
 };
-
 const podiumLights = {
     1: {
         shouldGreen: false,
@@ -210,6 +213,15 @@ const applause = {
     shouldHands: false,
     shouldStars: false,
     applauseActive: false,
+}
+// -Light
+let flashCountdown = 0;
+let spotlightCueActive = false;
+let lastJoystickPos = null;
+let flashColor = null;
+const light = {
+    shouldTintGreen: false,
+    shouldTintRed: false,
 }
 // Classes
 // -Sprite Animator
@@ -425,12 +437,12 @@ function changeAnimations(message) {
             applause.shouldHands = true;
         }
         else if (target === 'light') {
-            if (animation === 'green') console.log("tint spotlight green")
-            else if (animation === 'red') console.log("tint spotlight red")
+            if (animation === 'green') light.shouldTintGreen = true;
+            else if (animation === 'red') light.shouldTintRed = true;
         }
         else if (target === 'dial') {
-            if (animation === 'green') console.log("tint zoom dial green")
-            else if (animation === 'red') console.log("tint zoom dial red")
+            if (animation === 'green') light.shouldTintGreen = true;
+            else if (animation === 'red') light.shouldTintRed = true;
         }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
@@ -525,10 +537,21 @@ window.draw = function () {
 
         // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
+            spotlightCueActive = true;
             drawSpotlight();
+        } else if (spotlightCueActive) {
+            spotlightCueActive = false;
+            flashColor = light.shouldTintGreen ? 'green' : light.shouldTintRed ? 'red' : null;
+            flashCountdown = 5; // Lasts for 5 frames
+            light.shouldTintGreen = false;
+            light.shouldTintRed = false;
+        }
+        if (flashCountdown > 0) {
+            triggerFlash(lastJoystickPos, flashColor);
+            flashCountdown--;
         }
 
-        // Applause Feedback
+        // Applause Feedback (Could probably go in its own function)
         if (applause.shouldHands && !applause.applauseActive) {
             assets.hands.animator.setAnimation("idle", null, false);
             assets.hands.animator.play();
@@ -725,9 +748,29 @@ function drawCheat() {
 // Joystick
 function drawSpotlight() {
     let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
+    lastJoystickPos = newJoystickPosition; // Save for flash
     if (assets.spotlight) {
+        if (light.shouldTintGreen) {
+            tint(25, 161, 129);
+        } else if (light.shouldTintRed) {
+            tint(213, 55, 50);
+        } else {
+            noTint();
+        }
         backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
+        noTint();
     }
+}
+
+function triggerFlash(position, color) {
+    if (!position || !color) return;
+
+    let alpha = map(flashCountdown, 0, 5, 0, 150); // Fades out
+    if (color === 'green') fill(25, 161, 129, alpha);
+    else if (color === 'red') fill(213, 55, 50, alpha);
+
+    noStroke();
+    backgroundLayer.rect(position - (width / 4), 100, width / 2, height);
 }
 // Lever
 function drawLeverCue() {
@@ -761,12 +804,7 @@ function drawPodiumLight(podiumNumber) {
 }
 
 // Game (Playing State) Feedback
-// Applause
-function drawHands() {
-    if (assets.hands) {
-        image(assets.hands, width / 10 - 150, height / 2 + 50, width, height / 2);
-    }
-}
+// Applause - Animated with Spritesheets
 // Cheat: No Assets - Host is supposed to be happy/mad
 // Joystick: No Assets - Change color of spotlight to flash green/red for feedback
 // Lever
