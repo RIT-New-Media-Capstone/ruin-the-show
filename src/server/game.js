@@ -108,6 +108,7 @@ class GameMachine {
     loopHandle = null
     difficulty = 1
     score = 0
+    debounce = false;
     //Testing Purposes: Score Statistics
     scoreApplause = 0
     scoreCheat = 0
@@ -279,16 +280,20 @@ class GameMachine {
         }
 
         if (this.state === this.states.IDLE) {                                //IDLE STATE
-            turnOnApplauseLED();
-            if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
-                // DEBUG Purposes, goes to onboarding
-                turnOffApplauseLED();
-                this.state = this.states.ONBOARDING;
-                console.log(`State transition: IDLE -> ONBOARDING`);
-                setTimeout(() => {
-                    machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
-                }, 30 * 1000);
-                this.sendOscCue(this.lighting.ONBOARDING_START)
+            if(this.debounce === false) {
+                setTimeout(() => {this.debounce = true}, 1000);
+            } else {
+                turnOnApplauseLED();
+                if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                    this.debounce = false;
+                    turnOffApplauseLED();
+                    this.state = this.states.ONBOARDING;
+                    console.log(`State transition: IDLE -> ONBOARDING`);
+                    setTimeout(() => {
+                        machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
+                    }, 30 * 1000);
+                    this.sendOscCue(this.lighting.ONBOARDING_START)
+                }
             }
             if (event.name === this.events.RFID_SCAN) {
                 // switch to onboarding
@@ -304,13 +309,18 @@ class GameMachine {
                 return;
             }
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
+            if(this.debounce === false) {
+                setTimeout(() => {this.debounce = true}, 1000);
+            } else {
+                if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                    this.debounce = false;
+                    turnOffApplauseLED();
+                    moveToPlaying(this);
+                    this.sendOscCue(this.lighting.START_GAME)
+                }
+            }
             turnOnApplauseLED();
             if (event.name === this.events.ONBOARDING_COMPLETE) {
-                turnOffApplauseLED();
-                moveToPlaying(this);
-                this.sendOscCue(this.lighting.START_GAME)
-            }
-            if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 turnOffApplauseLED();
                 moveToPlaying(this);
                 this.sendOscCue(this.lighting.START_GAME)
@@ -345,6 +355,7 @@ class GameMachine {
                 //Delete Afterwards; Testing Purposes
                 console.log(`Final score: ${this.score} | Applause: ${this.scoreApplause}, Cheat: ${this.scoreCheat}, Joystick: ${this.scoreJoystick}, Lever: ${this.scoreLever}, Podium: ${this.scorePodium}`);
 
+                this.debounce = false
                 this.state = this.states.END;
 
                 // However we want to figure win vs lose 
@@ -626,15 +637,21 @@ class GameMachine {
                 })
             }
         } else if (this.state === this.states.END) {                          //END STATE
-            turnOnApplauseLED();
+            if(this.debounce === false) {
+                setTimeout(() => {this.debounce = true}, 3 * 1000);
+            } else {
+                turnOnApplauseLED();
+                if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                    turnOffApplauseLED();
+                    this.debounce = false
+                    this.state = this.states.IDLE;
+                    console.log(`State transition: END -> IDLE`);
+                    this.sendOscCue(this.lighting.IDLE)
+                }
+            }
             if (event.name === this.events.RETURN_IDLE) {
                 turnOffApplauseLED();
-                this.state = this.states.IDLE;
-                console.log(`State transition: END -> IDLE`);
-                this.sendOscCue(this.lighting.IDLE)
-            }
-            if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
-                turnOffApplauseLED();
+                this.debounce = false
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
                 this.sendOscCue(this.lighting.IDLE)
