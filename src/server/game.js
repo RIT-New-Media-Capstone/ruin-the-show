@@ -591,14 +591,14 @@ class GameMachine {
             }
             if (event.name === this.feedback.CHEAT_GOOD) {
                 machine.messages_for_frontend.push({
-                    name: 'happy',
-                    target: 'al'
+                    name: 'green',
+                    target: 'screen'
                 })
             }
             if (event.name === this.feedback.CHEAT_BAD) {
                 machine.messages_for_frontend.push({
-                    name: 'pissed',
-                    target: 'al'
+                    name: 'red',
+                    target: 'screen'
                 })
             }
             if (event.name === this.feedback.JOYSTICK_GOOD) {

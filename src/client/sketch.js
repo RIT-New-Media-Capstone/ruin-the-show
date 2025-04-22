@@ -178,6 +178,7 @@ let dialRotation = 0
 const dial = {
     shouldTintGreen: false,
     shouldTintRed: false,
+    isVisible: false,
 }
 // -Timer
 let countdownFont;
@@ -219,6 +220,11 @@ const applause = {
 const light = {
     shouldTintGreen: false,
     shouldTintRed: false,
+    isVisible: false
+}
+const cheat = {
+    shouldGreen: false, 
+    shouldRed: false,
     isVisible: false
 }
 // Classes
@@ -408,10 +414,6 @@ function changeAnimations(message) {
     const animation = message.name
     if (target && animation) {
         if (target === 'al') {
-            if (animation === 'happy' || animation === 'pissed') {
-                console.log("Need spritesheet: ", animation)
-                return
-            }
             host.animator.setAnimation(animation)
         }
         else if (target === 1) {
@@ -443,6 +445,11 @@ function changeAnimations(message) {
             if (animation === 'green') dial.shouldTintGreen = true;
             else if (animation === 'red') dial.shouldTintRed = true;
         }
+        else if (target === 'screen') {
+            if (animation === 'green') cheat.shouldTintGreen = true;
+            else if (animation === 'red') cheat.shouldTintRed = true;
+            cheat.isVisible = true
+        }
         else {
             console.log(`Target: ${target}, Animation: ${animation}`)
         }
@@ -455,7 +462,7 @@ function changeAnimations(message) {
 
 // V. Draw depends on sync and utilizes functions below it to show game state
 window.draw = function () {
-    backgroundLayer.background(255);
+    // backgroundLayer.background(255);
     if (RTSstate.state === 'PLAYING' && previousState !== 'PLAYING') {
         timerStart = millis();
         timerActive = true;
@@ -574,6 +581,11 @@ window.draw = function () {
             }
         }
 
+        // Cheat feedback
+        if(cheat.isVisible) {
+            drawCheatFeedback()
+        }
+
         // Zoom Camera Transactions
         // TODO: when zoom change event trigger, set zoomTimer to 0
         /*if (zoomedIn) {
@@ -612,6 +624,9 @@ window.draw = function () {
 
         // Zoom Cue
         if (RTSstate.cues.LEVER_CUE) {
+            dial.isVisible = true
+        }
+        if (dial.isVisible) {
             drawLeverCue();
             drawLeverFeedback()
         }
@@ -741,6 +756,27 @@ function drawCheat() {
         image(assets.cheat, 0, 100, width / 3, height / 1.5);
     }
 }
+function drawCheatFeedback() {
+    push()
+    let c = color(0, 0, 0, 0)
+    if (cheat.shouldTintGreen) {
+        c = color(25, 161, 129, 100);
+        setTimeout(() => { 
+            cheat.shouldTintGreen = false 
+            cheat.isVisible = false
+        }, 1000)
+        
+    } else if (cheat.shouldTintRed) {
+        c = color(213, 55, 50, 100);
+        setTimeout(() => { 
+            cheat.shouldTintRed = false 
+            cheat.isVisible = false
+        }, 1000)
+    } 
+    backgroundLayer.fill(c)
+    backgroundLayer.rect(0, 0, width, height)
+    pop()
+}
 // Joystick
 function drawSpotlight() {
     let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
@@ -768,7 +804,24 @@ function drawSpotlight() {
 // Lever
 function drawLeverCue() {
     if (assets.levercamera) {
+        if (dial.shouldTintGreen) {
+            tint(25, 161, 129);
+            setTimeout(() => { 
+                dial.shouldTintGreen = false 
+                dial.isVisible = false
+            }, 1000)
+            
+        } else if (dial.shouldTintRed) {
+            tint(213, 55, 50);
+            setTimeout(() => { 
+                dial.shouldTintRed = false 
+                dial.isVisible = false
+            }, 1000)
+        } else {
+            noTint();
+        }
         image(assets.levercamera, 0, 0, width, height);
+        noTint();
     }
 }
 
@@ -782,7 +835,15 @@ function drawLeverFeedback() {
         dialRotation = map(RTSstate.feedback.LEVER_POS, 1, 100, -45, 45)
         rotate(dialRotation)
         imageMode(CENTER)
+        if (dial.shouldTintGreen) {
+            tint(25, 161, 129);
+        }
+        else if (dial.shouldTintRed) {
+            tint(213, 55, 50);
+        }
+        else noTint()
         image(assets.leverdial, 0, 0, assets.leverdial.width / 7, assets.leverdial.height / 7)
+        noTint()
         pop()
     }
 }
