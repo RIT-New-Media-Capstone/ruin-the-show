@@ -205,11 +205,11 @@ const podiumLights = {
         shouldRed: false
     },
 }
-
-// Applause 
+// -Applause 
 const applause = {
     shouldHands: false,
     shouldStars: false,
+    applauseActive: false,
 }
 // Classes
 // -Sprite Animator
@@ -421,8 +421,8 @@ function changeAnimations(message) {
             else if (animation === 'red') podiumLights[message.location].shouldRed = true
         }
         else if (target === 'audience') {
-            if (animation === 'stars') applause.shouldStars = true
-            applause.shouldHands = true
+            if (animation === 'stars') applause.shouldStars = true;
+            applause.shouldHands = true;
         }
         else if (target === 'light') {
             if (animation === 'green') console.log("tint spotlight green")
@@ -459,7 +459,7 @@ window.draw = function () {
     ];
 
     //Debugging Particular States
-    // RTSstate.state = 'PLAYING'
+    //RTSstate.state = 'PLAYING'
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
@@ -518,16 +518,6 @@ window.draw = function () {
             }
         }
 
-        // Draw Podiums
-        drawPodiums();
-
-        // Podium Cue
-        for (let i = 1; i <= 4; i++) {
-            if (RTSstate.cues[`PODIUM_${i}_CUE`]) {
-                drawPodiumLight(i);
-            }
-        }
-
         //Host Animations
         host.animator.play()
         host.animator.update();
@@ -536,6 +526,33 @@ window.draw = function () {
         // Spotlight Cue
         if (RTSstate.cues.JOYSTICK_CUE) {
             drawSpotlight();
+        }
+
+        // Applause Feedback
+        if (applause.shouldHands && !applause.applauseActive) {
+            assets.hands.animator.setAnimation("idle", null, false);
+            assets.hands.animator.play();
+            if (applause.shouldStars) {
+                assets.handstars.animator.setAnimation("idle", null, false);
+                assets.handstars.animator.play();
+                applause.shouldStars = false;
+            }
+            applause.applauseActive = true;
+            applause.shouldHands = false;
+        }
+        
+        // Hands draw if active
+        if (applause.applauseActive) {
+            assets.hands.animator.update();
+            assets.hands.animator.draw(30, 30, 1.3);
+            assets.handstars.animator.update();
+            assets.handstars.animator.draw(150, 400, 0.5);
+            assets.handstars.animator.draw(450, 380, 0.5);
+            assets.handstars.animator.draw(800, 380, 0.5);
+            assets.handstars.animator.draw(1050, 400, 0.5);
+            if (!assets.hands.animator.isPlaying) {
+                applause.applauseActive = false;
+            }
         }
 
         // Zoom Camera Transactions
@@ -561,19 +578,6 @@ window.draw = function () {
         // Applause Cue
         if (RTSstate.cues.APPLAUSE_CUE) {
             drawApplauseON();
-        }
-
-        // Applause Feedback
-        if (applause.shouldHands) {
-            assets.hands.animator.setAnimation("idle", null, false);
-            assets.hands.animator.play();
-            assets.hands.animator.update();
-            assets.hands.animator.draw(width / 2, height - 50, 1, width);
-        } else if (applause.shouldStars) {
-            assets.handstars.animator.setAnimation("idle", null, false);
-            assets.handstars.animator.play();
-            assets.handstars.animator.update();
-            assets.handstars.animator.draw(width / 2, height - 50, 1, width);
         }
 
         // Audience Heads
@@ -764,7 +768,7 @@ function drawHands() {
     }
 }
 // Cheat: No Assets - Host is supposed to be happy/mad
-// Joystick: No Assets - Change color of spotlight to flash green/red for feedback?
+// Joystick: No Assets - Change color of spotlight to flash green/red for feedback
 // Lever
 function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
     let amount = timer / duration
