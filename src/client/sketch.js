@@ -665,9 +665,6 @@ window.draw = function () {
         drawCheatFeedback();
     }
 
-    console.log("Current: ", RTSstate.feedback.LEVER_POS)
-    console.log("Previous: ", previousFeedback.LEVER_POS)
-
     // Draw zoom 
     if(RTSstate.feedback.LEVER_POS === previousFeedback.LEVER_POS) {
         zoom.previousZoomPos = zoom.zoomPos
