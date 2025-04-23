@@ -12,6 +12,7 @@ let port;
 const devPorts = {
     max: '/dev/tty.usbserial-DA017SAV', 
     kaiden: 'COM5',
+    NMD: 'COM3'
 }
 
 const serialSetup = () => {
