@@ -613,23 +613,6 @@ window.draw = function () {
             drawCheatFeedback()
         }
 
-        // Zoom Camera Transactions
-        // TODO: when zoom change event trigger, set zoomTimer to 0
-        /*if (zoomedIn) {
-            if (zoomTimer <= zoomDuration) {
-                zoom = changeZoom(0, 0, 175, 125, width, width * 3 / 4, height, height * 3 / 4, zoomTimer, zoomDuration)
-                zoomTimer++
-            }
-        }
-        if (!zoomedIn) {
-            if (zoomTimer <= zoomDuration) {
-                zoom = changeZoom(175, 125, 0, 0, width * 3 / 4, width, height * 3 / 4, height, zoomTimer, zoomDuration)
-                zoomTimer++
-            }
-        }
-        image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)*/
-        image(backgroundLayer, 0, 0); // Temporary
-
         // Applause Visuals
         drawApplause();
 
