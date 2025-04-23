@@ -502,7 +502,6 @@ window.draw = function () {
     }
     previousState = RTSstate.state;
     previousCue = RTSstate.cues
-    previousFeedback = RTSstate.feedback
 
     const contestantXPositions = [
         width / 5,
@@ -666,7 +665,7 @@ window.draw = function () {
     }
 
     // Draw zoom 
-    if(RTSstate.feedback.LEVER_POS === previousFeedback.LEVER_POS) {
+    if(RTSstate.feedback.LEVER_POS === prevRTSstate.feedback.LEVER_POS) {
         zoom.previousZoomPos = zoom.zoomPos
         zoom.targetZoomPos = RTSstate.feedback.LEVER_POS
 
