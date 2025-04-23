@@ -170,11 +170,27 @@ let onboardingGraphicsLayer;
 let currentFrame = 0;
 let frameDelay = 6;
 // -Zoom
-let zoomedIn = false;
-let zoom;
-let zoomTimer = 0;
-let zoomDuration = 30;
-let dialRotation = 0
+const zoom = {
+    previousZoomPos: 0, 
+    zoomPos: 0,
+    targetZoomPos: 0,
+    minPos: 1, 
+    maxPos: 100, 
+    timer: 0, 
+    lerpTotalTime: 60, // in total frames for now
+    minX: 0, 
+    minY: 0, 
+    maxX: 0, 
+    maxY: 0, 
+    minWidth: 0, 
+    minHeight: 0, 
+    maxWidth: 0, 
+    maxHeight: 0, 
+    zoomX: 0, 
+    zoomY: 0, 
+    zoomWidth: 0, 
+    zoomHeight: 0, 
+}
 const dial = {
     shouldTintGreen: false,
     shouldTintRed: false,
@@ -223,8 +239,8 @@ const light = {
     isVisible: false
 }
 const cheat = {
-    shouldGreen: false, 
-    shouldRed: false,
+    shouldTintGreen: false, 
+    shouldTintRed: false,
     isVisible: false
 }
 // Classes
@@ -391,7 +407,24 @@ window.setup = async function () {
     idleOnboarding.onboarding.volume(0);
     idleOnboarding.onboarding.size(width, height)
 
-    syncStateLoop();
+    // Set default zoom values 
+    zoom.minWidth = width 
+    zoom.minHeight = height
+    zoom.maxWidth = zoom.minWidth / 2
+    zoom.maxHeight = zoom.minHeight / 2
+
+    zoom.minX = 0
+    zoom.minY = 0
+    zoom.maxX = (zoom.minWidth / 2) - (zoom.maxWidth / 2)
+    zoom.maxY = (zoom.minHeight / 2) - (zoom.maxHeight / 2)
+
+    zoom.zoomX = zoom.minX
+    zoom.zoomY = zoom.minY
+    zoom.zoomWidth = zoom.minWidth
+    zoom.zoomHeight = zoom.minHeight
+
+    // Start sync loop after a short delay to ensure setup is complete
+    setTimeout(syncStateLoop, 100);
 }
 
 const syncStateLoop = async () => {
@@ -545,12 +578,6 @@ window.draw = function () {
         if (RTSstate.cues.JOYSTICK_CUE) {
             light.isVisible = true
         }
-        // Spotlight Cue
-        // if (previousCue.JOYSTICK_CUE && !RTSstate.cues.JOYSTICK_CUE) {
-        //     setTimeout(() => {
-        //         light.isVisible = false
-        //     }, 1000);
-        // }
 
         if (light.isVisible) drawSpotlight()
 
@@ -647,6 +674,51 @@ window.draw = function () {
             drawScore()
             end.scoreVis = true
         }
+    }
+    
+    // Draw cheat feedback if visible
+    if (cheat.isVisible) {
+        drawCheatFeedback();
+    }
+
+    // Draw zoom 
+    if(RTSstate.feedback.LEVER_POS === prevRTSstate.feedback.LEVER_POS) {
+        zoom.previousZoomPos = zoom.zoomPos
+        zoom.targetZoomPos = RTSstate.feedback.LEVER_POS
+
+        changeZoom()
+    }
+    
+    // Draw the background layer to the canvas
+    image(backgroundLayer, 0, 0, width, height, zoom.zoomX, zoom.zoomY, zoom.zoomWidth, zoom.zoomHeight);
+    
+    // Draw foreground elements
+    drawApplause();
+    
+    // Draw applause cue if active
+    if (RTSstate.cues.APPLAUSE_CUE) {
+        drawApplauseON();
+    }
+    
+    // Draw audience
+    drawAudience();
+    
+    // Draw cheat cue if active
+    if (RTSstate.cues.CHEAT_CUE) {
+        drawCheat();
+    }
+    
+    // Draw HUD elements
+    drawHUD();
+    
+    // Handle lever/zoom cue
+    if (RTSstate.cues.LEVER_CUE) {
+        dial.isVisible = true;
+    }
+    
+    if (dial.isVisible) {
+        drawLeverCue();
+        drawLeverFeedback();
     }
 }
 
@@ -858,17 +930,16 @@ function drawPodiumLight(podiumNumber) {
 }
 
 // Game (Playing State) Feedback
-// Applause - Animated with Spritesheets
-// Cheat: No Assets - Host is supposed to be happy/mad
-// Joystick: No Assets - Change color of spotlight to flash green/red for feedback
-// Lever
-function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
-    let amount = timer / duration
-    let x = lerp(oldX, newX, amount)
-    let y = lerp(oldY, newY, amount)
-    let w = lerp(oldWidth, newWidth, amount)
-    let h = lerp(oldHeight, newHeight, amount)
-    return { x, y, w, h }
+function changeZoom() {
+   if (zoom.timer <= zoom.lerpTotalTime) {
+    let zoomAmt = lerp(zoom.previousZoomPos, zoom.targetZoomPos, zoom.timer / zoom.lerpTotalTime)
+    zoom.zoomX = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minX, zoom.maxX)
+    zoom.zoomY = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minY, zoom.maxY)
+    zoom.zoomWidth = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minWidth, zoom.maxWidth)
+    zoom.zoomHeight = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minHeight, zoom.maxHeight)
+
+    zoom.timer++
+   }
 }
 // Podiums
 function drawRightLight(index) {
