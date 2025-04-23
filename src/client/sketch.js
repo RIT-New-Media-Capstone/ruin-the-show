@@ -242,11 +242,11 @@ const cheat = {
     shouldGreen: false,
     shouldRed: false,
     isVisible: false,
-    offScreenXPos: 0,
+    offScreenXPos: -200,
     targetXPos: 100,
     currentXPos: 0,
     timer: 0,
-    lerpTotalTime: 30,
+    lerpTotalTime: 24,
 }
 // Classes
 // -Sprite Animator
