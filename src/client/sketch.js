@@ -174,7 +174,7 @@ let frameDelay = 6;
 const zoom = {
     previousZoomPos: 0,
     zoomPos: 0,
-    targetZoomPos: 0, 
+    targetZoomPos: 0,
     timer: 0,
     lerpTotalTime: 60,
     minLerpTime: 15,
@@ -241,7 +241,12 @@ const light = {
 const cheat = {
     shouldGreen: false,
     shouldRed: false,
-    isVisible: false
+    isVisible: false,
+    offScreenXPos: 0,
+    targetXPos: 100,
+    currentXPos: 0,
+    timer: 0,
+    lerpTotalTime: 30,
 }
 // Classes
 // -Sprite Animator
@@ -616,9 +621,9 @@ window.draw = function () {
             zoom.targetZoomPos = RTSstate.feedback.LEVER_POS;
 
             // Dynamically calculate lerp time based on distance
-            const dist = Math.abs(zoom.targetZoomPos - zoom.previousZoomPos);
-            const maxDist = zoom.maxPos - zoom.minPos;
-            zoom.lerpTotalTime = floor(map(dist, 0, maxDist, zoom.minLerpTime, zoom.maxLerpTime));
+            const zoomDistance = Math.abs(zoom.targetZoomPos - zoom.previousZoomPos);
+            const maxDistance = zoom.maxPos - zoom.minPos;
+            zoom.lerpTotalTime = floor(map(zoomDistance, 0, maxDistance, zoom.minLerpTime, zoom.maxLerpTime));
 
             // Start lerping
             zoom.timer = 1;
@@ -646,6 +651,12 @@ window.draw = function () {
 
         // Cheat Cue
         if (RTSstate.cues.CHEAT_CUE) {
+            if (cheat.timer === 0) {
+                // start lerp 
+                cheat.timer = 1
+            }
+            // cue in
+            if (cheat.timer > 0) animateCheat('right')
             drawCheat();
         }
 
@@ -776,25 +787,49 @@ function drawApplauseON() {
     }
 }
 // Cheat
+function animateCheat(direction) {
+    if (cheat.timer <= cheat.lerpTotalTime) {
+        if (direction === 'right') {
+            cheat.currentXPos = lerp(
+                cheat.offScreenXPos,
+                cheat.targetXPos,
+                cheat.timer / cheat.lerpTotalTime
+            )
+        }
+        else if (direction === 'left') {
+            cheat.currentXPos = lerp(
+                cheat.targetXPos,
+                cheat.offScreenXPos,
+                cheat.timer / cheat.lerpTotalTime
+            )
+        }
+        cheat.timer++
+    }
+    else {
+        cheat.timer = 0
+    }
+}
 function drawCheat() {
     if (assets.cheat) {
-        image(assets.cheat, 0, 100, width / 3, height / 1.5);
+        image(assets.cheat, cheat.currentXPos, 100, width / 3, height / 1.5);
     }
 }
 function drawCheatFeedback() {
     push()
     let c = color(0, 0, 0, 0)
-    if (cheat.shouldTintGreen) {
+    if (cheat.shouldGreen) {
         c = color(25, 161, 129, 100);
+        animateCheat('left')
         setTimeout(() => {
-            cheat.shouldTintGreen = false
+            cheat.shouldGreen = false
             cheat.isVisible = false
         }, 1000)
 
-    } else if (cheat.shouldTintRed) {
+    } else if (cheat.shouldRed) {
         c = color(213, 55, 50, 100);
+        animateCheat('left')
         setTimeout(() => {
-            cheat.shouldTintRed = false
+            cheat.shouldRed = false
             cheat.isVisible = false
         }, 1000)
     }
