@@ -669,6 +669,8 @@ window.draw = function () {
         zoom.previousZoomPos = zoom.zoomPos
         zoom.targetZoomPos = RTSstate.feedback.LEVER_POS
 
+        console.log("New target zoom: ", zoom.targetZoomPos)
+
         changeZoom()
     }
     
@@ -922,6 +924,8 @@ function changeZoom() {
     zoom.zoomHeight = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minHeight, zoom.maxHeight)
 
     zoom.timer++
+
+    console.log("Zoom changed")
    }
 }
 // Podiums
