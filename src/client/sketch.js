@@ -165,16 +165,26 @@ const contestants = {
 // -Game States
 let previousState = RTSstate.state;
 let previousCue = RTSstate.cues
+let previousFeedback = RTSstate.feedback
 let backgroundLayer;
 let onboardingGraphicsLayer;
 let currentFrame = 0;
 let frameDelay = 6;
 // -Zoom
-let zoomedIn = false;
-let zoom;
-let zoomTimer = 0;
-let zoomDuration = 30;
-let dialRotation = 0
+const zoom = {
+    previousZoomPos: 0,
+    zoomPos: 0,
+    timer: 0,
+    lerpTotalTime: 60,
+    minX: 0,
+    minY: 0,
+    maxX: 0,
+    maxY: 0,
+    minWidth: 0,
+    minHeight: 0,
+    maxWidth: 0,
+    maxHeight: 0,
+}
 const dial = {
     shouldTintGreen: false,
     shouldTintRed: false,
@@ -223,7 +233,7 @@ const light = {
     isVisible: false
 }
 const cheat = {
-    shouldGreen: false, 
+    shouldGreen: false,
     shouldRed: false,
     isVisible: false
 }
@@ -391,6 +401,22 @@ window.setup = async function () {
     idleOnboarding.onboarding.volume(0);
     idleOnboarding.onboarding.size(width, height)
 
+    // Set default zoom values 
+    zoom.minWidth = width
+    zoom.minHeight = height
+    zoom.maxWidth = zoom.minWidth / 2
+    zoom.maxHeight = zoom.minHeight / 2
+
+    zoom.minX = 0
+    zoom.minY = 0
+    zoom.maxX = (zoom.minWidth / 2) - (zoom.maxWidth / 2)
+    zoom.maxY = (zoom.minHeight / 2) - (zoom.maxHeight / 2)
+
+    zoom.zoomX = zoom.minX
+    zoom.zoomY = zoom.minY
+    zoom.zoomWidth = zoom.minWidth
+    zoom.zoomHeight = zoom.minHeight
+
     syncStateLoop();
 }
 
@@ -469,6 +495,7 @@ window.draw = function () {
     }
     previousState = RTSstate.state;
     previousCue = RTSstate.cues
+    previousFeedback = RTSstate.feedback
 
     const contestantXPositions = [
         width / 5,
@@ -566,7 +593,7 @@ window.draw = function () {
             applause.applauseActive = true;
             applause.shouldHands = false;
         }
-        
+
         // Hands draw if active
         if (applause.applauseActive) {
             assets.hands.animator.update();
@@ -582,26 +609,23 @@ window.draw = function () {
         }
 
         // Cheat feedback
-        if(cheat.isVisible) {
+        if (cheat.isVisible) {
             drawCheatFeedback()
         }
 
-        // Zoom Camera Transactions
-        // TODO: when zoom change event trigger, set zoomTimer to 0
-        /*if (zoomedIn) {
-            if (zoomTimer <= zoomDuration) {
-                zoom = changeZoom(0, 0, 175, 125, width, width * 3 / 4, height, height * 3 / 4, zoomTimer, zoomDuration)
-                zoomTimer++
-            }
+        console.log("Current: ", RTSstate.feedback.LEVER_POS)
+        console.log("Previous: ", previousFeedback.LEVER_POS)
+
+        // Draw zoom 
+        if (RTSstate.feedback.LEVER_POS === previousFeedback.LEVER_POS) {
+            zoom.previousZoomPos = zoom.zoomPos
+            zoom.targetZoomPos = RTSstate.feedback.LEVER_POS
+
+            changeZoom()
         }
-        if (!zoomedIn) {
-            if (zoomTimer <= zoomDuration) {
-                zoom = changeZoom(175, 125, 0, 0, width * 3 / 4, width, height * 3 / 4, height, zoomTimer, zoomDuration)
-                zoomTimer++
-            }
-        }
-        image(backgroundLayer, 0, 0, width, height, zoom.x, zoom.y, zoom.w, zoom.h)*/
-        image(backgroundLayer, 0, 0); // Temporary
+
+        // Draw the background layer to the canvas
+        image(backgroundLayer, 0, 0, width, height, zoom.zoomX, zoom.zoomY, zoom.zoomWidth, zoom.zoomHeight);
 
         // Applause Visuals
         drawApplause();
@@ -761,18 +785,18 @@ function drawCheatFeedback() {
     let c = color(0, 0, 0, 0)
     if (cheat.shouldTintGreen) {
         c = color(25, 161, 129, 100);
-        setTimeout(() => { 
-            cheat.shouldTintGreen = false 
+        setTimeout(() => {
+            cheat.shouldTintGreen = false
             cheat.isVisible = false
         }, 1000)
-        
+
     } else if (cheat.shouldTintRed) {
         c = color(213, 55, 50, 100);
-        setTimeout(() => { 
-            cheat.shouldTintRed = false 
+        setTimeout(() => {
+            cheat.shouldTintRed = false
             cheat.isVisible = false
         }, 1000)
-    } 
+    }
     backgroundLayer.fill(c)
     backgroundLayer.rect(0, 0, width, height)
     pop()
@@ -783,15 +807,15 @@ function drawSpotlight() {
     if (assets.spotlight) {
         if (light.shouldTintGreen) {
             backgroundLayer.tint(25, 161, 129);
-            setTimeout(() => { 
-                light.shouldTintGreen = false 
+            setTimeout(() => {
+                light.shouldTintGreen = false
                 light.isVisible = false
             }, 1000)
-            
+
         } else if (light.shouldTintRed) {
             backgroundLayer.tint(213, 55, 50);
-            setTimeout(() => { 
-                light.shouldTintRed = false 
+            setTimeout(() => {
+                light.shouldTintRed = false
                 light.isVisible = false
             }, 1000)
         } else {
@@ -806,15 +830,15 @@ function drawLeverCue() {
     if (assets.levercamera) {
         if (dial.shouldTintGreen) {
             tint(25, 161, 129);
-            setTimeout(() => { 
-                dial.shouldTintGreen = false 
+            setTimeout(() => {
+                dial.shouldTintGreen = false
                 dial.isVisible = false
             }, 1000)
-            
+
         } else if (dial.shouldTintRed) {
             tint(213, 55, 50);
-            setTimeout(() => { 
-                dial.shouldTintRed = false 
+            setTimeout(() => {
+                dial.shouldTintRed = false
                 dial.isVisible = false
             }, 1000)
         } else {
@@ -862,14 +886,17 @@ function drawPodiumLight(podiumNumber) {
 // Cheat: No Assets - Host is supposed to be happy/mad
 // Joystick: No Assets - Change color of spotlight to flash green/red for feedback
 // Lever
-function changeZoom(oldX, oldY, newX, newY, oldWidth, newWidth, oldHeight, newHeight, timer, duration) {
-    let amount = timer / duration
-    let x = lerp(oldX, newX, amount)
-    let y = lerp(oldY, newY, amount)
-    let w = lerp(oldWidth, newWidth, amount)
-    let h = lerp(oldHeight, newHeight, amount)
-    return { x, y, w, h }
-}
+function changeZoom() {
+    if (zoom.timer <= zoom.lerpTotalTime) {
+     let zoomAmt = lerp(zoom.previousZoomPos, zoom.targetZoomPos, zoom.timer / zoom.lerpTotalTime)
+     zoom.zoomX = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minX, zoom.maxX)
+     zoom.zoomY = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minY, zoom.maxY)
+     zoom.zoomWidth = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minWidth, zoom.maxWidth)
+     zoom.zoomHeight = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minHeight, zoom.maxHeight)
+ 
+     zoom.timer++
+    }
+ }
 // Podiums
 function drawRightLight(index) {
     let x = 0
