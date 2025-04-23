@@ -242,8 +242,8 @@ const cheat = {
     shouldGreen: false,
     shouldRed: false,
     isVisible: false,
-    offScreenXPos: -200,
-    targetXPos: 100,
+    offScreenXPos: -400,
+    targetXPos: 0,
     currentXPos: 0,
     timer: 0,
     lerpTotalTime: 24,
@@ -477,8 +477,8 @@ function changeAnimations(message) {
             else if (animation === 'red') dial.shouldTintRed = true;
         }
         else if (target === 'screen') {
-            if (animation === 'green') cheat.shouldTintGreen = true;
-            else if (animation === 'red') cheat.shouldTintRed = true;
+            if (animation === 'green') cheat.shouldGreen = true;
+            else if (animation === 'red') cheat.shouldRed = true;
             cheat.isVisible = true
         }
         else {
@@ -651,7 +651,8 @@ window.draw = function () {
 
         // Cheat Cue
         if (RTSstate.cues.CHEAT_CUE) {
-            if (cheat.timer === 0) {
+            // if the cue is just starting
+            if (!previousCue.CHEAT_CUE) {
                 // start lerp 
                 cheat.timer = 1
             }
