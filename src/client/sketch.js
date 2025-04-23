@@ -421,6 +421,10 @@ window.setup = async function () {
 }
 
 const syncStateLoop = async () => {
+    previousState = RTSstate.state;
+    previousCue = RTSstate.cues
+    previousFeedback = RTSstate.feedback
+    
     try {
         const res = await fetch('/getState');
         const state = await res.json();
@@ -493,9 +497,6 @@ window.draw = function () {
         timerStart = millis();
         timerActive = true;
     }
-    previousState = RTSstate.state;
-    previousCue = RTSstate.cues
-    previousFeedback = RTSstate.feedback
 
     const contestantXPositions = [
         width / 5,
@@ -613,11 +614,9 @@ window.draw = function () {
             drawCheatFeedback()
         }
 
-        console.log("Current: ", RTSstate.feedback.LEVER_POS)
-        console.log("Previous: ", previousFeedback.LEVER_POS)
-
         // Draw zoom 
         if (RTSstate.feedback.LEVER_POS === previousFeedback.LEVER_POS) {
+            console.log("lever")
             zoom.previousZoomPos = zoom.zoomPos
             zoom.targetZoomPos = RTSstate.feedback.LEVER_POS
 
@@ -856,7 +855,7 @@ function drawLeverFeedback() {
         let y = height / 2;
 
         translate(x, y);
-        dialRotation = map(RTSstate.feedback.LEVER_POS, 1, 100, -45, 45)
+        let dialRotation = map(RTSstate.feedback.LEVER_POS, 1, 100, -45, 45)
         rotate(dialRotation)
         imageMode(CENTER)
         if (dial.shouldTintGreen) {
