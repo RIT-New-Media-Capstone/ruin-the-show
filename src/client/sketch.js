@@ -174,8 +174,11 @@ let frameDelay = 6;
 const zoom = {
     previousZoomPos: 0,
     zoomPos: 0,
+    targetZoomPos: 0, 
     timer: 0,
     lerpTotalTime: 60,
+    minLerpTime: 15,
+    maxLerpTime: 60,
     minX: 0,
     minY: 0,
     maxX: 0,
@@ -184,6 +187,9 @@ const zoom = {
     minHeight: 0,
     maxWidth: 0,
     maxHeight: 0,
+    minPos: 1,
+    maxPos: 100,
+    previousLeverPos: null,
 }
 const dial = {
     shouldTintGreen: false,
@@ -386,7 +392,6 @@ function populateFrames(animConfig, framesArray) {
     }
 }
 
-
 // IV. Setup canvas, frame rate, timer, graphic layers, onboard video, and sync (30 ms)
 window.setup = async function () {
     // 16:9 aspect ratio with slight padding
@@ -424,7 +429,7 @@ const syncStateLoop = async () => {
     previousState = RTSstate.state;
     previousCue = RTSstate.cues
     previousFeedback = RTSstate.feedback
-    
+
     try {
         const res = await fetch('/getState');
         const state = await res.json();
@@ -446,17 +451,8 @@ function changeAnimations(message) {
         if (target === 'al') {
             host.animator.setAnimation(animation)
         }
-        else if (target === 1) {
-            contestants[1].animator.setAnimation(animation)
-        }
-        else if (target === 2) {
-            contestants[2].animator.setAnimation(animation)
-        }
-        else if (target === 3) {
-            contestants[3].animator.setAnimation(animation)
-        }
-        else if (target === 4) {
-            contestants[4].animator.setAnimation(animation)
+        else if (contestants[target]) {
+            contestants[target].animator.setAnimation(animation);
         }
         else if (target === 'podium') {
             if (animation === 'green') podiumLights[message.location].shouldGreen = true
@@ -615,13 +611,24 @@ window.draw = function () {
         }
 
         // Draw zoom 
-        if (RTSstate.feedback.LEVER_POS === previousFeedback.LEVER_POS) {
-            console.log("lever")
-            zoom.previousZoomPos = zoom.zoomPos
-            zoom.targetZoomPos = RTSstate.feedback.LEVER_POS
+        if (RTSstate.feedback.LEVER_POS === zoom.previousLeverPos && zoom.timer === 0) {
+            zoom.previousZoomPos = zoom.zoomPos;
+            zoom.targetZoomPos = RTSstate.feedback.LEVER_POS;
 
-            changeZoom()
+            // Dynamically calculate lerp time based on distance
+            const dist = Math.abs(zoom.targetZoomPos - zoom.previousZoomPos);
+            const maxDist = zoom.maxPos - zoom.minPos;
+            zoom.lerpTotalTime = floor(map(dist, 0, maxDist, zoom.minLerpTime, zoom.maxLerpTime));
+
+            // Start lerping
+            zoom.timer = 1;
         }
+
+        if (zoom.timer > 0) {
+            changeZoom();
+        }
+
+        zoom.previousLeverPos = RTSstate.feedback.LEVER_POS
 
         // Draw the background layer to the canvas
         image(backgroundLayer, 0, 0, width, height, zoom.zoomX, zoom.zoomY, zoom.zoomWidth, zoom.zoomHeight);
@@ -685,11 +692,6 @@ function drawBackground() {
     }
     if (assets.stagelights) {
         backgroundLayer.image(assets.stagelights, 0, -45, width, height / 3);
-    }
-}
-function updateCountdown() {
-    if (countdownTimer > 0) {
-        countdownTimer -= 1; // Decrease by one second
     }
 }
 function drawPodiums() {
@@ -887,15 +889,23 @@ function drawPodiumLight(podiumNumber) {
 // Lever
 function changeZoom() {
     if (zoom.timer <= zoom.lerpTotalTime) {
-     let zoomAmt = lerp(zoom.previousZoomPos, zoom.targetZoomPos, zoom.timer / zoom.lerpTotalTime)
-     zoom.zoomX = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minX, zoom.maxX)
-     zoom.zoomY = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minY, zoom.maxY)
-     zoom.zoomWidth = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minWidth, zoom.maxWidth)
-     zoom.zoomHeight = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minHeight, zoom.maxHeight)
- 
-     zoom.timer++
+        const zoomAmt = lerp(
+            zoom.previousZoomPos,
+            zoom.targetZoomPos,
+            zoom.timer / zoom.lerpTotalTime
+        );
+
+        zoom.zoomX = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minX, zoom.maxX);
+        zoom.zoomY = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minY, zoom.maxY);
+        zoom.zoomWidth = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minWidth, zoom.maxWidth);
+        zoom.zoomHeight = map(zoomAmt, zoom.minPos, zoom.maxPos, zoom.minHeight, zoom.maxHeight);
+        zoom.zoomPos = zoomAmt;
+
+        zoom.timer++;
+    } else {
+        zoom.timer = 0; // Done lerping
     }
- }
+}
 // Podiums
 function drawRightLight(index) {
     let x = 0
@@ -941,31 +951,6 @@ function drawWrongLight(index) {
 }
 
 // DRAW Functions (End)
-function drawCurtainClose() {
-    let x = 0;
-    const y = 0;
-    let sx;
-    let sy;
-
-    // if the curtains aren't closed, draw the animation 
-    if (!end.curtainsClosed) {
-        sx = (currentFrameCurtains % numCols) * frameWidthCurtains;
-        sy = Math.floor(currentFrameCurtains / numCols) * frameHeightCurtains;
-
-        if (frameCount % frameDelay === 0) {
-            currentFrameCurtains = (currentFrameCurtains + 1) % totalFramesCurtains;
-            if (currentFrameCurtains === 0) end.curtainsClosed = true;
-        }
-    }
-    // else hardcoded to closed position 
-    else {
-        sx = numCols * frameWidthCurtains;
-        sy = frameHeight
-    }
-
-    //anim
-    image(end.curtains, x, y, width, height, sx, sy, frameWidthCurtains, frameHeight);
-}
 function drawScore() {
     if (RTSstate.score >= 0) {
         image(end.shadow, 0, 0, width, height)
