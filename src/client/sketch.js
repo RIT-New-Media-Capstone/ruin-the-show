@@ -197,7 +197,8 @@ const dial = {
     shouldTintRed: false,
     isVisible: false,
 }
-// -Timer
+// -Timer/Score
+let scoreFont;
 let countdownFont;
 let timerDuration = 60000; // 60 seconds
 let timerStart;
@@ -338,6 +339,7 @@ window.preload = function () {
     assets.timer = loadImage('/Assets/Background/Timer.png');
     assets.score = loadImage('/Assets/Background/PointTrack.png')
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
+    scoreFont = loadFont('/Assets/Fonts/SourceCodePro-Medium.ttf');
     // -Cues & Feedback
     assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
     assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
@@ -1077,7 +1079,7 @@ function drawScore() {
         push()
 
         fill('black');
-        textFont(countdownFont);
+        textFont(scoreFont);
         textSize(64);
         textAlign(CENTER, CENTER);
         text(RTSstate.score * 10, 670, 380);
