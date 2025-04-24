@@ -36,6 +36,8 @@ explain the contents of each folder / file at a high level
 ### Running the project
 How to get started from scratch (what I had to do to get it on the New Media computer basically)
 
+Also mention the keyboard controls option for if you want to test / use without the hardware
+
 ### Hardware
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
 
