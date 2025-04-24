@@ -1,7 +1,7 @@
 "use strict";
 
 // PLAN B: 
-const keyboardInputs = false
+const keyboardInputs = true
 const keyboardMapping = {
     applause: 'q',
     cheat: 'e',
@@ -118,7 +118,8 @@ const assets = {
     staticbackground: "",
     timer: "",
     levercamera: "",
-    leverdial: "",
+    levertarget: "",
+    levermarker: "",
 }
 // -End
 const end = {
@@ -373,8 +374,9 @@ window.preload = function () {
     assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
     assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
     assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
-    assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature.png')
-    assets.leverdial = loadImage('/Assets/Interactions/Lever/ZoomDial.png')
+    assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature_Background.png')
+    assets.levertarget = loadImage('/Assets/Interactions/Lever/Zoom_Target.png')
+    assets.levermarker = loadImage('/Assets/Interactions/Lever/Zoom.png')
 
     assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
     assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
@@ -967,14 +969,12 @@ function drawLeverCue() {
 }
 
 function drawLeverFeedback() {
-    if (assets.leverdial) {
+    if (assets.levertarget && assets.levermarker) {
+        console.log(RTSstate.cues.LEVER_TARGET)
         push()
-        let x = width / 1.05;
+        let x = width / 2;
         let y = height / 2;
 
-        translate(x, y);
-        let dialRotation = map(RTSstate.feedback.LEVER_POS, 1, 100, -45, 45)
-        rotate(dialRotation)
         imageMode(CENTER)
         if (dial.shouldTintGreen) {
             tint(25, 161, 129);
@@ -983,7 +983,8 @@ function drawLeverFeedback() {
             tint(213, 55, 50);
         }
         else noTint()
-        image(assets.leverdial, 0, 0, assets.leverdial.width / 7, assets.leverdial.height / 7)
+        image(assets.levertarget, x, y, assets.levertarget.width / 7, assets.levertarget.height / 7)
+        image(assets.levermarker, x, y, assets.levermarker.width / 7, assets.levermarker.height / 7)
         noTint()
         pop()
     }
