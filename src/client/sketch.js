@@ -768,6 +768,7 @@ function drawHUD() {
         image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
         //Let's make this look better
         fill('#000000');
+        textFont(scoreFont);
         textSize(60);
         scale(1.3, 1);
         text(nf(RTSstate.score * 10, 4), width - 398.5, 60);
