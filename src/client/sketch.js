@@ -1,7 +1,7 @@
 "use strict";
 
 // PLAN B: 
-const keyboardInputs = true
+const keyboardInputs = false
 const keyboardMapping = {
     applause: 'q',
     cheat: 'e',
