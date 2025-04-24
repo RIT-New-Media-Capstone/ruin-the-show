@@ -98,6 +98,7 @@ const idleOnboarding = {
 // Playing 
 const assets = {
     audience: "",
+    applauseSign: "", 
     background: { idle: { file: "RTS Background", config: bigSpriteSheetConfig, frames: [] } },
     cheat: "",
     hands: { idle: { file: "Audience Reaction", config: bigSpriteSheetConfig, frames: [] } },
@@ -250,9 +251,15 @@ const applause = {
     shouldHands: false,
     shouldStars: false,
     applauseActive: false,
-    drawCue: false,
-    interval: null
+    //drawCue: false,
+    //interval: null
+    offScreenXPos: 0,
+    targetXPos: 0,
+    currentXPos: 0,
+    timer: 0,
+    lerpTotalTime: 24,
 }
+
 // -Light
 const light = {
     shouldTintGreen: false,
@@ -370,6 +377,7 @@ window.preload = function () {
     // -Cues & Feedback
     assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
     assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
+    assets.applauseSign = loadImage('/Assets/Interactions/Applause/ApplauseCue.png');
     assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
     assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
     assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
@@ -475,6 +483,11 @@ window.setup = async function () {
     zoom.zoomY = zoom.minY
     zoom.zoomWidth = zoom.minWidth
     zoom.zoomHeight = zoom.minHeight
+
+    // Set default applause values
+    applause.offScreenXPos = width
+    applause.targetXPos = width - assets.applauseSign.width / 10,
+    applause.currentXPos = applause.offScreenXPos
 
     syncStateLoop();
 }
@@ -697,14 +710,32 @@ window.draw = function () {
         image(backgroundLayer, 0, 0, width, height, zoom.zoomX, zoom.zoomY, zoom.zoomWidth, zoom.zoomHeight);
 
         // Applause Visuals
-        drawApplause();
+        // drawApplause();
 
         // Applause Cue
+        // if (RTSstate.cues.APPLAUSE_CUE) {
+        //     if (!previousCue.APPLAUSE_CUE) startApplauseFlash()
+        //     if (applause.drawCue) drawApplauseON();
+        // } else {
+        //     if (previousCue.APPLAUSE_CUE) stopApplauseFlash()
+        // }
+
+        if (!RTSstate.cues.APPLAUSE_CUE && previousCue.APPLAUSE_CUE) {
+            applause.timer = 1
+        }
         if (RTSstate.cues.APPLAUSE_CUE) {
-            if (!previousCue.APPLAUSE_CUE) startApplauseFlash()
-            if (applause.drawCue) drawApplauseON();
-        } else {
-            if (previousCue.APPLAUSE_CUE) stopApplauseFlash()
+            // if the cue is just starting
+            if (!previousCue.APPLAUSE_CUE) {
+                // start lerp 
+                applause.timer = 1
+            }
+            // cue in
+            if (applause.timer > 0) animateApplause('left')
+            drawApplauseSign();
+        }
+        else if (applause.timer > 0) {
+            animateApplause('right')
+            drawApplauseSign()
         }
 
         // Audience Heads
@@ -882,6 +913,38 @@ function stopApplauseFlash() {
     applause.interval = null;
     applause.drawCue = false;
 }
+
+function drawApplauseSign() {
+    if(assets.applauseSign) {
+        let assetWidth = assets.applauseSign.width / 10
+        let assetHeight = assets.applauseSign.height / 10
+        image(assets.applauseSign, applause.currentXPos, height - (assetHeight * 1.5), assetWidth, assetHeight)
+    }
+}
+
+function animateApplause(direction) {
+    if (applause.timer <= applause.lerpTotalTime) {
+        if (direction === 'left') {
+            applause.currentXPos = lerp(
+                applause.offScreenXPos,
+                applause.targetXPos,
+                applause.timer / applause.lerpTotalTime
+            )
+        }
+        else if (direction === 'right') {
+            applause.currentXPos = lerp(
+                applause.targetXPos,
+                applause.offScreenXPos,
+                applause.timer / applause.lerpTotalTime
+            )
+        }
+        applause.timer++
+    }
+    else {
+        applause.timer = 0
+    }
+}
+
 // Cheat
 function animateCheat(direction) {
     if (cheat.timer <= cheat.lerpTotalTime) {
