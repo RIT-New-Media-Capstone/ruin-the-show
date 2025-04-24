@@ -252,6 +252,16 @@ const cheat = {
     timer: 0,
     lerpTotalTime: 24,
 }
+
+// Audio assets
+const audio = {
+    playing: "",
+    idle: "",
+    end: null,
+    onboard: null,
+    playingVolume: 0.5,
+    idleVolume: 0.5,
+}
 // Classes
 // -Sprite Animator
 class SpriteAnimator {
@@ -394,6 +404,17 @@ window.preload = function () {
     end.curtains.animator.setAnimation("idle", null, false, () => {
         end.curtainsClosed = true
     })
+
+    // Audio preload
+    audio.playing = loadSound('Assets/Audio/playing-state-music.mp3')
+    audio.playing.setLoop(true)
+    audio.playing.stop()
+    audio.playing.setVolume(audio.playingVolume)
+
+    audio.idle = loadSound('Assets/Audio/idle-state-music.mp3')
+    audio.idle.setLoop(true)
+    audio.idle.stop()
+    audio.idle.setVolume(audio.idleVolume)
 }
 
 function populateFrames(animConfig, framesArray) {
@@ -517,11 +538,16 @@ window.draw = function () {
     ];
 
     //Debugging Particular States
-    //RTSstate.state = 'PLAYING'
+    // RTSstate.state = 'PLAYING'
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
         idleOnboarding.onboarding_playing = false
+
+        // Audio
+        if(audio.idle.isLoaded()) {
+            if(!audio.idle.isPlaying()) audio.idle.play()
+        }
 
         end.curtainsClosed = false
         end.scoreVis = false
@@ -529,7 +555,8 @@ window.draw = function () {
 
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
-        // TODO: find a way to let audio play without triggering browser-side autoblock 
+        if(audio.idle.isPlaying()) audio.idle.stop()
+
         idleOnboarding.onboarding.volume(1)
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
@@ -538,10 +565,17 @@ window.draw = function () {
         onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
         image(onboardingGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'PLAYING') { // Playing
-        // Background Setup & Countdown Logic
-        idleOnboarding.onboarding.stop()
-        idleOnboarding.onboarding_playing = false
-        idleOnboarding.onboarding.volume(0)
+        if (previousState !== 'PLAYING'){
+            // Background Setup & Countdown Logic
+            idleOnboarding.onboarding.stop()
+            idleOnboarding.onboarding_playing = false
+            idleOnboarding.onboarding.volume(0)
+        }
+        // Audio
+        if(audio.playing.isLoaded()) {
+            if(!audio.playing.isPlaying()) audio.playing.play()
+        }
+
         drawBackground();
 
         // Contestant Idle Animations
@@ -688,10 +722,10 @@ window.draw = function () {
         }
 
     } else if (RTSstate.state === 'END') { // End
-        idleOnboarding.onboarding.stop()
         light.isVisible = false
         zoom.isVisible = false
         dial.isVisible = false
+        if(audio.playing.isPlaying()) audio.playing.stop()
 
         // Close curtains 
         if (!end.curtainsClosed) {
