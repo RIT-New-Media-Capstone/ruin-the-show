@@ -422,8 +422,8 @@ window.setup = async function () {
     // Set default zoom values 
     zoom.minWidth = width
     zoom.minHeight = height
-    zoom.maxWidth = zoom.minWidth / 4
-    zoom.maxHeight = zoom.minHeight / 4
+    zoom.maxWidth = zoom.minWidth * 3 / 4
+    zoom.maxHeight = zoom.minHeight * 3 / 4
 
     zoom.minX = 0
     zoom.minY = 0
@@ -885,7 +885,7 @@ function drawSpotlight() {
         } else {
             backgroundLayer.noTint();
         }
-        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
+        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 150, width / 2, height);
         backgroundLayer.noTint();
     }
 }
