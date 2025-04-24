@@ -64,20 +64,20 @@ const moveToPlaying = (machine) => {
     }, 60 * 1000);
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_APPLAUSE, {});
-    }, 5 * 1000); // prev val: 3   E: x M: x H: x
+    }, machine.applause.initialDelay * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_CHEAT, {});
-    }, 10 * 1000);  // prev val: 2   E: x M: x H: x
+    }, machine.cheat.initialDelay * 1000);  // prev val: 2   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_JOYSTICK, {});
-    }, 17 * 1000); // prev val: 3   E: x M: x H: x
+    }, machine.joystick.initialDelay * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         const podiumToTrigger = Math.floor(Math.random() * 4) + 1
         machine.addEvent(machine.events.TURN_ON_PODIUM, { num: podiumToTrigger });
-    }, 5 * 1000); // prev val: 3   E: x M: x H: x
+    }, machine.podium.initialDelay * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_LEVER, {});
-    }, 11 * 1000); // prev val: 5   E: x M: x H: x
+    }, machine.lever.initialDelay * 1000); // prev val: 5   E: x M: x H: x
 }
 
 //Third variable temporary (For Testing Purposes)
@@ -213,6 +213,53 @@ class GameMachine {
         POSITIVE_FEEDBACK: "positive-feedback",
         NEGATIVE_FEEDBACK: "negative-feedback",
         ONBOARDING_START: "onboarding-start",
+    }
+
+    // Variables for each minigame values
+    // If one set value, make max = (min + 1)
+    applause = {
+        initialDelay: 5, 
+        onMin: 8,
+        onMax: 11, 
+        cooldownMin: 2,
+        cooldownMax: 3,
+        points: 5,
+    }
+
+    cheat = {
+        initialDelay: 10, 
+        onMin: 4,
+        onMax: 9, 
+        cooldownMin: 5,
+        cooldownMax: 9,
+        points: 15,
+    }
+
+    joystick = {
+        initialDelay: 20, 
+        onMin: 10,
+        onMax: 11,
+        cooldownMin: 8,
+        cooldownMax: 11,
+        points: 10,
+    }
+
+    podium = {
+        initialDelay: 8, 
+        onMin: 3,
+        onMax: 7, 
+        cooldownMin: 3,
+        cooldownMax: 4,
+        points: 8,
+    }
+
+    lever = {
+        initialDelay: 12, 
+        onMin: 6,
+        onMax: 12, 
+        cooldownMin: 5,
+        cooldownMax: 6, 
+        points: 7,
     }
 
     constructor(initialState) {
@@ -369,25 +416,25 @@ class GameMachine {
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 if (this.cues.APPLAUSE_CUE) {
-                    scoreChange(this, 5, "Applause");
+                    scoreChange(this, this.applause.points, "Applause");
                     clearTimeout(this.applauseTimer);
                     this.addEvent(this.events.TURN_OFF_APPLAUSE);
                     this.addEvent(this.feedback.APPLAUSE_GOOD, { });
                 } else if (!this.cues.APPLAUSE_CUE) {
-                    scoreChange(this, -5, "Applause");
+                    scoreChange(this, -1 * this.applause.points, "Applause");
                     this.addEvent(this.feedback.APPLAUSE_BAD, { });
                 }
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 if (this.cues.CHEAT_CUE) {
-                    scoreChange(this, 15, "Cheat");
+                    scoreChange(this, this.cheat.points, "Cheat");
                     clearTimeout(this.cheatTimer);
                     this.addEvent(this.feedback.CHEAT_GOOD, { });
                     this.addEvent(this.events.TURN_OFF_CHEAT);
                     this.sendOscCue(this.lighting.CHEAT)
                     this.sendOscCue(this.lighting.IDLE)
                 } else if (!this.cues.CHEAT_CUE) {
-                    scoreChange(this, -15, "Cheat");
+                    scoreChange(this, -1 * this.cheat.points, "Cheat");
                     this.addEvent(this.feedback.CHEAT_BAD, { });
                 }
             }
@@ -415,7 +462,7 @@ class GameMachine {
 
                     if (pos >= min && pos <= max) {
                         // Successful move
-                        scoreChange(this, 7, "Lever");
+                        scoreChange(this, this.lever.points, "Lever");
                         this.addEvent(this.feedback.LEVER_GOOD, { });
                         clearTimeout(this.leverTimer);
                         this.cues.LEVER_TARGET = null; // prevent double scoring
@@ -427,11 +474,11 @@ class GameMachine {
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data.num
                 if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
-                    scoreChange(this, 8, "Podium");
+                    scoreChange(this, this.podium.points, "Podium");
                     this.addEvent(this.feedback.PODIUM_GOOD, { podiumNum });
                     this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
                 } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
-                    scoreChange(this, -8, "Podium");
+                    scoreChange(this, -1 * this.podium.points, "Podium");
                     this.addEvent(this.feedback.PODIUM_BAD, { podiumNum });
                 }
                 clearTimeout(this.podiumTimer);
@@ -444,14 +491,14 @@ class GameMachine {
                 turnOnApplauseLED();
                 this.applauseTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_APPLAUSE, {});
-                }, 10 * 1000);
+                }, Math.floor(Math.random(this.applause.onMin, this.applause.onMax)) * 1000);
             }
             if (event.name === this.events.TURN_ON_CHEAT && !this.cues.CHEAT_CUE) {
                 this.cues.CHEAT_CUE = true
                 turnOnCheatLED();
                 this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_CHEAT, {});
-                }, 5 * 1000);
+                }, Math.floor(Math.random(this.cheat.onMin, this.cheat.onMax)) * 1000);
             }
             if (event.name === this.events.TURN_ON_JOYSTICK && !this.cues.JOYSTICK_CUE) {
                 this.feedback.JOYSTICK_POS = 0
@@ -463,11 +510,11 @@ class GameMachine {
                     const diff = Math.abs(this.feedback.JOYSTICK_POS - this.cues.JOYSTICK_TARGET)
                     if (this.joystickTouched) {
                         if (diff <= 10) {
-                            scoreChange(this, 10, "Joystick");
+                            scoreChange(this, this.joystick.points, "Joystick");
                             this.addEvent(this.feedback.JOYSTICK_GOOD, {});
                             console.log("Joystick moved correctly to target. Score rewarded.")
                         } else {
-                            scoreChange(this, -10, "Joystick");
+                            scoreChange(this, -1 * this.joystick.points, "Joystick");
                             this.addEvent(this.feedback.JOYSTICK_BAD, {});
                             console.log("Joystick missed the target. Score penalized.")
                         }
@@ -475,7 +522,7 @@ class GameMachine {
                         console.log("Joystick was not touched. Nothing happens")
                     }
                     this.addEvent(this.events.TURN_OFF_JOYSTICK, {});
-                }, 5 * 1000);
+                }, Math.floor(Math.random(this.joystick.onMin, this.joystick.onMax)) * 1000);
             }
             if (event.name === this.events.TURN_ON_LEVER && !this.cues.LEVER_CUE) {
                 this.cues.LEVER_CUE = true
@@ -495,7 +542,7 @@ class GameMachine {
                     if (this.cues.LEVER_TARGET) {
                         if (this.leverTouched) {
                             // Moved but failed to hit target
-                            scoreChange(this, -7, "Lever");
+                            scoreChange(this, -1 * this.lever.points, "Lever");
                             this.addEvent(this.feedback.LEVER_BAD, { });
                             console.log("Lever moved but missed target. Score penalized.");
                         } else {
@@ -503,14 +550,14 @@ class GameMachine {
                         }
                     }
                     this.addEvent(this.events.TURN_OFF_LEVER, {});
-                }, 10 * 1000);
+                }, Math.floor(Math.random(this.lever.onMin, this.lever.onMax)) * 1000);
             }
             if (event.name === this.events.TURN_ON_PODIUM && !this.cues[`PODIUM_${event.data.num}_CUE`]) {
                 this.cues[`PODIUM_${event.data.num}_CUE`] = true
                 turnOnPodiumLED(event.data.num);
                 this.podiumTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_PODIUM, { num: event.data.num });
-                }, 3 * 1000);
+                }, Math.floor(Math.random(this.podium.onMin, this.podium.onMax)) * 1000);
             }
 
             // Set off-states
@@ -519,26 +566,26 @@ class GameMachine {
                 turnOffApplauseLED();
                 this.applauseTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_APPLAUSE, {});
-                }, 1 * 1000);
+                }, Math.floor(Math.random(this.applause.cooldownMin, this.applause.cooldownMax)) * 1000);
             }
             if (event.name === this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE) {
                 this.cues.CHEAT_CUE = false
                 turnOffCheatLED();
                 this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_CHEAT, {});
-                }, 2 * 1000);
+                }, Math.floor(Math.random(this.cheat.cooldownMin, this.cheat.cooldownMax)) * 1000);
             }
             if (event.name === this.events.TURN_OFF_JOYSTICK && this.cues.JOYSTICK_CUE) {
                 this.cues.JOYSTICK_CUE = false
                 this.joystickTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_JOYSTICK, {});
-                }, 5 * 1000);
+                }, Math.floor(Math.random(this.joystick.cooldownMin, this.joystick.cooldownMax)) * 1000);
             }
             if (event.name === this.events.TURN_OFF_LEVER && this.cues.LEVER_CUE) {
                 this.cues.LEVER_CUE = false
                 this.leverTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_LEVER, {});
-                }, 2 * 1000);
+                }, Math.floor(Math.random(this.lever.cooldownMin, this.lever.cooldownMax)) * 1000);
             }
             if (event.name == this.events.TURN_OFF_PODIUM) {
                 for (let i = 1; i <= 4; i++) {
@@ -548,7 +595,7 @@ class GameMachine {
                 const podiumToTrigger = Math.floor(Math.random() * 4) + 1
                 this.podiumTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_PODIUM, { num: podiumToTrigger });
-                }, 3 * 1000);
+                }, Math.floor(Math.random(this.podium.cooldownMin, this.podium.cooldownMax)) * 1000);
             }
             // Set feedback 
             if (event.name === this.feedback.PODIUM_GOOD) {
