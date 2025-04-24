@@ -416,8 +416,8 @@ window.setup = async function () {
     // Set default zoom values 
     zoom.minWidth = width
     zoom.minHeight = height
-    zoom.maxWidth = zoom.minWidth / 2
-    zoom.maxHeight = zoom.minHeight / 2
+    zoom.maxWidth = zoom.minWidth / 4
+    zoom.maxHeight = zoom.minHeight / 4
 
     zoom.minX = 0
     zoom.minY = 0
