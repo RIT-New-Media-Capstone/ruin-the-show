@@ -364,16 +364,14 @@ class GameMachine {
             if(this.debounce === false) {
                 setTimeout(() => {this.debounce = true}, 1000);
             } else {
-                if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                // Scan RFID to exit early
+                if (event.name === this.events.RFID_SCAN) { 
                     this.debounce = false;
-                    turnOffApplauseLED();
                     moveToPlaying(this);
                     this.sendOscCue(this.lighting.START_GAME)
                 }
             }
-            turnOnApplauseLED();
             if (event.name === this.events.ONBOARDING_COMPLETE) {
-                turnOffApplauseLED();
                 moveToPlaying(this);
                 this.sendOscCue(this.lighting.START_GAME)
             }

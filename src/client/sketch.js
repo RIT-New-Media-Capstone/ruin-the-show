@@ -486,7 +486,7 @@ window.setup = async function () {
 
     // Set default applause values
     applause.offScreenXPos = width
-    applause.targetXPos = width - assets.applauseSign.width / 10,
+    applause.targetXPos = (width - assets.applauseSign.width / 5) + 200
     applause.currentXPos = applause.offScreenXPos
 
     syncStateLoop();
@@ -802,7 +802,7 @@ function drawBackground() {
     assets.background.animator.update();
     assets.background.animator.draw(0, 0, 1, width, height);
     if (assets.stage) {
-        backgroundLayer.image(assets.stage, width / 10, height / 1.75, width / 1.25, height / 2);
+        backgroundLayer.image(assets.stage, width / 10, height / 1.75, width / 1.15, height / 2);
     }
     if (assets.stagelights) {
         backgroundLayer.image(assets.stagelights, 0, -45, width, height / 3);
@@ -834,12 +834,12 @@ function drawAudience() {
 }
 function drawHUD() {
     if (assets.timer) {
-        image(assets.timer, -20, 60, assets.timer.width / 5, assets.timer.height / 5);
+        image(assets.timer, -20, 55, assets.timer.width / 5, assets.timer.height / 5);
         drawCountdown();
     }
     if (assets.stars) {
         let x = 10
-        let y = -10
+        let y = -15
 
         fill('#d9d9d9')
         rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3);
@@ -850,22 +850,20 @@ function drawHUD() {
     }
     if (assets.score) {
         push()
-        image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
+        image(assets.score, width - 250, -27, assets.score.width / 5, assets.score.height / 5);
         //Let's make this look better
         fill('#000000');
         textFont(scoreFont);
         textSize(60);
-        // scale(1.3, 1);
-        // text(nf(RTSstate.score * 10, 4), width - 100, 60);
 
         // 1xxx
-        text(floor(RTSstate.score / 100) % 10, width - 189, 60)
+        text(floor(RTSstate.score / 100) % 10, width - 189, 55)
         // x1xx
-        text(floor(RTSstate.score / 10) % 10, width - 141.5, 60)
+        text(floor(RTSstate.score / 10) % 10, width - 141.5, 55)
         // xx1x
-        text(floor(RTSstate.score / 1) % 10, width - 95, 60)
+        text(floor(RTSstate.score / 1) % 10, width - 95, 55)
         // xxx0
-        text(0, width - 49, 60)
+        text(0, width - 49, 55)
         pop()
     }
 }
@@ -878,7 +876,7 @@ function drawCountdown() {
         textFont(countdownFont);
         textSize(32);
         textAlign(CENTER, CENTER);
-        text(seconds, 112, 148);
+        text(seconds, 112, 143);
 
         if (remaining === 0) {
             timerActive = false;
@@ -916,9 +914,9 @@ function stopApplauseFlash() {
 
 function drawApplauseSign() {
     if(assets.applauseSign) {
-        let assetWidth = assets.applauseSign.width / 10
-        let assetHeight = assets.applauseSign.height / 10
-        image(assets.applauseSign, applause.currentXPos, height - (assetHeight * 1.5), assetWidth, assetHeight)
+        let assetWidth = assets.applauseSign.width / 5
+        let assetHeight = assets.applauseSign.height / 5
+        image(assets.applauseSign, applause.currentXPos, height - (assetHeight * 0.85), assetWidth, assetHeight)
     }
 }
 
@@ -1015,7 +1013,7 @@ function drawSpotlight() {
         } else {
             backgroundLayer.noTint();
         }
-        imageMode(CORNER)
+        imageMode(CENTER)
         backgroundLayer.image(assets.spotlight, newJoystickPosition, 300,
             assets.spotlight.width / 12, assets.spotlight.height / 12);
         backgroundLayer.noTint();
