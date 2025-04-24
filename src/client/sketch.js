@@ -563,8 +563,8 @@ window.draw = function () {
         idleOnboarding.onboarding_playing = false
 
         // Audio
-        if(audio.idle.isLoaded()) {
-            if(!audio.idle.isPlaying()) audio.idle.play()
+        if (audio.idle.isLoaded()) {
+            if (!audio.idle.isPlaying()) audio.idle.play()
         }
 
         end.curtainsClosed = false
@@ -573,7 +573,7 @@ window.draw = function () {
 
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
-        if(audio.idle.isPlaying()) audio.idle.stop()
+        if (audio.idle.isPlaying()) audio.idle.stop()
 
         idleOnboarding.onboarding.volume(1)
         if (!idleOnboarding.onboarding_playing) {
@@ -583,15 +583,15 @@ window.draw = function () {
         onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
         image(onboardingGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'PLAYING') { // Playing
-        if (previousState !== 'PLAYING'){
+        if (previousState !== 'PLAYING') {
             // Background Setup & Countdown Logic
             idleOnboarding.onboarding.stop()
             idleOnboarding.onboarding_playing = false
             idleOnboarding.onboarding.volume(0)
         }
         // Audio
-        if(audio.playing.isLoaded()) {
-            if(!audio.playing.isPlaying()) audio.playing.play()
+        if (audio.playing.isLoaded()) {
+            if (!audio.playing.isPlaying()) audio.playing.play()
         }
 
         drawBackground();
@@ -743,7 +743,7 @@ window.draw = function () {
         light.isVisible = false
         zoom.isVisible = false
         dial.isVisible = false
-        if(audio.playing.isPlaying()) audio.playing.stop()
+        if (audio.playing.isPlaying()) audio.playing.stop()
 
         // Close curtains 
         if (!end.curtainsClosed) {
@@ -970,7 +970,6 @@ function drawLeverCue() {
 
 function drawLeverFeedback() {
     if (assets.levertarget && assets.levermarker) {
-        console.log(RTSstate.cues.LEVER_TARGET)
         push()
         let x = width / 2;
         let y = height / 2;
@@ -983,8 +982,32 @@ function drawLeverFeedback() {
             tint(213, 55, 50);
         }
         else noTint()
-        image(assets.levertarget, x, y, assets.levertarget.width / 7, assets.levertarget.height / 7)
-        image(assets.levermarker, x, y, assets.levermarker.width / 7, assets.levermarker.height / 7)
+
+        let targetWidth = 0
+        let targetHeight = 0
+
+        if (RTSstate.cues.LEVER_TARGET) {
+            if (RTSstate.cues.LEVER_TARGET.min === 1) {
+                targetWidth = assets.levertarget.width / 4.5
+                targetHeight = assets.levertarget.height / 4.5
+            } else if (RTSstate.cues.LEVER_TARGET.max === 100) {
+                targetWidth = assets.levertarget.width / 7
+                targetHeight = assets.levertarget.height / 7
+            }
+        }
+
+        let minMarkerWidth = assets.levermarker.width / 7 
+        let minMarkerHeight = assets.levermarker.height / 7
+
+        let maxMarkerWidth = assets.levermarker.width / 11
+        let maxMarkerHeight = assets.levermarker.height / 11
+
+        let markerWidth = map(RTSstate.feedback.LEVER_POS, 1, 100, minMarkerWidth, maxMarkerWidth)
+        let markerHeight = map(RTSstate.feedback.LEVER_POS, 1, 100, minMarkerHeight, maxMarkerHeight)
+
+        image(assets.levertarget, x, y, targetWidth, targetHeight)
+        image(assets.levermarker, x, y, markerWidth, markerHeight)
+
         noTint()
         pop()
     }
@@ -1175,42 +1198,42 @@ window.keyPressed = function () {
 
             case keyboardMapping.joystickLeft:
                 event = 'joystick-moved'
-                data = {dir: 1}
+                data = { dir: 1 }
                 break
 
             case keyboardMapping.joystickRight:
                 event = 'joystick-moved'
-                data = {dir: -1}
+                data = { dir: -1 }
                 break
 
             case keyboardMapping.leverUp:
                 event = 'lever-moved'
-                data = {value: 100}
+                data = { value: 100 }
                 break
 
             case keyboardMapping.leverDown:
                 event = 'lever-moved'
-                data = {value: 1}
+                data = { value: 1 }
                 break
 
             case keyboardMapping.podium_1:
                 event = 'podium-button-pressed'
-                data = {num: 1}
+                data = { num: 1 }
                 break
 
             case keyboardMapping.podium_2:
                 event = 'podium-button-pressed'
-                data = {num: 2}
+                data = { num: 2 }
                 break
 
             case keyboardMapping.podium_3:
                 event = 'podium-button-pressed'
-                data = {num: 3}
+                data = { num: 3 }
                 break
 
             case keyboardMapping.podium_4:
                 event = 'podium-button-pressed'
-                data = {num: 4}
+                data = { num: 4 }
                 break
 
             case keyboardMapping.rfid_scan:
@@ -1224,13 +1247,13 @@ window.keyPressed = function () {
 
         if (event) {
             fetch('/setState', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ event, data })
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ event, data })
             })
-            .then(res => res.json())
-            .then(console.log)
-            .catch(console.error);
-          }
+                .then(res => res.json())
+                .then(console.log)
+                .catch(console.error);
+        }
     }
 }
