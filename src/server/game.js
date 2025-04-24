@@ -58,26 +58,26 @@ const moveToPlaying = (machine) => {
     machine.scoreLever = 0
     machine.scorePodium = 0
 
-    // Start the game timer
+    // Start the game timer | Intial Delay
     setTimeout(() => {
         machine.addEvent(machine.events.GAME_OVER, {});
     }, 60 * 1000);
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_APPLAUSE, {});
-    }, 3 * 1000);
+    }, 5 * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_CHEAT, {});
-    }, 2 * 1000);
+    }, 10 * 1000);  // prev val: 2   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_JOYSTICK, {});
-    }, 3 * 1000);
+    }, random(15,20) * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         const podiumToTrigger = Math.floor(Math.random() * 4) + 1
         machine.addEvent(machine.events.TURN_ON_PODIUM, { num: podiumToTrigger });
-    }, 3 * 1000);
+    }, random(4,6) * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_LEVER, {});
-    }, 5 * 1000);
+    }, random(10,12) * 1000); // prev val: 5   E: x M: x H: x
 }
 
 //Third variable temporary (For Testing Purposes)
