@@ -650,6 +650,9 @@ window.draw = function () {
         drawAudience();
 
         // Cheat Cue
+        if (!RTSstate.cues.CHEAT_CUE && previousCue.CHEAT_CUE){
+            cheat.timer = 1
+        }
         if (RTSstate.cues.CHEAT_CUE) {
             // if the cue is just starting
             if (!previousCue.CHEAT_CUE) {
@@ -659,6 +662,10 @@ window.draw = function () {
             // cue in
             if (cheat.timer > 0) animateCheat('right')
             drawCheat();
+        }
+        else if (cheat.timer > 0) {
+            animateCheat('left')
+            drawCheat()
         }
 
         //HUD
@@ -820,7 +827,6 @@ function drawCheatFeedback() {
     let c = color(0, 0, 0, 0)
     if (cheat.shouldGreen) {
         c = color(25, 161, 129, 100);
-        animateCheat('left')
         setTimeout(() => {
             cheat.shouldGreen = false
             cheat.isVisible = false
@@ -828,7 +834,6 @@ function drawCheatFeedback() {
 
     } else if (cheat.shouldRed) {
         c = color(213, 55, 50, 100);
-        animateCheat('left')
         setTimeout(() => {
             cheat.shouldRed = false
             cheat.isVisible = false
