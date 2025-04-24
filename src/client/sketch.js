@@ -82,7 +82,7 @@ const idleOnboarding = {
 // Playing 
 const assets = {
     audience: "",
-    background: "",
+    background: { idle: {file: "RTS Background", config: bigSpriteSheetConfig, frames: [] } },
     cheat: "",
     hands: { idle: { file: "Audience Reaction", config: bigSpriteSheetConfig, frames: [] } },
     handstars: { idle: { file: "RTS_Stars", config: starSpriteSheetConfig, frames: [] } },
@@ -99,6 +99,7 @@ const assets = {
     stage: "",
     stagelights: "",
     stars: "",
+    staticbackground: "",
     timer: "",
     levercamera: "",
     leverdial: "",
@@ -318,7 +319,12 @@ window.preload = function () {
     idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
     // Playing
     // -Background & Podiums
-    assets.background = loadImage('/Assets/Background/MainBackground.png');
+    assets.staticbackground = loadImage('/Assets/Background/MainBackground.png');
+    assets.background.idle.image = loadImage('/Assets/SpriteSheets/Misc/RTS Background.png');
+    populateFrames(assets.background.idle.config, assets.background.idle.frames);
+    assets.background.animator = new SpriteAnimator({ idle: assets.background.idle });
+    assets.background.animator.setAnimation("idle");
+
     assets.stage = loadImage('/Assets/Background/Stage.png');
     assets.stagelights = loadImage('/Assets/Background/StageLights.png');
     assets.audience = loadImage('/Assets/Background/Audience.png');
@@ -402,7 +408,7 @@ function populateFrames(animConfig, framesArray) {
 // IV. Setup canvas, frame rate, timer, graphic layers, onboard video, and sync (30 ms)
 window.setup = async function () {
     // 16:9 aspect ratio with slight padding
-    createCanvas(assets.background.width / 6, assets.background.height / 6);
+    createCanvas(assets.staticbackground.width / 6, assets.staticbackground.height / 6);
     frameRate(30);
     angleMode(DEGREES)
     backgroundLayer = createGraphics(width, height);
@@ -702,9 +708,9 @@ window.draw = function () {
 
 // DRAW Functions (Playing)
 function drawBackground() {
-    if (assets.background) {
-        backgroundLayer.image(assets.background, 0, 0, width, height);
-    }
+    assets.background.animator.play();
+    assets.background.animator.update();
+    assets.background.animator.draw(0, 0, 1, width, height);
     if (assets.stage) {
         backgroundLayer.image(assets.stage, width / 10, height / 1.75, width / 1.25, height / 2);
     }
