@@ -82,7 +82,7 @@ const idleOnboarding = {
 // Playing 
 const assets = {
     audience: "",
-    background: { idle: {file: "RTS Background", config: bigSpriteSheetConfig, frames: [] } },
+    background: { idle: { file: "RTS Background", config: bigSpriteSheetConfig, frames: [] } },
     cheat: "",
     hands: { idle: { file: "Audience Reaction", config: bigSpriteSheetConfig, frames: [] } },
     handstars: { idle: { file: "RTS_Stars", config: starSpriteSheetConfig, frames: [] } },
@@ -655,7 +655,7 @@ window.draw = function () {
         drawAudience();
 
         // Cheat Cue
-        if (!RTSstate.cues.CHEAT_CUE && previousCue.CHEAT_CUE){
+        if (!RTSstate.cues.CHEAT_CUE && previousCue.CHEAT_CUE) {
             cheat.timer = 1
         }
         if (RTSstate.cues.CHEAT_CUE) {
@@ -687,6 +687,9 @@ window.draw = function () {
 
     } else if (RTSstate.state === 'END') { // End
         idleOnboarding.onboarding.stop()
+        light.isVisible = false
+        zoom.isVisible = false
+        dial.isVisible = false
 
         // Close curtains 
         if (!end.curtainsClosed) {
@@ -796,7 +799,7 @@ function getTimeRemaining() {
 // Applause
 function drawApplauseON() {
     if (assets.applauseon) {
-            image(assets.applauseon, width / 2 - 148, -50, width / 4, height / 4);
+        image(assets.applauseon, width / 2 - 148, -50, width / 4, height / 4);
     }
 }
 
