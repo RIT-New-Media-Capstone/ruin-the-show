@@ -824,8 +824,17 @@ function drawHUD() {
         fill('#000000');
         textFont(scoreFont);
         textSize(60);
-        scale(1.3, 1);
-        text(nf(RTSstate.score * 10, 4), width - 398.5, 60);
+        // scale(1.3, 1);
+        // text(nf(RTSstate.score * 10, 4), width - 100, 60);
+
+        // 1xxx
+        text(floor(RTSstate.score / 100) % 10, width - 189, 60)
+        // x1xx
+        text(floor(RTSstate.score / 10) % 10, width - 141.5, 60)
+        // xx1x
+        text(floor(RTSstate.score / 1) % 10, width - 95, 60)
+        // xxx0
+        text(0, width - 49, 60)
         pop()
     }
 }
@@ -924,7 +933,8 @@ function drawCheatFeedback() {
 }
 // Joystick
 function drawSpotlight() {
-    let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
+    push()
+    let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width - assets.spotlight.width / 12);
     if (assets.spotlight) {
         if (light.shouldTintGreen) {
             backgroundLayer.tint(25, 161, 129);
@@ -942,10 +952,12 @@ function drawSpotlight() {
         } else {
             backgroundLayer.noTint();
         }
-        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 300,
+        imageMode(CORNER)
+        backgroundLayer.image(assets.spotlight, newJoystickPosition, 300,
             assets.spotlight.width / 12, assets.spotlight.height / 12);
         backgroundLayer.noTint();
     }
+    pop()
 }
 // Lever
 function drawLeverCue() {
