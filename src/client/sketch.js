@@ -231,6 +231,8 @@ const applause = {
     shouldHands: false,
     shouldStars: false,
     applauseActive: false,
+    drawCue: false,
+    interval: null
 }
 // -Light
 const light = {
@@ -574,12 +576,6 @@ window.draw = function () {
         if (RTSstate.cues.JOYSTICK_CUE) {
             light.isVisible = true
         }
-        // Spotlight Cue
-        // if (previousCue.JOYSTICK_CUE && !RTSstate.cues.JOYSTICK_CUE) {
-        //     setTimeout(() => {
-        //         light.isVisible = false
-        //     }, 1000);
-        // }
 
         if (light.isVisible) drawSpotlight()
 
@@ -643,7 +639,10 @@ window.draw = function () {
 
         // Applause Cue
         if (RTSstate.cues.APPLAUSE_CUE) {
-            drawApplauseON();
+            if (!previousCue.APPLAUSE_CUE) startApplauseFlash()
+            if (applause.drawCue) drawApplauseON();
+        } else {
+            if (previousCue.APPLAUSE_CUE) stopApplauseFlash()
         }
 
         // Audience Heads
@@ -791,8 +790,22 @@ function getTimeRemaining() {
 // Applause
 function drawApplauseON() {
     if (assets.applauseon) {
-        image(assets.applauseon, width / 2 - 148, -50, width / 4, height / 4);
+            image(assets.applauseon, width / 2 - 148, -50, width / 4, height / 4);
     }
+}
+
+function startApplauseFlash() {
+    if (applause.interval) return;
+    applause.drawCue = true;
+    applause.interval = setInterval(() => {
+        applause.drawCue = !applause.drawCue;
+    }, 250);
+}
+
+function stopApplauseFlash() {
+    clearInterval(applause.interval);
+    applause.interval = null;
+    applause.drawCue = false;
 }
 // Cheat
 function animateCheat(direction) {
