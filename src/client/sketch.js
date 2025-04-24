@@ -628,16 +628,18 @@ window.draw = function () {
             }
         }
 
-        //Host Animations
-        host.animator.play()
-        host.animator.update();
-        host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, -300, width - 500), height / 2.4, 0.75);
 
         if (RTSstate.cues.JOYSTICK_CUE) {
             light.isVisible = true
         }
 
         if (light.isVisible) drawSpotlight()
+
+        //Host Animations
+        host.animator.play()
+        host.animator.update();
+        host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, -300, width - 500), height / 2.4, 0.75);
+
 
         // Applause Feedback (Could probably go in its own function)
         if (applause.shouldHands && !applause.applauseActive) {
@@ -940,7 +942,8 @@ function drawSpotlight() {
         } else {
             backgroundLayer.noTint();
         }
-        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 150, width / 2, height);
+        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 300,
+            assets.spotlight.width / 12, assets.spotlight.height / 12);
         backgroundLayer.noTint();
     }
 }
@@ -988,16 +991,16 @@ function drawLeverFeedback() {
 
         if (RTSstate.cues.LEVER_TARGET) {
             if (RTSstate.cues.LEVER_TARGET.min === 1) {
-                targetWidth = assets.levertarget.width / 4.5
-                targetHeight = assets.levertarget.height / 4.5
+                targetWidth = assets.levertarget.width / 3.75
+                targetHeight = assets.levertarget.height / 3.75
             } else if (RTSstate.cues.LEVER_TARGET.max === 100) {
                 targetWidth = assets.levertarget.width / 7
                 targetHeight = assets.levertarget.height / 7
             }
         }
 
-        let minMarkerWidth = assets.levermarker.width / 7 
-        let minMarkerHeight = assets.levermarker.height / 7
+        let minMarkerWidth = assets.levermarker.width / 6
+        let minMarkerHeight = assets.levermarker.height / 6
 
         let maxMarkerWidth = assets.levermarker.width / 11
         let maxMarkerHeight = assets.levermarker.height / 11
