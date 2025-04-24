@@ -1,5 +1,21 @@
 "use strict";
 
+// PLAN B: 
+const keyboardInputs = false
+const keyboardMapping = {
+    applause: 'q',
+    cheat: 'e',
+    joystickLeft: 'a',
+    joystickRight: 'd',
+    leverUp: 'w',
+    leverDown: 's',
+    podium_1: '1',
+    podium_2: '2',
+    podium_3: '3',
+    podium_4: '4',
+    rfid_scan: ' '
+}
+
 // I. Initialize "RTSstate" object for syncing
 let RTSstate = {
     score: 0,
@@ -1139,5 +1155,81 @@ function drawStar(index, filledIn) {
         case 5:
             image(filledIn ? end.star : end.emptyStar, 720, 269, 140, 140)
             break
+    }
+}
+
+window.keyPressed = function () {
+    if (keyboardInputs) {
+        let event = null
+        let data = {}
+
+        switch (key) {
+            case keyboardMapping.applause:
+                event = 'applause-button-pressed'
+                break
+
+            case keyboardMapping.cheat:
+                event = 'cheat-button-pressed'
+                break
+
+            case keyboardMapping.joystickLeft:
+                event = 'joystick-moved'
+                data = {dir: 1}
+                break
+
+            case keyboardMapping.joystickRight:
+                event = 'joystick-moved'
+                data = {dir: -1}
+                break
+
+            case keyboardMapping.leverUp:
+                event = 'lever-moved'
+                data = {value: 100}
+                break
+
+            case keyboardMapping.leverDown:
+                event = 'lever-moved'
+                data = {value: 1}
+                break
+
+            case keyboardMapping.podium_1:
+                event = 'podium-button-pressed'
+                data = {num: 1}
+                break
+
+            case keyboardMapping.podium_2:
+                event = 'podium-button-pressed'
+                data = {num: 2}
+                break
+
+            case keyboardMapping.podium_3:
+                event = 'podium-button-pressed'
+                data = {num: 3}
+                break
+
+            case keyboardMapping.podium_4:
+                event = 'podium-button-pressed'
+                data = {num: 4}
+                break
+
+            case keyboardMapping.rfid_scan:
+                event = 'rfid-scan'
+                break
+
+            default:
+                console.log(key)
+                break
+        }
+
+        if (event) {
+            fetch('/setState', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ event, data })
+            })
+            .then(res => res.json())
+            .then(console.log)
+            .catch(console.error);
+          }
     }
 }

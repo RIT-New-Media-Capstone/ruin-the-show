@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import * as game from './game.js';
 
 const app = express();
+app.use(express.json());
 const PORT = 3000;
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,21 @@ app.get('/getState', (req, res) => {
 
   game.machine.messages_for_frontend.length = 0;
 });
+
+app.post('/setState', (req, res) => {
+  const { event, data = {} } = req.body;
+
+  if (!event || typeof event !== 'string') {
+    return res.status(400).json({ error: `Missing or invalid event name: ${event}` });
+  }
+
+  if (!Object.values(game.machine.events).includes(event)) {
+    return res.status(400).json({ error: 'Unknown event' });
+  }
+
+  game.machine.addEvent(event, data);
+  res.json({ success: true, message: `Event '${event}' dispatched` });
+})
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
