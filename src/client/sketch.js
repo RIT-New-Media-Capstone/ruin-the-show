@@ -1,5 +1,21 @@
 "use strict";
 
+// PLAN B: 
+const keyboardInputs = true
+const keyboardMapping = {
+    applause: 'q',
+    cheat: 'e',
+    joystickLeft: 'a',
+    joystickRight: 'd',
+    leverUp: 'w',
+    leverDown: 's',
+    podium_1: 1,
+    podium_2: 2,
+    podium_3: 3,
+    podium_4: 4,
+    rfid_scan: ' '
+}
+
 // I. Initialize "RTSstate" object for syncing
 let RTSstate = {
     score: 0,
@@ -174,7 +190,7 @@ let frameDelay = 6;
 const zoom = {
     previousZoomPos: 0,
     zoomPos: 0,
-    targetZoomPos: 0, 
+    targetZoomPos: 0,
     timer: 0,
     lerpTotalTime: 60,
     minLerpTime: 15,
@@ -1039,5 +1055,59 @@ function drawStar(index, filledIn) {
         case 5:
             image(filledIn ? end.star : end.emptyStar, 720, 269, 140, 140)
             break
+    }
+}
+
+window.keyPressed = function () {
+    if (keyboardInputs) {
+        switch (key) {
+            case keyboardMapping.applause:
+                console.log("applause")
+                break
+
+            case keyboardMapping.cheat:
+                console.log("cheat")
+                break
+
+            case keyboardMapping.joystickLeft:
+                console.log("joystick left")
+                break
+
+            case keyboardMapping.joystickRight:
+                console.log("joystick right")
+                break
+
+            case keyboardMapping.leverUp:
+                console.log("lever up")
+                break
+
+            case keyboardMapping.leverDown:
+                console.log("lever down")
+                break
+
+            case keyboardMapping.podium_1:
+                console.log("podium 1")
+                break
+
+            case keyboardMapping.podium_2:
+                console.log("podium 2")
+                break
+
+            case keyboardMapping.podium_3:
+                console.log("podium 3")
+                break
+
+            case keyboardMapping.podium_4:
+                console.log("podium 4")
+                break
+
+            case keyboardMapping.rfid_scan:
+                console.log("rfid")
+                break
+                
+            default:
+                console.log(key)
+                break
+        }
     }
 }
