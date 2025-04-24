@@ -9,10 +9,10 @@ const keyboardMapping = {
     joystickRight: 'd',
     leverUp: 'w',
     leverDown: 's',
-    podium_1: 1,
-    podium_2: 2,
-    podium_3: 3,
-    podium_4: 4,
+    podium_1: '1',
+    podium_2: '2',
+    podium_3: '3',
+    podium_4: '4',
     rfid_scan: ' '
 }
 
@@ -1060,54 +1060,76 @@ function drawStar(index, filledIn) {
 
 window.keyPressed = function () {
     if (keyboardInputs) {
+        let event = null
+        let data = {}
+
         switch (key) {
             case keyboardMapping.applause:
-                console.log("applause")
+                event = 'applause-button-pressed'
                 break
 
             case keyboardMapping.cheat:
-                console.log("cheat")
+                event = 'cheat-button-pressed'
                 break
 
             case keyboardMapping.joystickLeft:
-                console.log("joystick left")
+                event = 'joystick-moved'
+                data = {dir: 1}
                 break
 
             case keyboardMapping.joystickRight:
-                console.log("joystick right")
+                event = 'joystick-moved'
+                data = {dir: -1}
                 break
 
             case keyboardMapping.leverUp:
-                console.log("lever up")
+                event = 'lever-moved'
+                data = {value: 100}
                 break
 
             case keyboardMapping.leverDown:
-                console.log("lever down")
+                event = 'lever-moved'
+                data = {value: 1}
                 break
 
             case keyboardMapping.podium_1:
-                console.log("podium 1")
+                event = 'podium-button-pressed'
+                data = {num: 1}
                 break
 
             case keyboardMapping.podium_2:
-                console.log("podium 2")
+                event = 'podium-button-pressed'
+                data = {num: 2}
                 break
 
             case keyboardMapping.podium_3:
-                console.log("podium 3")
+                event = 'podium-button-pressed'
+                data = {num: 3}
                 break
 
             case keyboardMapping.podium_4:
-                console.log("podium 4")
+                event = 'podium-button-pressed'
+                data = {num: 4}
                 break
 
             case keyboardMapping.rfid_scan:
-                console.log("rfid")
+                event = 'rfid-scan'
                 break
-                
+
             default:
                 console.log(key)
                 break
         }
+
+        if (event) {
+            fetch('/setState', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ event, data })
+            })
+            .then(res => res.json())
+            .then(console.log)
+            .catch(console.error);
+          }
     }
 }
