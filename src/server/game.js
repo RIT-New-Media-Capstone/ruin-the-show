@@ -108,45 +108,49 @@ const moveToOnboarding = (machine) => {
     // Setup timers for lighting up buttons 
     // Podiums: light one at a time 
     // Rough cues: 1 per second 0-4s
+    let podiumEndTime = 4 + (11/60)
     videoCues.push(setTimeout(() => {
         turnOnPodiumLED(1)
     }, 0 * 1000))
     videoCues.push(setTimeout(() => {
         turnOnPodiumLED(2)
         turnOffPodiumLED(1)
-    }, 1 * 1000))
+    }, podiumEndTime * 1 / 4 * 1000))
     videoCues.push(setTimeout(() => {
         turnOnPodiumLED(3)
         turnOffPodiumLED(2)
-    }, 2 * 1000))
+    }, podiumEndTime * 2 / 4 * 1000))
     videoCues.push(setTimeout(() => {
         turnOnPodiumLED(4)
         turnOffPodiumLED(3)
-    }, 3 * 1000))
+    }, podiumEndTime * 3 / 4 * 1000))
     videoCues.push(setTimeout(() => {
         turnOffPodiumLED(4)
-    }, 4 * 1000))
+    }, podiumEndTime * 4 / 4 * 1000))
 
     // Applause
     // Rough cues: 4-8s on 
+    let applauseEndTime = 9 + (11/60)
     videoCues.push(setTimeout(() => {
         turnOnApplauseLED()
-    }, 4 * 1000))
+    }, podiumEndTime * 1000))
     videoCues.push(setTimeout(() => {
         turnOffApplauseLED()
-    }, 8 * 1000))
+    }, applauseEndTime * 1000))
 
     // Lever
     // No podium cue, rough cues: 8-12s
+    let leverEndTime = 13 + (22 / 60)
 
     // Cheat
     // Rough cues: 12-17s 
+    let cheatEndTime = 17 + (30 / 60)
     videoCues.push(setTimeout(() => {
         turnOnCheatLED()
-    }, 12 * 1000))
+    }, leverEndTime * 1000))
     videoCues.push(setTimeout(() => {
         turnOffCheatLED()
-    }, 17 * 1000))
+    }, cheatEndTime * 1000))
 
     // Joystick 
     // No podium cue, rough cues: 17-22s 
