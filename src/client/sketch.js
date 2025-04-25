@@ -798,9 +798,10 @@ window.draw = function () {
 
 // DRAW Functions (Playing)
 function drawBackground() {
-    assets.background.animator.play();
-    assets.background.animator.update();
-    assets.background.animator.draw(0, 0, 1, width, height);
+    // assets.background.animator.play();
+    // assets.background.animator.update();
+    // assets.background.animator.draw(0, 0, 1, width, height);
+    backgroundLayer.image(assets.staticbackground, 0, 0, width, height)
     if (assets.stage) {
         backgroundLayer.image(assets.stage, width / 10, height / 1.75, width / 1.15, height / 2);
     }
