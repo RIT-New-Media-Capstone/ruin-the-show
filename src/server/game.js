@@ -19,7 +19,74 @@ const EventSource = require('eventsource').EventSource;
 
 const rfidEventSource = new EventSource('http://nm-rfid-5.new-media-metagame.com:8001/sse')
 
+let videoCues = []
+const moveToOnboarding = (machine) => {
+    machine.debounce = false;
+    turnOffApplauseLED();
+    machine.state = machine.states.ONBOARDING;
+    console.log(`State transition: IDLE -> ONBOARDING`);
+    setTimeout(() => {
+        machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
+    }, 30 * 1000);
+    machine.sendOscCue(machine.lighting.ONBOARDING_START)
+
+    // Setup timers for lighting up buttons 
+    // Podiums: light one at a time 
+    // Rough cues: 1 per second 0-4s
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(1)
+    }, 0 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(2)
+        turnOffPodiumLED(1)
+    }, 1 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(3)
+        turnOffPodiumLED(2)
+    }, 2 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(4)
+        turnOffPodiumLED(3)
+    }, 3 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOffPodiumLED(4)
+    }, 4 * 1000))
+
+    // Applause
+    // Rough cues: 4-8s on 
+    videoCues.push(setTimeout(() => {
+        turnOnApplauseLED()
+    }, 4 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOffApplauseLED()
+    }, 8 * 1000))
+
+    // Lever
+    // No podium cue, rough cues: 8-12s
+
+    // Cheat
+    // Rough cues: 12-17s 
+    videoCues.push(setTimeout(() => {
+        turnOnCheatLED()
+    }, 12 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOffCheatLED()
+    }, 17 * 1000))
+
+    // Joystick 
+    // No podium cue, rough cues: 17-22s 
+}
+
 const moveToPlaying = (machine) => {
+    // Clean up onboarding cues
+    videoCues.forEach(clearTimeout)
+    videoCues.length = 0
+    for(let i = 1; i <= 4; i++) {
+        turnOffPodiumLED(i)
+    }
+    turnOffApplauseLED()
+    turnOffCheatLED()
+
     machine.state = 'PLAYING';
     console.log(`State transition: ONBOARDING -> PLAYING`);
     //INITIALIZE ALL GAMEPLAY COMPONENTS HERE (e.g. Score)
@@ -223,25 +290,25 @@ class GameMachine {
     // Variables for each minigame values
     // If one set value, make max = (min + 1)
     applause = {
-        initialDelay: 5, 
+        initialDelay: 5,
         onMin: 8,
-        onMax: 11, 
+        onMax: 11,
         cooldownMin: 2,
         cooldownMax: 3,
         points: 5,
     }
 
     cheat = {
-        initialDelay: 10, 
+        initialDelay: 10,
         onMin: 4,
-        onMax: 9, 
+        onMax: 9,
         cooldownMin: 5,
         cooldownMax: 9,
         points: 15,
     }
 
     joystick = {
-        initialDelay: 20, 
+        initialDelay: 20,
         onMin: 10,
         onMax: 11,
         cooldownMin: 8,
@@ -250,20 +317,20 @@ class GameMachine {
     }
 
     podium = {
-        initialDelay: 8, 
+        initialDelay: 8,
         onMin: 3,
-        onMax: 7, 
+        onMax: 7,
         cooldownMin: 3,
         cooldownMax: 4,
         points: 8,
     }
 
     lever = {
-        initialDelay: 12, 
+        initialDelay: 12,
         onMin: 6,
-        onMax: 12, 
+        onMax: 12,
         cooldownMin: 5,
-        cooldownMax: 6, 
+        cooldownMax: 6,
         points: 7,
     }
 
@@ -332,40 +399,26 @@ class GameMachine {
         }
 
         if (this.state === this.states.IDLE) {                                //IDLE STATE
-            if(this.debounce === false) {
-                setTimeout(() => {this.debounce = true}, 1000);
+            if (this.debounce === false) {
+                setTimeout(() => { this.debounce = true }, 1000);
             } else {
                 turnOnApplauseLED();
                 if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
-                    this.debounce = false;
-                    turnOffApplauseLED();
-                    this.state = this.states.ONBOARDING;
-                    console.log(`State transition: IDLE -> ONBOARDING`);
-                    setTimeout(() => {
-                        machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
-                    }, 30 * 1000);
-                    this.sendOscCue(this.lighting.ONBOARDING_START)
+                    moveToOnboarding(this)
                 }
             }
             if (event.name === this.events.RFID_SCAN) {
-                // switch to onboarding
-                turnOffApplauseLED();
-                this.state = this.states.ONBOARDING;
-                console.log(`State transition: IDLE -> ONBOARDING`);
-                setTimeout(() => {
-                    machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
-                }, 30 * 1000);
-                this.sendOscCue(this.lighting.ONBOARDING_START)
+                moveToOnboarding(this)
             }
             else {
                 return;
             }
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
-            if(this.debounce === false) {
-                setTimeout(() => {this.debounce = true}, 1000);
+            if (this.debounce === false) {
+                setTimeout(() => { this.debounce = true }, 1000);
             } else {
                 // Scan RFID to exit early
-                if (event.name === this.events.RFID_SCAN) { 
+                if (event.name === this.events.RFID_SCAN) {
                     this.debounce = false;
                     moveToPlaying(this);
                     this.sendOscCue(this.lighting.START_GAME)
@@ -422,23 +475,23 @@ class GameMachine {
                     scoreChange(this, this.applause.points, "Applause");
                     clearTimeout(this.applauseTimer);
                     this.addEvent(this.events.TURN_OFF_APPLAUSE);
-                    this.addEvent(this.feedback.APPLAUSE_GOOD, { });
+                    this.addEvent(this.feedback.APPLAUSE_GOOD, {});
                 } else if (!this.cues.APPLAUSE_CUE) {
                     scoreChange(this, -1 * this.applause.points, "Applause");
-                    this.addEvent(this.feedback.APPLAUSE_BAD, { });
+                    this.addEvent(this.feedback.APPLAUSE_BAD, {});
                 }
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 if (this.cues.CHEAT_CUE) {
                     scoreChange(this, this.cheat.points, "Cheat");
                     clearTimeout(this.cheatTimer);
-                    this.addEvent(this.feedback.CHEAT_GOOD, { });
+                    this.addEvent(this.feedback.CHEAT_GOOD, {});
                     this.addEvent(this.events.TURN_OFF_CHEAT);
                     this.sendOscCue(this.lighting.CHEAT)
                     this.sendOscCue(this.lighting.IDLE)
                 } else if (!this.cues.CHEAT_CUE) {
                     scoreChange(this, -1 * this.cheat.points, "Cheat");
-                    this.addEvent(this.feedback.CHEAT_BAD, { });
+                    this.addEvent(this.feedback.CHEAT_BAD, {});
                 }
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
@@ -466,7 +519,7 @@ class GameMachine {
                     if (pos >= min && pos <= max) {
                         // Successful move
                         scoreChange(this, this.lever.points, "Lever");
-                        this.addEvent(this.feedback.LEVER_GOOD, { });
+                        this.addEvent(this.feedback.LEVER_GOOD, {});
                         clearTimeout(this.leverTimer);
                         this.cues.LEVER_TARGET = null; // prevent double scoring
                         console.log("Lever moved correctly. Score rewarded.");
@@ -546,7 +599,7 @@ class GameMachine {
                         if (this.leverTouched) {
                             // Moved but failed to hit target
                             scoreChange(this, -1 * this.lever.points, "Lever");
-                            this.addEvent(this.feedback.LEVER_BAD, { });
+                            this.addEvent(this.feedback.LEVER_BAD, {});
                             console.log("Lever moved but missed target. Score penalized.");
                         } else {
                             console.log("Lever not touched. No penalty.");
@@ -687,8 +740,8 @@ class GameMachine {
                 })
             }
         } else if (this.state === this.states.END) {                          //END STATE
-            if(this.debounce === false) {
-                setTimeout(() => {this.debounce = true}, 3 * 1000);
+            if (this.debounce === false) {
+                setTimeout(() => { this.debounce = true }, 3 * 1000);
             } else {
                 turnOnApplauseLED();
                 if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
