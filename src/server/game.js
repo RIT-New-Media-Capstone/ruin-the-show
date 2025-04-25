@@ -70,26 +70,31 @@ const RTSrfidPresets = {
 }
 
 const sendLightingPreset = (rtsPreset) => {
-    const url = 'http://nm-rfid-5.new-media-metagame.com:8001/lights';
+    try {
+        const url = 'http://nm-rfid-5.new-media-metagame.com:8001/lights';
 
-    const body = new URLSearchParams();
+        const body = new URLSearchParams();
 
-    for (const [key, value] of Object.entries(rtsPreset)) {
-        if (value !== undefined && value !== null) {
-            body.append(key, value.toString());
+        for (const [key, value] of Object.entries(rtsPreset)) {
+            if (value !== undefined && value !== null) {
+                body.append(key, value.toString());
+            }
         }
+
+        fetch(url, {
+            method: 'POST',
+            body,
+        }).then((response) => {
+            if (!response.ok) {
+                console.error('Failed to set lights:', response.statusText);
+            } else {
+                console.log('Lights set!');
+            }
+        });
     }
-
-    fetch(url, {
-        method: 'POST',
-        body,
-    }).then((response) => {
-        if (!response.ok) {
-            console.error('Failed to set lights:', response.statusText);
-        } else {
-            console.log('Lights set!');
-        }
-    });
+    catch (err) {
+        console.log("RFID error: ", err)
+    }
 }
 
 
@@ -108,7 +113,7 @@ const moveToOnboarding = (machine) => {
     // Setup timers for lighting up buttons 
     // Podiums: light one at a time 
     // Rough cues: 1 per second 0-4s
-    let podiumEndTime = 4 + (11/60)
+    let podiumEndTime = 4 + (11 / 60)
     videoCues.push(setTimeout(() => {
         turnOnPodiumLED(1)
     }, 0 * 1000))
@@ -130,7 +135,7 @@ const moveToOnboarding = (machine) => {
 
     // Applause
     // Rough cues: 4-8s on 
-    let applauseEndTime = 9 + (11/60)
+    let applauseEndTime = 9 + (11 / 60)
     videoCues.push(setTimeout(() => {
         turnOnApplauseLED()
     }, podiumEndTime * 1000))
@@ -1040,12 +1045,17 @@ const awake = () => {
     //moveToPlaying(machine);
 
 
-    rfidEventSource.addEventListener('message', (event) => {
-        const data = event.data
-        if (data) {
-            machine.addEvent(machine.events.RFID_SCAN)
-        }
-    })
+    try {
+        rfidEventSource.addEventListener('message', (event) => {
+            const data = event.data
+            if (data) {
+                machine.addEvent(machine.events.RFID_SCAN)
+            }
+        })
+    }
+    catch (err) {
+        console.log("RFID addEvent error: ", err)
+    }
 
 };
 

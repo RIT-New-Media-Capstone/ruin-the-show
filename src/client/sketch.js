@@ -1323,14 +1323,17 @@ window.keyPressed = function () {
         }
 
         if (event) {
-            fetch('/setState', {
+            try{fetch('/setState', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ event, data })
             })
                 .then(res => res.json())
                 .then(console.log)
-                .catch(console.error);
+                .catch(console.error);}
+                catch (err) {
+                    console.log("Error sending event data: ", err)
+                }
         }
     }
 }
