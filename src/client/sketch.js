@@ -463,7 +463,7 @@ window.setup = async function () {
     backgroundLayer = createGraphics(width, height);
     onboardingGraphicsLayer = createGraphics(width, height)
 
-    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/onboarding.mov')
+    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/onboarding.mp4')
     idleOnboarding.onboarding.hide();
     idleOnboarding.onboarding.volume(0);
     idleOnboarding.onboarding.size(width, height)
