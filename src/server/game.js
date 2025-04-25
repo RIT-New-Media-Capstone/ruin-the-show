@@ -19,6 +19,80 @@ const EventSource = require('eventsource').EventSource;
 
 const rfidEventSource = new EventSource('http://nm-rfid-5.new-media-metagame.com:8001/sse')
 
+const RTSrfidPresets = {
+    idle: {
+        duration: 0,
+        pattern: "pulse",
+        foreground: "#ff00ee",
+        background: "#000000",
+        period: 2
+    },
+    onboarding: {
+        duration: 0,
+        pattern: "solid",
+        foreground: "#ff00ee",
+    },
+    end: {
+        good: {
+            duration: 0,
+            pattern: "comet",
+            foreground: "#FFC800",
+            background: "#705800",
+            period: 0.75
+        },
+        mid: {
+            duration: 0,
+            pattern: "comet",
+            foreground: "#0091FF",
+            background: "#004275",
+            period: 0.75
+        },
+        fail: {
+            duration: 0,
+            pattern: "comet",
+            foreground: "#ff0000",
+            background: "#800000",
+            period: 0.75
+        }
+    },
+    onSuccessfulTap: {
+        duration: 2,
+        pattern: "pulse",
+        foreground: "#00ff00",
+        background: "#000000",
+        period: 0.5
+    },
+    off: {
+        duration: 0,
+        pattern: "solid",
+        foreground: "#000000",
+    }
+}
+
+const sendLightingPreset = (rtsPreset) => {
+    const url = 'http://nm-rfid-5.new-media-metagame.com:8001/lights';
+
+    const body = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(rtsPreset)) {
+        if (value !== undefined && value !== null) {
+            body.append(key, value.toString());
+        }
+    }
+
+    fetch(url, {
+        method: 'POST',
+        body,
+    }).then((response) => {
+        if (!response.ok) {
+            console.error('Failed to set lights:', response.statusText);
+        } else {
+            console.log('Lights set!');
+        }
+    });
+}
+
+
 let videoCues = []
 const moveToOnboarding = (machine) => {
     machine.debounce = false;
@@ -29,6 +103,7 @@ const moveToOnboarding = (machine) => {
         machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
     }, 30 * 1000);
     machine.sendOscCue(machine.lighting.ONBOARDING_START)
+    sendLightingPreset(RTSrfidPresets.onboarding)
 
     // Setup timers for lighting up buttons 
     // Podiums: light one at a time 
@@ -81,11 +156,13 @@ const moveToPlaying = (machine) => {
     // Clean up onboarding cues
     videoCues.forEach(clearTimeout)
     videoCues.length = 0
-    for(let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 4; i++) {
         turnOffPodiumLED(i)
     }
     turnOffApplauseLED()
     turnOffCheatLED()
+
+    sendLightingPreset(RTSrfidPresets.off)
 
     machine.state = 'PLAYING';
     console.log(`State transition: ONBOARDING -> PLAYING`);
@@ -103,12 +180,6 @@ const moveToPlaying = (machine) => {
     machine.cues.LEVER_CUE = false;
     for (let i = 1; i <= 4; i++) {
         machine.cues[`PODIUM_${i}_CUE`] = false;
-    }
-
-    turnOffApplauseLED();
-    turnOffCheatLED();
-    for (let i = 1; i <= 4; i++) {
-        turnOffPodiumLED(i);
     }
 
     machine.cheatTimer = null;
@@ -200,6 +271,13 @@ class GameMachine {
     lastDir = null
     targetDir = null
     messages_for_frontend = []
+
+    // End screen states
+    scoreThreshold = {
+        good: 200,
+        mid: 100,
+        fail: 0,
+    }
 
     states = {
         IDLE: 'IDLE',
@@ -408,6 +486,7 @@ class GameMachine {
                 }
             }
             if (event.name === this.events.RFID_SCAN) {
+                sendLightingPreset(RTSrfidPresets.onSuccessfulTap)
                 moveToOnboarding(this)
             }
             else {
@@ -420,6 +499,7 @@ class GameMachine {
                 // Scan RFID to exit early
                 if (event.name === this.events.RFID_SCAN) {
                     this.debounce = false;
+                    sendLightingPreset(RTSrfidPresets.onSuccessfulTap)
                     moveToPlaying(this);
                     this.sendOscCue(this.lighting.START_GAME)
                 }
@@ -469,6 +549,11 @@ class GameMachine {
                 setTimeout(() => {
                     machine.addEvent(machine.events.RETURN_IDLE, {});
                 }, 15 * 1000);
+
+                if (this.score >= this.scoreThreshold.good) sendLightingPreset(RTSrfidPresets.end.good)
+                else if (this.score >= this.scoreThreshold.mid) sendLightingPreset(RTSrfidPresets.end.mid)
+                else if (this.score >= this.scoreThreshold.fail) sendLightingPreset(RTSrfidPresets.end.fail)
+                else sendLightingPreset(RTSrfidPresets.off)
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 if (this.cues.APPLAUSE_CUE) {
@@ -750,6 +835,17 @@ class GameMachine {
                     this.state = this.states.IDLE;
                     console.log(`State transition: END -> IDLE`);
                     this.sendOscCue(this.lighting.IDLE)
+
+                    sendLightingPreset(RTSrfidPresets.idle)
+                }
+                else if (event.name === this.events.RFID_SCAN) {
+                    sendLightingPreset(RTSrfidPresets.onSuccessfulTap)
+                    turnOffApplauseLED();
+                    this.debounce = false
+                    this.state = this.states.IDLE;
+                    console.log(`State transition: END -> IDLE`);
+                    this.sendOscCue(this.lighting.IDLE)
+                    sendLightingPreset(RTSrfidPresets.idle)
                 }
             }
             if (event.name === this.events.RETURN_IDLE) {
@@ -758,6 +854,7 @@ class GameMachine {
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
                 this.sendOscCue(this.lighting.IDLE)
+                sendLightingPreset(RTSrfidPresets.idle)
             }
         }
     }
@@ -923,6 +1020,7 @@ setTimeout(updateHostPosition, 100);
 // On Start Up
 const awake = () => {
     console.log("WELCOME TO RUIN THE SHOW! PLEASE SHOW YOUR RFID BAND TO START PLAYING!");
+    sendLightingPreset(RTSrfidPresets.idle)
     // Create a new game machine in IDLE state
 
     // Start the state machine
