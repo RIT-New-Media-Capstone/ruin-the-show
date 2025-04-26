@@ -283,8 +283,8 @@ const audio = {
     idle: "",
     end: null,
     onboard: null,
-    playingVolume: 0.5,
-    idleVolume: 0.5,
+    playingVolume: 0.15,
+    idleVolume: 0.2,
 }
 // Classes
 // -Sprite Animator
@@ -1172,7 +1172,7 @@ function drawScore() {
     if (RTSstate.score >= 0) {
         image(end.shadow, 0, 0, width, height)
         // change values based on score 
-        if (RTSstate.score > 250) {
+        if (RTSstate.score > 280) {
             image(end.success, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {
@@ -1181,7 +1181,7 @@ function drawScore() {
                 }, 100 * i)
             }
         }
-        else if (RTSstate.score > 200) {
+        else if (RTSstate.score > 225) {
             image(end.success, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {
@@ -1199,7 +1199,7 @@ function drawScore() {
                 }, 100 * i)
             }
         }
-        else if (RTSstate.score > 100) {
+        else if (RTSstate.score > 75) {
             image(end.middle, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {
@@ -1208,7 +1208,7 @@ function drawScore() {
                 }, 100 * i)
             }
         }
-        else if (RTSstate.score > 50) {
+        else if (RTSstate.score > 25) {
             image(end.fail, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {

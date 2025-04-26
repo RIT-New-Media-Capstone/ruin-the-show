@@ -17,7 +17,7 @@ const require = createRequire(import.meta.url);
 
 const EventSource = require('eventsource').EventSource;
 
-const rfidEventSource = new EventSource('http://nm-rfid-5.new-media-metagame.com:8001/sse')
+const rfidEventSource = new EventSource('http://192.168.0.169:8001/sse')
 
 const RTSrfidPresets = {
     idle: {
@@ -71,7 +71,7 @@ const RTSrfidPresets = {
 
 const sendLightingPreset = (rtsPreset) => {
     try {
-        const url = 'http://nm-rfid-5.new-media-metagame.com:8001/lights';
+        const url = 'http://192.168.0.169:8001/lights';
 
         const body = new URLSearchParams();
 
@@ -81,16 +81,26 @@ const sendLightingPreset = (rtsPreset) => {
             }
         }
 
-        fetch(url, {
-            method: 'POST',
-            body,
-        }).then((response) => {
-            if (!response.ok) {
-                console.error('Failed to set lights:', response.statusText);
-            } else {
-                console.log('Lights set!');
-            }
-        });
+        const fetchReq = (url, body) => {
+            fetch(url, {
+                method: 'POST',
+                body,
+            }).then((response) => {
+                if (!response.ok) {
+                    console.error('Failed to set lights:', response.statusText);
+                } else {
+                    console.log('Lights set!');
+                }
+            }).catch((err) => { 
+                console.log("RFID Error: ", err, Date.now()) 
+                setTimeout(() => {
+                    fetchReq(url, body)
+                }, 2000);
+            });
+        }
+
+        fetchReq(url, body)
+        
     }
     catch (err) {
         console.log("RFID error: ", err)
@@ -283,8 +293,8 @@ class GameMachine {
 
     // End screen states
     scoreThreshold = {
-        good: 200,
-        mid: 100,
+        good: 225,
+        mid: 75,
         fail: 0,
     }
 
@@ -377,48 +387,48 @@ class GameMachine {
     // Variables for each minigame values
     // If one set value, make max = (min + 1)
     applause = {
-        initialDelay: 5,
-        onMin: 8,
+        initialDelay: 2,
+        onMin: 7,
         onMax: 11,
-        cooldownMin: 2,
-        cooldownMax: 3,
+        cooldownMin: 4,
+        cooldownMax: 11,
         points: 5,
     }
 
     cheat = {
-        initialDelay: 10,
-        onMin: 4,
+        initialDelay: 18,
+        onMin: 5,
         onMax: 9,
-        cooldownMin: 5,
-        cooldownMax: 9,
-        points: 15,
+        cooldownMin: 10,
+        cooldownMax: 15,
+        points: 40,
     }
 
     joystick = {
-        initialDelay: 20,
-        onMin: 10,
-        onMax: 11,
-        cooldownMin: 8,
-        cooldownMax: 11,
-        points: 10,
+        initialDelay: 6,
+        onMin: 5,
+        onMax: 7,
+        cooldownMin: 10,
+        cooldownMax: 20,
+        points: 15,
     }
 
     podium = {
-        initialDelay: 8,
-        onMin: 3,
-        onMax: 7,
-        cooldownMin: 3,
-        cooldownMax: 4,
+        initialDelay: 10,
+        onMin: 5,
+        onMax: 9,
+        cooldownMin: 4,
+        cooldownMax: 8,
         points: 8,
     }
 
     lever = {
-        initialDelay: 12,
+        initialDelay: 14,
         onMin: 6,
         onMax: 12,
-        cooldownMin: 5,
-        cooldownMax: 6,
-        points: 7,
+        cooldownMin: 10,
+        cooldownMax: 20,
+        points: 12,
     }
 
     constructor(initialState) {
@@ -1043,7 +1053,6 @@ const awake = () => {
 
     //DEBUG PURPOSES: START AT PLAYING STATE
     //moveToPlaying(machine);
-
 
     try {
         rfidEventSource.addEventListener('message', (event) => {
