@@ -561,7 +561,7 @@ class GameMachine {
                 this.state = this.states.END;
 
                 // However we want to figure win vs lose 
-                if (this.score > 0) this.sendOscCue(this.lighting.WIN)
+                if (this.score > 75) this.sendOscCue(this.lighting.WIN)
                 else this.sendOscCue(this.lighting.FAIL)
 
                 console.log(`State transition: PLAYING -> END`);
