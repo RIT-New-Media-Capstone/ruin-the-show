@@ -12,11 +12,12 @@ let port;
 const devPorts = {
     max: '/dev/tty.usbserial-DA017SAV', 
     kaiden: 'COM5',
+    NMD: 'COM3'
 }
 
 const serialSetup = () => {
     // Change based on which dev is running the program 
-    const portPath = devPorts.max
+    const portPath = devPorts.kaiden
 
     port = new SerialPort({ path: portPath, baudRate: 9600 });
     const serial = port.pipe(new ReadlineParser({ delimiter: '\n' }));

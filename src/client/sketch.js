@@ -1,5 +1,21 @@
 "use strict";
 
+// PLAN B: 
+const keyboardInputs = true
+const keyboardMapping = {
+    applause: 'q',
+    cheat: 'e',
+    joystickLeft: 'a',
+    joystickRight: 'd',
+    leverUp: 'w',
+    leverDown: 's',
+    podium_1: '1',
+    podium_2: '2',
+    podium_3: '3',
+    podium_4: '4',
+    rfid_scan: ' '
+}
+
 // I. Initialize "RTSstate" object for syncing
 let RTSstate = {
     score: 0,
@@ -82,7 +98,8 @@ const idleOnboarding = {
 // Playing 
 const assets = {
     audience: "",
-    background: "",
+    applauseSign: "", 
+    background: { idle: { file: "RTS Background", config: bigSpriteSheetConfig, frames: [] } },
     cheat: "",
     hands: { idle: { file: "Audience Reaction", config: bigSpriteSheetConfig, frames: [] } },
     handstars: { idle: { file: "RTS_Stars", config: starSpriteSheetConfig, frames: [] } },
@@ -99,9 +116,11 @@ const assets = {
     stage: "",
     stagelights: "",
     stars: "",
+    staticbackground: "",
     timer: "",
     levercamera: "",
-    leverdial: "",
+    levertarget: "",
+    levermarker: "",
 }
 // -End
 const end = {
@@ -174,7 +193,7 @@ let frameDelay = 6;
 const zoom = {
     previousZoomPos: 0,
     zoomPos: 0,
-    targetZoomPos: 0, 
+    targetZoomPos: 0,
     timer: 0,
     lerpTotalTime: 60,
     minLerpTime: 15,
@@ -196,7 +215,8 @@ const dial = {
     shouldTintRed: false,
     isVisible: false,
 }
-// -Timer
+// -Timer/Score
+let scoreFont;
 let countdownFont;
 let timerDuration = 60000; // 60 seconds
 let timerStart;
@@ -231,7 +251,15 @@ const applause = {
     shouldHands: false,
     shouldStars: false,
     applauseActive: false,
+    //drawCue: false,
+    //interval: null
+    offScreenXPos: 0,
+    targetXPos: 0,
+    currentXPos: 0,
+    timer: 0,
+    lerpTotalTime: 24,
 }
+
 // -Light
 const light = {
     shouldTintGreen: false,
@@ -241,7 +269,22 @@ const light = {
 const cheat = {
     shouldGreen: false,
     shouldRed: false,
-    isVisible: false
+    isVisible: false,
+    offScreenXPos: -400,
+    targetXPos: 0,
+    currentXPos: 0,
+    timer: 0,
+    lerpTotalTime: 24,
+}
+
+// Audio assets
+const audio = {
+    playing: "",
+    idle: "",
+    end: null,
+    onboard: null,
+    playingVolume: 0.15,
+    idleVolume: 0.2,
 }
 // Classes
 // -Sprite Animator
@@ -311,7 +354,12 @@ window.preload = function () {
     idleOnboarding.idle = loadImage('/Assets/Idle_Onboarding/00_RTS_Splash.gif');
     // Playing
     // -Background & Podiums
-    assets.background = loadImage('/Assets/Background/MainBackground.png');
+    assets.staticbackground = loadImage('/Assets/Background/MainBackground.png');
+    assets.background.idle.image = loadImage('/Assets/SpriteSheets/Misc/RTS Background.png');
+    populateFrames(assets.background.idle.config, assets.background.idle.frames);
+    assets.background.animator = new SpriteAnimator({ idle: assets.background.idle });
+    assets.background.animator.setAnimation("idle");
+
     assets.stage = loadImage('/Assets/Background/Stage.png');
     assets.stagelights = loadImage('/Assets/Background/StageLights.png');
     assets.audience = loadImage('/Assets/Background/Audience.png');
@@ -325,15 +373,18 @@ window.preload = function () {
     assets.timer = loadImage('/Assets/Background/Timer.png');
     assets.score = loadImage('/Assets/Background/PointTrack.png')
     countdownFont = loadFont('/Assets/Fonts/SourceCodePro-Bold.ttf');
+    scoreFont = loadFont('/Assets/Fonts/SourceCodePro-Medium.ttf');
     // -Cues & Feedback
     assets.cheat = loadImage('/Assets/Interactions/Cheat/CheatingHand-01.png');
     assets.applauseon = loadImage('/Assets/Interactions/Applause/Applause_ON.png');
+    assets.applauseSign = loadImage('/Assets/Interactions/Applause/ApplauseCue.png');
     assets.podiumlit2 = loadImage('/Assets/Interactions/Podiums/1light_WhitePodium.png');
     assets.podiumlit1 = loadImage('/Assets/Interactions/Podiums/2light_YellowPodium.png');
     assets.podiumlit4 = loadImage('/Assets/Interactions/Podiums/3light_BluePodium.png');
     assets.podiumlit3 = loadImage('/Assets/Interactions/Podiums/4light_RedPodium.png');
-    assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature.png')
-    assets.leverdial = loadImage('/Assets/Interactions/Lever/ZoomDial.png')
+    assets.levercamera = loadImage('/Assets/Interactions/Lever/ZoomFeature_Background.png')
+    assets.levertarget = loadImage('/Assets/Interactions/Lever/Zoom_Target.png')
+    assets.levermarker = loadImage('/Assets/Interactions/Lever/Zoom.png')
 
     assets.rightLit = loadImage('/Assets/Interactions/Podiums/ContestantRight.png');
     assets.wrongLit = loadImage('/Assets/Interactions/Podiums/ContestantWrong.png');
@@ -379,6 +430,17 @@ window.preload = function () {
     end.curtains.animator.setAnimation("idle", null, false, () => {
         end.curtainsClosed = true
     })
+
+    // Audio preload
+    audio.playing = loadSound('Assets/Audio/playing-state-music.mp3')
+    audio.playing.setLoop(true)
+    audio.playing.stop()
+    audio.playing.setVolume(audio.playingVolume)
+
+    audio.idle = loadSound('Assets/Audio/idle-state-music.mp3')
+    audio.idle.setLoop(true)
+    audio.idle.stop()
+    audio.idle.setVolume(audio.idleVolume)
 }
 
 function populateFrames(animConfig, framesArray) {
@@ -395,13 +457,13 @@ function populateFrames(animConfig, framesArray) {
 // IV. Setup canvas, frame rate, timer, graphic layers, onboard video, and sync (30 ms)
 window.setup = async function () {
     // 16:9 aspect ratio with slight padding
-    createCanvas(assets.background.width / 6, assets.background.height / 6);
+    createCanvas(assets.staticbackground.width / 6, assets.staticbackground.height / 6);
     frameRate(30);
     angleMode(DEGREES)
     backgroundLayer = createGraphics(width, height);
     onboardingGraphicsLayer = createGraphics(width, height)
 
-    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/NEW ONBOARDING w Captions.mp4')
+    idleOnboarding.onboarding = createVideo('/Assets/Idle_Onboarding/onboarding.mp4')
     idleOnboarding.onboarding.hide();
     idleOnboarding.onboarding.volume(0);
     idleOnboarding.onboarding.size(width, height)
@@ -409,8 +471,8 @@ window.setup = async function () {
     // Set default zoom values 
     zoom.minWidth = width
     zoom.minHeight = height
-    zoom.maxWidth = zoom.minWidth / 2
-    zoom.maxHeight = zoom.minHeight / 2
+    zoom.maxWidth = zoom.minWidth * 3 / 4
+    zoom.maxHeight = zoom.minHeight * 3 / 4
 
     zoom.minX = 0
     zoom.minY = 0
@@ -421,6 +483,11 @@ window.setup = async function () {
     zoom.zoomY = zoom.minY
     zoom.zoomWidth = zoom.minWidth
     zoom.zoomHeight = zoom.minHeight
+
+    // Set default applause values
+    applause.offScreenXPos = width
+    applause.targetXPos = (width - assets.applauseSign.width / 5) + 200
+    applause.currentXPos = applause.offScreenXPos
 
     syncStateLoop();
 }
@@ -472,8 +539,8 @@ function changeAnimations(message) {
             else if (animation === 'red') dial.shouldTintRed = true;
         }
         else if (target === 'screen') {
-            if (animation === 'green') cheat.shouldTintGreen = true;
-            else if (animation === 'red') cheat.shouldTintRed = true;
+            if (animation === 'green') cheat.shouldGreen = true;
+            else if (animation === 'red') cheat.shouldRed = true;
             cheat.isVisible = true
         }
         else {
@@ -502,11 +569,16 @@ window.draw = function () {
     ];
 
     //Debugging Particular States
-    //RTSstate.state = 'PLAYING'
+    // RTSstate.state = 'PLAYING'
 
     if (RTSstate.state === 'IDLE') { // Idle/Onboarding
         idleOnboarding.onboarding.stop()
         idleOnboarding.onboarding_playing = false
+
+        // Audio
+        if (audio.idle.isLoaded()) {
+            if (!audio.idle.isPlaying()) audio.idle.play()
+        }
 
         end.curtainsClosed = false
         end.scoreVis = false
@@ -514,7 +586,8 @@ window.draw = function () {
 
         image(idleOnboarding.idle, 0, 0, width, height);
     } else if (RTSstate.state === 'ONBOARDING') {
-        // TODO: find a way to let audio play without triggering browser-side autoblock 
+        if (audio.idle.isPlaying()) audio.idle.stop()
+
         idleOnboarding.onboarding.volume(1)
         if (!idleOnboarding.onboarding_playing) {
             idleOnboarding.onboarding.play()
@@ -523,10 +596,17 @@ window.draw = function () {
         onboardingGraphicsLayer.image(idleOnboarding.onboarding, 0, 0)
         image(onboardingGraphicsLayer, 0, 0)
     } else if (RTSstate.state === 'PLAYING') { // Playing
-        // Background Setup & Countdown Logic
-        idleOnboarding.onboarding.stop()
-        idleOnboarding.onboarding_playing = false
-        idleOnboarding.onboarding.volume(0)
+        if (previousState !== 'PLAYING') {
+            // Background Setup & Countdown Logic
+            idleOnboarding.onboarding.stop()
+            idleOnboarding.onboarding_playing = false
+            idleOnboarding.onboarding.volume(0)
+        }
+        // Audio
+        if (audio.playing.isLoaded()) {
+            if (!audio.playing.isPlaying()) audio.playing.play()
+        }
+
         drawBackground();
 
         // Contestant Idle Animations
@@ -561,22 +641,18 @@ window.draw = function () {
             }
         }
 
+
+        if (RTSstate.cues.JOYSTICK_CUE) {
+            light.isVisible = true
+        }
+
+        if (light.isVisible) drawSpotlight()
+
         //Host Animations
         host.animator.play()
         host.animator.update();
         host.animator.draw(map(RTSstate.host.POSITION, RTSstate.host.MIN, RTSstate.host.MAX, -300, width - 500), height / 2.4, 0.75);
 
-        if (RTSstate.cues.JOYSTICK_CUE) {
-            light.isVisible = true
-        }
-        // Spotlight Cue
-        // if (previousCue.JOYSTICK_CUE && !RTSstate.cues.JOYSTICK_CUE) {
-        //     setTimeout(() => {
-        //         light.isVisible = false
-        //     }, 1000);
-        // }
-
-        if (light.isVisible) drawSpotlight()
 
         // Applause Feedback (Could probably go in its own function)
         if (applause.shouldHands && !applause.applauseActive) {
@@ -616,9 +692,9 @@ window.draw = function () {
             zoom.targetZoomPos = RTSstate.feedback.LEVER_POS;
 
             // Dynamically calculate lerp time based on distance
-            const dist = Math.abs(zoom.targetZoomPos - zoom.previousZoomPos);
-            const maxDist = zoom.maxPos - zoom.minPos;
-            zoom.lerpTotalTime = floor(map(dist, 0, maxDist, zoom.minLerpTime, zoom.maxLerpTime));
+            const zoomDistance = Math.abs(zoom.targetZoomPos - zoom.previousZoomPos);
+            const maxDistance = zoom.maxPos - zoom.minPos;
+            zoom.lerpTotalTime = floor(map(zoomDistance, 0, maxDistance, zoom.minLerpTime, zoom.maxLerpTime));
 
             // Start lerping
             zoom.timer = 1;
@@ -634,19 +710,54 @@ window.draw = function () {
         image(backgroundLayer, 0, 0, width, height, zoom.zoomX, zoom.zoomY, zoom.zoomWidth, zoom.zoomHeight);
 
         // Applause Visuals
-        drawApplause();
+        // drawApplause();
 
         // Applause Cue
+        // if (RTSstate.cues.APPLAUSE_CUE) {
+        //     if (!previousCue.APPLAUSE_CUE) startApplauseFlash()
+        //     if (applause.drawCue) drawApplauseON();
+        // } else {
+        //     if (previousCue.APPLAUSE_CUE) stopApplauseFlash()
+        // }
+
+        if (!RTSstate.cues.APPLAUSE_CUE && previousCue.APPLAUSE_CUE) {
+            applause.timer = 1
+        }
         if (RTSstate.cues.APPLAUSE_CUE) {
-            drawApplauseON();
+            // if the cue is just starting
+            if (!previousCue.APPLAUSE_CUE) {
+                // start lerp 
+                applause.timer = 1
+            }
+            // cue in
+            if (applause.timer > 0) animateApplause('left')
+            drawApplauseSign();
+        }
+        else if (applause.timer > 0) {
+            animateApplause('right')
+            drawApplauseSign()
         }
 
         // Audience Heads
         drawAudience();
 
         // Cheat Cue
+        if (!RTSstate.cues.CHEAT_CUE && previousCue.CHEAT_CUE) {
+            cheat.timer = 1
+        }
         if (RTSstate.cues.CHEAT_CUE) {
+            // if the cue is just starting
+            if (!previousCue.CHEAT_CUE) {
+                // start lerp 
+                cheat.timer = 1
+            }
+            // cue in
+            if (cheat.timer > 0) animateCheat('right')
             drawCheat();
+        }
+        else if (cheat.timer > 0) {
+            animateCheat('left')
+            drawCheat()
         }
 
         //HUD
@@ -662,7 +773,10 @@ window.draw = function () {
         }
 
     } else if (RTSstate.state === 'END') { // End
-        idleOnboarding.onboarding.stop()
+        light.isVisible = false
+        zoom.isVisible = false
+        dial.isVisible = false
+        if (audio.playing.isPlaying()) audio.playing.stop()
 
         // Close curtains 
         if (!end.curtainsClosed) {
@@ -684,11 +798,12 @@ window.draw = function () {
 
 // DRAW Functions (Playing)
 function drawBackground() {
-    if (assets.background) {
-        backgroundLayer.image(assets.background, 0, 0, width, height);
-    }
+    // assets.background.animator.play();
+    // assets.background.animator.update();
+    // assets.background.animator.draw(0, 0, 1, width, height);
+    backgroundLayer.image(assets.staticbackground, 0, 0, width, height)
     if (assets.stage) {
-        backgroundLayer.image(assets.stage, width / 10, height / 1.75, width / 1.25, height / 2);
+        backgroundLayer.image(assets.stage, width / 10, height / 1.75, width / 1.15, height / 2);
     }
     if (assets.stagelights) {
         backgroundLayer.image(assets.stagelights, 0, -45, width, height / 3);
@@ -720,12 +835,12 @@ function drawAudience() {
 }
 function drawHUD() {
     if (assets.timer) {
-        image(assets.timer, -20, 60, assets.timer.width / 5, assets.timer.height / 5);
+        image(assets.timer, -20, 55, assets.timer.width / 5, assets.timer.height / 5);
         drawCountdown();
     }
     if (assets.stars) {
         let x = 10
-        let y = -10
+        let y = -15
 
         fill('#d9d9d9')
         rect(x + 15, y + 70, 250 * 2 / 3 + 70, 50 * 2 / 3);
@@ -736,12 +851,20 @@ function drawHUD() {
     }
     if (assets.score) {
         push()
-        image(assets.score, width - 250, -22, assets.score.width / 5, assets.score.height / 5);
+        image(assets.score, width - 250, -27, assets.score.width / 5, assets.score.height / 5);
         //Let's make this look better
         fill('#000000');
+        textFont(scoreFont);
         textSize(60);
-        scale(1.3, 1);
-        text(nf(RTSstate.score * 10, 4), width - 398.5, 60);
+
+        // 1xxx
+        text(floor(RTSstate.score / 100) % 10, width - 189, 55)
+        // x1xx
+        text(floor(RTSstate.score / 10) % 10, width - 141.5, 55)
+        // xx1x
+        text(floor(RTSstate.score / 1) % 10, width - 95, 55)
+        // xxx0
+        text(0, width - 49, 55)
         pop()
     }
 }
@@ -754,7 +877,7 @@ function drawCountdown() {
         textFont(countdownFont);
         textSize(32);
         textAlign(CENTER, CENTER);
-        text(seconds, 112, 148);
+        text(seconds, 112, 143);
 
         if (remaining === 0) {
             timerActive = false;
@@ -775,26 +898,94 @@ function drawApplauseON() {
         image(assets.applauseon, width / 2 - 148, -50, width / 4, height / 4);
     }
 }
+
+function startApplauseFlash() {
+    if (applause.interval) return;
+    applause.drawCue = true;
+    applause.interval = setInterval(() => {
+        applause.drawCue = !applause.drawCue;
+    }, 250);
+}
+
+function stopApplauseFlash() {
+    clearInterval(applause.interval);
+    applause.interval = null;
+    applause.drawCue = false;
+}
+
+function drawApplauseSign() {
+    if(assets.applauseSign) {
+        let assetWidth = assets.applauseSign.width / 5
+        let assetHeight = assets.applauseSign.height / 5
+        image(assets.applauseSign, applause.currentXPos, height - (assetHeight * 0.85), assetWidth, assetHeight)
+    }
+}
+
+function animateApplause(direction) {
+    if (applause.timer <= applause.lerpTotalTime) {
+        if (direction === 'left') {
+            applause.currentXPos = lerp(
+                applause.offScreenXPos,
+                applause.targetXPos,
+                applause.timer / applause.lerpTotalTime
+            )
+        }
+        else if (direction === 'right') {
+            applause.currentXPos = lerp(
+                applause.targetXPos,
+                applause.offScreenXPos,
+                applause.timer / applause.lerpTotalTime
+            )
+        }
+        applause.timer++
+    }
+    else {
+        applause.timer = 0
+    }
+}
+
 // Cheat
+function animateCheat(direction) {
+    if (cheat.timer <= cheat.lerpTotalTime) {
+        if (direction === 'right') {
+            cheat.currentXPos = lerp(
+                cheat.offScreenXPos,
+                cheat.targetXPos,
+                cheat.timer / cheat.lerpTotalTime
+            )
+        }
+        else if (direction === 'left') {
+            cheat.currentXPos = lerp(
+                cheat.targetXPos,
+                cheat.offScreenXPos,
+                cheat.timer / cheat.lerpTotalTime
+            )
+        }
+        cheat.timer++
+    }
+    else {
+        cheat.timer = 0
+    }
+}
 function drawCheat() {
     if (assets.cheat) {
-        image(assets.cheat, 0, 100, width / 3, height / 1.5);
+        image(assets.cheat, cheat.currentXPos, 100, width / 3, height / 1.5);
     }
 }
 function drawCheatFeedback() {
     push()
     let c = color(0, 0, 0, 0)
-    if (cheat.shouldTintGreen) {
+    if (cheat.shouldGreen) {
         c = color(25, 161, 129, 100);
         setTimeout(() => {
-            cheat.shouldTintGreen = false
+            cheat.shouldGreen = false
             cheat.isVisible = false
         }, 1000)
 
-    } else if (cheat.shouldTintRed) {
+    } else if (cheat.shouldRed) {
         c = color(213, 55, 50, 100);
         setTimeout(() => {
-            cheat.shouldTintRed = false
+            cheat.shouldRed = false
             cheat.isVisible = false
         }, 1000)
     }
@@ -804,7 +995,8 @@ function drawCheatFeedback() {
 }
 // Joystick
 function drawSpotlight() {
-    let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width);
+    push()
+    let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width - assets.spotlight.width / 12);
     if (assets.spotlight) {
         if (light.shouldTintGreen) {
             backgroundLayer.tint(25, 161, 129);
@@ -822,9 +1014,12 @@ function drawSpotlight() {
         } else {
             backgroundLayer.noTint();
         }
-        backgroundLayer.image(assets.spotlight, newJoystickPosition - (width / 4), 100, width / 2, height);
+        imageMode(CENTER)
+        backgroundLayer.image(assets.spotlight, newJoystickPosition, 300,
+            assets.spotlight.width / 12, assets.spotlight.height / 12);
         backgroundLayer.noTint();
     }
+    pop()
 }
 // Lever
 function drawLeverCue() {
@@ -851,14 +1046,11 @@ function drawLeverCue() {
 }
 
 function drawLeverFeedback() {
-    if (assets.leverdial) {
+    if (assets.levertarget && assets.levermarker) {
         push()
-        let x = width / 1.05;
+        let x = width / 2;
         let y = height / 2;
 
-        translate(x, y);
-        let dialRotation = map(RTSstate.feedback.LEVER_POS, 1, 100, -45, 45)
-        rotate(dialRotation)
         imageMode(CENTER)
         if (dial.shouldTintGreen) {
             tint(25, 161, 129);
@@ -867,7 +1059,32 @@ function drawLeverFeedback() {
             tint(213, 55, 50);
         }
         else noTint()
-        image(assets.leverdial, 0, 0, assets.leverdial.width / 7, assets.leverdial.height / 7)
+
+        let targetWidth = 0
+        let targetHeight = 0
+
+        if (RTSstate.cues.LEVER_TARGET) {
+            if (RTSstate.cues.LEVER_TARGET.min === 1) {
+                targetWidth = assets.levertarget.width / 3.75
+                targetHeight = assets.levertarget.height / 3.75
+            } else if (RTSstate.cues.LEVER_TARGET.max === 100) {
+                targetWidth = assets.levertarget.width / 7
+                targetHeight = assets.levertarget.height / 7
+            }
+        }
+
+        let minMarkerWidth = assets.levermarker.width / 6
+        let minMarkerHeight = assets.levermarker.height / 6
+
+        let maxMarkerWidth = assets.levermarker.width / 11
+        let maxMarkerHeight = assets.levermarker.height / 11
+
+        let markerWidth = map(RTSstate.feedback.LEVER_POS, 1, 100, minMarkerWidth, maxMarkerWidth)
+        let markerHeight = map(RTSstate.feedback.LEVER_POS, 1, 100, minMarkerHeight, maxMarkerHeight)
+
+        image(assets.levertarget, x, y, targetWidth, targetHeight)
+        image(assets.levermarker, x, y, markerWidth, markerHeight)
+
         noTint()
         pop()
     }
@@ -955,7 +1172,7 @@ function drawScore() {
     if (RTSstate.score >= 0) {
         image(end.shadow, 0, 0, width, height)
         // change values based on score 
-        if (RTSstate.score > 250) {
+        if (RTSstate.score > 280) {
             image(end.success, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {
@@ -964,7 +1181,7 @@ function drawScore() {
                 }, 100 * i)
             }
         }
-        else if (RTSstate.score > 200) {
+        else if (RTSstate.score > 225) {
             image(end.success, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {
@@ -982,7 +1199,7 @@ function drawScore() {
                 }, 100 * i)
             }
         }
-        else if (RTSstate.score > 100) {
+        else if (RTSstate.score > 75) {
             image(end.middle, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {
@@ -991,7 +1208,7 @@ function drawScore() {
                 }, 100 * i)
             }
         }
-        else if (RTSstate.score > 50) {
+        else if (RTSstate.score > 25) {
             image(end.fail, 0, 0, width, height)
 
             for (let i = 1; i <= 5; i++) {
@@ -1014,7 +1231,7 @@ function drawScore() {
         push()
 
         fill('black');
-        textFont(countdownFont);
+        textFont(scoreFont);
         textSize(64);
         textAlign(CENTER, CENTER);
         text(RTSstate.score * 10, 670, 380);
@@ -1039,5 +1256,84 @@ function drawStar(index, filledIn) {
         case 5:
             image(filledIn ? end.star : end.emptyStar, 720, 269, 140, 140)
             break
+    }
+}
+
+window.keyPressed = function () {
+    if (keyboardInputs) {
+        let event = null
+        let data = {}
+
+        switch (key) {
+            case keyboardMapping.applause:
+                event = 'applause-button-pressed'
+                break
+
+            case keyboardMapping.cheat:
+                event = 'cheat-button-pressed'
+                break
+
+            case keyboardMapping.joystickLeft:
+                event = 'joystick-moved'
+                data = { dir: 1 }
+                break
+
+            case keyboardMapping.joystickRight:
+                event = 'joystick-moved'
+                data = { dir: -1 }
+                break
+
+            case keyboardMapping.leverUp:
+                event = 'lever-moved'
+                data = { value: 100 }
+                break
+
+            case keyboardMapping.leverDown:
+                event = 'lever-moved'
+                data = { value: 1 }
+                break
+
+            case keyboardMapping.podium_1:
+                event = 'podium-button-pressed'
+                data = { num: 1 }
+                break
+
+            case keyboardMapping.podium_2:
+                event = 'podium-button-pressed'
+                data = { num: 2 }
+                break
+
+            case keyboardMapping.podium_3:
+                event = 'podium-button-pressed'
+                data = { num: 3 }
+                break
+
+            case keyboardMapping.podium_4:
+                event = 'podium-button-pressed'
+                data = { num: 4 }
+                break
+
+            case keyboardMapping.rfid_scan:
+                event = 'rfid-scan'
+                break
+
+            default:
+                console.log(key)
+                break
+        }
+
+        if (event) {
+            try{fetch('/setState', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ event, data })
+            })
+                .then(res => res.json())
+                .then(console.log)
+                .catch(console.error);}
+                catch (err) {
+                    console.log("Error sending event data: ", err)
+                }
+        }
     }
 }

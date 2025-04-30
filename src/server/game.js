@@ -17,9 +17,172 @@ const require = createRequire(import.meta.url);
 
 const EventSource = require('eventsource').EventSource;
 
-const rfidEventSource = new EventSource('http://nm-rfid-5.new-media-metagame.com:8001/sse')
+const rfidEventSource = new EventSource('http://192.168.0.169:8001/sse')
+
+const RTSrfidPresets = {
+    idle: {
+        duration: 0,
+        pattern: "pulse",
+        foreground: "#ff00ee",
+        background: "#000000",
+        period: 2
+    },
+    onboarding: {
+        duration: 0,
+        pattern: "solid",
+        foreground: "#ff00ee",
+    },
+    end: {
+        good: {
+            duration: 0,
+            pattern: "comet",
+            foreground: "#FFC800",
+            background: "#705800",
+            period: 0.75
+        },
+        mid: {
+            duration: 0,
+            pattern: "comet",
+            foreground: "#0091FF",
+            background: "#004275",
+            period: 0.75
+        },
+        fail: {
+            duration: 0,
+            pattern: "comet",
+            foreground: "#ff0000",
+            background: "#800000",
+            period: 0.75
+        }
+    },
+    onSuccessfulTap: {
+        duration: 2,
+        pattern: "pulse",
+        foreground: "#00ff00",
+        background: "#000000",
+        period: 0.5
+    },
+    off: {
+        duration: 0,
+        pattern: "solid",
+        foreground: "#000000",
+    }
+}
+
+const sendLightingPreset = (rtsPreset) => {
+    try {
+        const url = 'http://192.168.0.169:8001/lights';
+
+        const body = new URLSearchParams();
+
+        for (const [key, value] of Object.entries(rtsPreset)) {
+            if (value !== undefined && value !== null) {
+                body.append(key, value.toString());
+            }
+        }
+
+        const fetchReq = (url, body) => {
+            fetch(url, {
+                method: 'POST',
+                body,
+            }).then((response) => {
+                if (!response.ok) {
+                    console.error('Failed to set lights:', response.statusText);
+                } else {
+                    console.log('Lights set!');
+                }
+            }).catch((err) => { 
+                console.log("RFID Error: ", err, Date.now()) 
+                setTimeout(() => {
+                    fetchReq(url, body)
+                }, 2000);
+            });
+        }
+
+        fetchReq(url, body)
+        
+    }
+    catch (err) {
+        console.log("RFID error: ", err)
+    }
+}
+
+
+let videoCues = []
+const moveToOnboarding = (machine) => {
+    machine.debounce = false;
+    turnOffApplauseLED();
+    machine.state = machine.states.ONBOARDING;
+    console.log(`State transition: IDLE -> ONBOARDING`);
+    setTimeout(() => {
+        machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
+    }, 30 * 1000);
+    machine.sendOscCue(machine.lighting.ONBOARDING_START)
+    sendLightingPreset(RTSrfidPresets.onboarding)
+
+    // Setup timers for lighting up buttons 
+    // Podiums: light one at a time 
+    // Rough cues: 1 per second 0-4s
+    let podiumEndTime = 4 + (11 / 60)
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(1)
+    }, 0 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(2)
+        turnOffPodiumLED(1)
+    }, podiumEndTime * 1 / 4 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(3)
+        turnOffPodiumLED(2)
+    }, podiumEndTime * 2 / 4 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOnPodiumLED(4)
+        turnOffPodiumLED(3)
+    }, podiumEndTime * 3 / 4 * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOffPodiumLED(4)
+    }, podiumEndTime * 4 / 4 * 1000))
+
+    // Applause
+    // Rough cues: 4-8s on 
+    let applauseEndTime = 9 + (11 / 60)
+    videoCues.push(setTimeout(() => {
+        turnOnApplauseLED()
+    }, podiumEndTime * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOffApplauseLED()
+    }, applauseEndTime * 1000))
+
+    // Lever
+    // No podium cue, rough cues: 8-12s
+    let leverEndTime = 13 + (22 / 60)
+
+    // Cheat
+    // Rough cues: 12-17s 
+    let cheatEndTime = 17 + (30 / 60)
+    videoCues.push(setTimeout(() => {
+        turnOnCheatLED()
+    }, leverEndTime * 1000))
+    videoCues.push(setTimeout(() => {
+        turnOffCheatLED()
+    }, cheatEndTime * 1000))
+
+    // Joystick 
+    // No podium cue, rough cues: 17-22s 
+}
 
 const moveToPlaying = (machine) => {
+    // Clean up onboarding cues
+    videoCues.forEach(clearTimeout)
+    videoCues.length = 0
+    for (let i = 1; i <= 4; i++) {
+        turnOffPodiumLED(i)
+    }
+    turnOffApplauseLED()
+    turnOffCheatLED()
+
+    sendLightingPreset(RTSrfidPresets.off)
+
     machine.state = 'PLAYING';
     console.log(`State transition: ONBOARDING -> PLAYING`);
     //INITIALIZE ALL GAMEPLAY COMPONENTS HERE (e.g. Score)
@@ -38,12 +201,6 @@ const moveToPlaying = (machine) => {
         machine.cues[`PODIUM_${i}_CUE`] = false;
     }
 
-    turnOffApplauseLED();
-    turnOffCheatLED();
-    for (let i = 1; i <= 4; i++) {
-        turnOffPodiumLED(i);
-    }
-
     machine.cheatTimer = null;
     machine.applauseTimer = null;
     machine.joystickTimer = null;
@@ -58,26 +215,26 @@ const moveToPlaying = (machine) => {
     machine.scoreLever = 0
     machine.scorePodium = 0
 
-    // Start the game timer
+    // Start the game timer | Intial Delay
     setTimeout(() => {
         machine.addEvent(machine.events.GAME_OVER, {});
     }, 60 * 1000);
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_APPLAUSE, {});
-    }, 3 * 1000);
+    }, machine.applause.initialDelay * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_CHEAT, {});
-    }, 2 * 1000);
+    }, machine.cheat.initialDelay * 1000);  // prev val: 2   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_JOYSTICK, {});
-    }, 3 * 1000);
+    }, machine.joystick.initialDelay * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         const podiumToTrigger = Math.floor(Math.random() * 4) + 1
         machine.addEvent(machine.events.TURN_ON_PODIUM, { num: podiumToTrigger });
-    }, 3 * 1000);
+    }, machine.podium.initialDelay * 1000); // prev val: 3   E: x M: x H: x
     setTimeout(() => {
         machine.addEvent(machine.events.TURN_ON_LEVER, {});
-    }, 5 * 1000);
+    }, machine.lever.initialDelay * 1000); // prev val: 5   E: x M: x H: x
 }
 
 //Third variable temporary (For Testing Purposes)
@@ -99,6 +256,11 @@ const scoreChange = (machine, scoreEarned, minigame) => {
         machine[key] = 0
     }
     console.log("Your " + minigame + " score is: " + machine[key]);
+}
+
+// Helper random
+const randomRange = (min, max) => {
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 // GAME MACHINE (Idle, Onboard, Playing (w/ Associated Sub Machine Functions))
@@ -128,6 +290,13 @@ class GameMachine {
     lastDir = null
     targetDir = null
     messages_for_frontend = []
+
+    // End screen states
+    scoreThreshold = {
+        good: 225,
+        mid: 75,
+        fail: 0,
+    }
 
     states = {
         IDLE: 'IDLE',
@@ -215,6 +384,53 @@ class GameMachine {
         ONBOARDING_START: "onboarding-start",
     }
 
+    // Variables for each minigame values
+    // If one set value, make max = (min + 1)
+    applause = {
+        initialDelay: 2,
+        onMin: 7,
+        onMax: 11,
+        cooldownMin: 4,
+        cooldownMax: 11,
+        points: 5,
+    }
+
+    cheat = {
+        initialDelay: 18,
+        onMin: 5,
+        onMax: 9,
+        cooldownMin: 10,
+        cooldownMax: 15,
+        points: 40,
+    }
+
+    joystick = {
+        initialDelay: 6,
+        onMin: 5,
+        onMax: 7,
+        cooldownMin: 10,
+        cooldownMax: 20,
+        points: 15,
+    }
+
+    podium = {
+        initialDelay: 10,
+        onMin: 5,
+        onMax: 9,
+        cooldownMin: 4,
+        cooldownMax: 8,
+        points: 8,
+    }
+
+    lever = {
+        initialDelay: 14,
+        onMin: 6,
+        onMax: 12,
+        cooldownMin: 10,
+        cooldownMax: 20,
+        points: 12,
+    }
+
     constructor(initialState) {
         this.state = initialState;
     }
@@ -280,48 +496,34 @@ class GameMachine {
         }
 
         if (this.state === this.states.IDLE) {                                //IDLE STATE
-            if(this.debounce === false) {
-                setTimeout(() => {this.debounce = true}, 1000);
+            if (this.debounce === false) {
+                setTimeout(() => { this.debounce = true }, 1000);
             } else {
                 turnOnApplauseLED();
                 if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
-                    this.debounce = false;
-                    turnOffApplauseLED();
-                    this.state = this.states.ONBOARDING;
-                    console.log(`State transition: IDLE -> ONBOARDING`);
-                    setTimeout(() => {
-                        machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
-                    }, 30 * 1000);
-                    this.sendOscCue(this.lighting.ONBOARDING_START)
+                    moveToOnboarding(this)
                 }
             }
             if (event.name === this.events.RFID_SCAN) {
-                // switch to onboarding
-                turnOffApplauseLED();
-                this.state = this.states.ONBOARDING;
-                console.log(`State transition: IDLE -> ONBOARDING`);
-                setTimeout(() => {
-                    machine.addEvent(machine.events.ONBOARDING_COMPLETE, {});
-                }, 30 * 1000);
-                this.sendOscCue(this.lighting.ONBOARDING_START)
+                sendLightingPreset(RTSrfidPresets.onSuccessfulTap)
+                moveToOnboarding(this)
             }
             else {
                 return;
             }
         } else if (this.state === this.states.ONBOARDING) {                   //ONBOARDING STATE
-            if(this.debounce === false) {
-                setTimeout(() => {this.debounce = true}, 1000);
+            if (this.debounce === false) {
+                setTimeout(() => { this.debounce = true }, 1000);
             } else {
-                if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
+                // Scan RFID to exit early
+                if (event.name === this.events.RFID_SCAN) {
                     this.debounce = false;
-                    turnOffApplauseLED();
+                    sendLightingPreset(RTSrfidPresets.onSuccessfulTap)
                     moveToPlaying(this);
                     this.sendOscCue(this.lighting.START_GAME)
                 }
             }
-            turnOnApplauseLED();
             if (event.name === this.events.ONBOARDING_COMPLETE) {
-                turnOffApplauseLED();
                 moveToPlaying(this);
                 this.sendOscCue(this.lighting.START_GAME)
             }
@@ -359,36 +561,41 @@ class GameMachine {
                 this.state = this.states.END;
 
                 // However we want to figure win vs lose 
-                if (this.score > 0) this.sendOscCue(this.lighting.WIN)
+                if (this.score > 75) this.sendOscCue(this.lighting.WIN)
                 else this.sendOscCue(this.lighting.FAIL)
 
                 console.log(`State transition: PLAYING -> END`);
                 setTimeout(() => {
                     machine.addEvent(machine.events.RETURN_IDLE, {});
                 }, 15 * 1000);
+
+                if (this.score >= this.scoreThreshold.good) sendLightingPreset(RTSrfidPresets.end.good)
+                else if (this.score >= this.scoreThreshold.mid) sendLightingPreset(RTSrfidPresets.end.mid)
+                else if (this.score >= this.scoreThreshold.fail) sendLightingPreset(RTSrfidPresets.end.fail)
+                else sendLightingPreset(RTSrfidPresets.off)
             }
             if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
                 if (this.cues.APPLAUSE_CUE) {
-                    scoreChange(this, 5, "Applause");
+                    scoreChange(this, this.applause.points, "Applause");
                     clearTimeout(this.applauseTimer);
                     this.addEvent(this.events.TURN_OFF_APPLAUSE);
-                    this.addEvent(this.feedback.APPLAUSE_GOOD, { });
+                    this.addEvent(this.feedback.APPLAUSE_GOOD, {});
                 } else if (!this.cues.APPLAUSE_CUE) {
-                    scoreChange(this, -5, "Applause");
-                    this.addEvent(this.feedback.APPLAUSE_BAD, { });
+                    scoreChange(this, -1 * this.applause.points, "Applause");
+                    this.addEvent(this.feedback.APPLAUSE_BAD, {});
                 }
             }
             if (event.name === this.events.CHEAT_BUTTON_PRESSED) {
                 if (this.cues.CHEAT_CUE) {
-                    scoreChange(this, 15, "Cheat");
+                    scoreChange(this, this.cheat.points, "Cheat");
                     clearTimeout(this.cheatTimer);
-                    this.addEvent(this.feedback.CHEAT_GOOD, { });
+                    this.addEvent(this.feedback.CHEAT_GOOD, {});
                     this.addEvent(this.events.TURN_OFF_CHEAT);
                     this.sendOscCue(this.lighting.CHEAT)
                     this.sendOscCue(this.lighting.IDLE)
                 } else if (!this.cues.CHEAT_CUE) {
-                    scoreChange(this, -15, "Cheat");
-                    this.addEvent(this.feedback.CHEAT_BAD, { });
+                    scoreChange(this, -1 * this.cheat.points, "Cheat");
+                    this.addEvent(this.feedback.CHEAT_BAD, {});
                 }
             }
             if (event.name === this.events.JOYSTICK_MOVED) {
@@ -415,8 +622,8 @@ class GameMachine {
 
                     if (pos >= min && pos <= max) {
                         // Successful move
-                        scoreChange(this, 7, "Lever");
-                        this.addEvent(this.feedback.LEVER_GOOD, { });
+                        scoreChange(this, this.lever.points, "Lever");
+                        this.addEvent(this.feedback.LEVER_GOOD, {});
                         clearTimeout(this.leverTimer);
                         this.cues.LEVER_TARGET = null; // prevent double scoring
                         console.log("Lever moved correctly. Score rewarded.");
@@ -427,11 +634,11 @@ class GameMachine {
             if (event.name === this.events.PODIUM_BUTTON_PRESSED) {
                 const podiumNum = event.data.num
                 if (this.cues[`PODIUM_${podiumNum}_CUE`]) {
-                    scoreChange(this, 8, "Podium");
+                    scoreChange(this, this.podium.points, "Podium");
                     this.addEvent(this.feedback.PODIUM_GOOD, { podiumNum });
                     this.sendOscCue(this.lighting[`PODIUM_${podiumNum}`])
                 } else if (!this.cues[`PODIUM_${podiumNum}_CUE`]) {
-                    scoreChange(this, -8, "Podium");
+                    scoreChange(this, -1 * this.podium.points, "Podium");
                     this.addEvent(this.feedback.PODIUM_BAD, { podiumNum });
                 }
                 clearTimeout(this.podiumTimer);
@@ -444,14 +651,14 @@ class GameMachine {
                 turnOnApplauseLED();
                 this.applauseTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_APPLAUSE, {});
-                }, 10 * 1000);
+                }, randomRange(this.applause.onMin, this.applause.onMax) * 1000);
             }
             if (event.name === this.events.TURN_ON_CHEAT && !this.cues.CHEAT_CUE) {
                 this.cues.CHEAT_CUE = true
                 turnOnCheatLED();
                 this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_CHEAT, {});
-                }, 5 * 1000);
+                }, randomRange(this.cheat.onMin, this.cheat.onMax) * 1000);
             }
             if (event.name === this.events.TURN_ON_JOYSTICK && !this.cues.JOYSTICK_CUE) {
                 this.feedback.JOYSTICK_POS = 0
@@ -463,11 +670,11 @@ class GameMachine {
                     const diff = Math.abs(this.feedback.JOYSTICK_POS - this.cues.JOYSTICK_TARGET)
                     if (this.joystickTouched) {
                         if (diff <= 10) {
-                            scoreChange(this, 10, "Joystick");
+                            scoreChange(this, this.joystick.points, "Joystick");
                             this.addEvent(this.feedback.JOYSTICK_GOOD, {});
                             console.log("Joystick moved correctly to target. Score rewarded.")
                         } else {
-                            scoreChange(this, -10, "Joystick");
+                            scoreChange(this, -1 * this.joystick.points, "Joystick");
                             this.addEvent(this.feedback.JOYSTICK_BAD, {});
                             console.log("Joystick missed the target. Score penalized.")
                         }
@@ -475,7 +682,7 @@ class GameMachine {
                         console.log("Joystick was not touched. Nothing happens")
                     }
                     this.addEvent(this.events.TURN_OFF_JOYSTICK, {});
-                }, 5 * 1000);
+                }, randomRange(this.joystick.onMin, this.joystick.onMax) * 1000);
             }
             if (event.name === this.events.TURN_ON_LEVER && !this.cues.LEVER_CUE) {
                 this.cues.LEVER_CUE = true
@@ -495,22 +702,22 @@ class GameMachine {
                     if (this.cues.LEVER_TARGET) {
                         if (this.leverTouched) {
                             // Moved but failed to hit target
-                            scoreChange(this, -7, "Lever");
-                            this.addEvent(this.feedback.LEVER_BAD, { });
+                            scoreChange(this, -1 * this.lever.points, "Lever");
+                            this.addEvent(this.feedback.LEVER_BAD, {});
                             console.log("Lever moved but missed target. Score penalized.");
                         } else {
                             console.log("Lever not touched. No penalty.");
                         }
                     }
                     this.addEvent(this.events.TURN_OFF_LEVER, {});
-                }, 10 * 1000);
+                }, randomRange(this.lever.onMin, this.lever.onMax) * 1000);
             }
             if (event.name === this.events.TURN_ON_PODIUM && !this.cues[`PODIUM_${event.data.num}_CUE`]) {
                 this.cues[`PODIUM_${event.data.num}_CUE`] = true
                 turnOnPodiumLED(event.data.num);
                 this.podiumTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_OFF_PODIUM, { num: event.data.num });
-                }, 3 * 1000);
+                }, randomRange(this.podium.onMin, this.podium.onMax) * 1000);
             }
 
             // Set off-states
@@ -519,26 +726,26 @@ class GameMachine {
                 turnOffApplauseLED();
                 this.applauseTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_APPLAUSE, {});
-                }, 1 * 1000);
+                }, randomRange(this.applause.cooldownMin, this.applause.cooldownMax) * 1000);
             }
             if (event.name === this.events.TURN_OFF_CHEAT && this.cues.CHEAT_CUE) {
                 this.cues.CHEAT_CUE = false
                 turnOffCheatLED();
                 this.cheatTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_CHEAT, {});
-                }, 2 * 1000);
+                }, randomRange(this.cheat.cooldownMin, this.cheat.cooldownMax) * 1000);
             }
             if (event.name === this.events.TURN_OFF_JOYSTICK && this.cues.JOYSTICK_CUE) {
                 this.cues.JOYSTICK_CUE = false
                 this.joystickTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_JOYSTICK, {});
-                }, 5 * 1000);
+                }, randomRange(this.joystick.cooldownMin, this.joystick.cooldownMax) * 1000);
             }
             if (event.name === this.events.TURN_OFF_LEVER && this.cues.LEVER_CUE) {
                 this.cues.LEVER_CUE = false
                 this.leverTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_LEVER, {});
-                }, 2 * 1000);
+                }, randomRange(this.lever.cooldownMin, this.lever.cooldownMax) * 1000);
             }
             if (event.name == this.events.TURN_OFF_PODIUM) {
                 for (let i = 1; i <= 4; i++) {
@@ -548,7 +755,7 @@ class GameMachine {
                 const podiumToTrigger = Math.floor(Math.random() * 4) + 1
                 this.podiumTimer = setTimeout(() => {
                     this.addEvent(this.events.TURN_ON_PODIUM, { num: podiumToTrigger });
-                }, 3 * 1000);
+                }, randomRange(this.podium.cooldownMin, this.podium.cooldownMax) * 1000);
             }
             // Set feedback 
             if (event.name === this.feedback.PODIUM_GOOD) {
@@ -637,8 +844,8 @@ class GameMachine {
                 })
             }
         } else if (this.state === this.states.END) {                          //END STATE
-            if(this.debounce === false) {
-                setTimeout(() => {this.debounce = true}, 3 * 1000);
+            if (this.debounce === false) {
+                setTimeout(() => { this.debounce = true }, 3 * 1000);
             } else {
                 turnOnApplauseLED();
                 if (event.name === this.events.APPLAUSE_BUTTON_PRESSED) {
@@ -647,6 +854,17 @@ class GameMachine {
                     this.state = this.states.IDLE;
                     console.log(`State transition: END -> IDLE`);
                     this.sendOscCue(this.lighting.IDLE)
+
+                    sendLightingPreset(RTSrfidPresets.idle)
+                }
+                else if (event.name === this.events.RFID_SCAN) {
+                    sendLightingPreset(RTSrfidPresets.onSuccessfulTap)
+                    turnOffApplauseLED();
+                    this.debounce = false
+                    this.state = this.states.IDLE;
+                    console.log(`State transition: END -> IDLE`);
+                    this.sendOscCue(this.lighting.IDLE)
+                    sendLightingPreset(RTSrfidPresets.idle)
                 }
             }
             if (event.name === this.events.RETURN_IDLE) {
@@ -655,6 +873,7 @@ class GameMachine {
                 this.state = this.states.IDLE;
                 console.log(`State transition: END -> IDLE`);
                 this.sendOscCue(this.lighting.IDLE)
+                sendLightingPreset(RTSrfidPresets.idle)
             }
         }
     }
@@ -820,6 +1039,7 @@ setTimeout(updateHostPosition, 100);
 // On Start Up
 const awake = () => {
     console.log("WELCOME TO RUIN THE SHOW! PLEASE SHOW YOUR RFID BAND TO START PLAYING!");
+    sendLightingPreset(RTSrfidPresets.idle)
     // Create a new game machine in IDLE state
 
     // Start the state machine
@@ -834,13 +1054,17 @@ const awake = () => {
     //DEBUG PURPOSES: START AT PLAYING STATE
     //moveToPlaying(machine);
 
-
-    rfidEventSource.addEventListener('message', (event) => {
-        const data = event.data
-        if (data) {
-            machine.addEvent(machine.events.RFID_SCAN)
-        }
-    })
+    try {
+        rfidEventSource.addEventListener('message', (event) => {
+            const data = event.data
+            if (data) {
+                machine.addEvent(machine.events.RFID_SCAN)
+            }
+        })
+    }
+    catch (err) {
+        console.log("RFID addEvent error: ", err)
+    }
 
 };
 
