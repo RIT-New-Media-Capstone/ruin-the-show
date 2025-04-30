@@ -1,26 +1,22 @@
-# Ruin the Show (add logo)
-(Overview - needs more)
+# ![Ruin The Show](https://framerusercontent.com/images/VvMwG6Eu8ztUXPjxhWTwiP4.png?scale-down-to=1024)
 
-Ruin the Show is an interactive exhibit where you are the producer of a game show, and need to manage all the moving parts to keep the ratings up. (Add more about the partnership between RIT & Strong, NMID & NMD, etc)
+Ruin the Show is an interactive exhibit that takes you behind the scenes of a game show as the producer, where you manage the lights and cameras to make the show run smoothly. Ruin the Show was also inspired by the 1950s Quiz Show Scandals, where producers would have certain contestants cheat in order to boost their ratings, so in Ruin the Show, you are also trying to cheat without getting caught - the more you successfully cheat, the higher your ratings go! 
 
-[Link to the website]
+[Visit our Website](https://ruintheshow.com)
 
-## Team
-(Authors, maybe contact info? Ask if people want websites / instagrams / emails visible)
-| Name          | Role      |
-| --------      | -------   |
-| Adi D.        | Designer  |
-| Blessing O.   | Developer |
-| Brandon R.    | Designer  |
-| Cassidy K.    | Designer  |
-| Griffin P.    | Designer  |
-| Jaelin V.     | Designer  |
-| Kaiden T.     | Developer |
-| Lily K.       | Designer  |
-| Max C.        | Developer |
-| Yohermry K.   | Designer  |
+## Meet the Team
+Ruin the Show was created by a team of designers and developers from the Rochester Institute of Technology, partnering with the Strong Museum of Play as their Senior Capstones for New Media Design (BFA) and New Media Interactive Development (BS). 
 
-Maybe go into more detail on what roles people had instead of just designer and developer, need confirmation from others before going for it though 
+| Designers                 | Developers    |
+| --------                  | -------       |
+| [Adi D.](https://www.linkedin.com/in/adi-das-01a200197/)         | [Blessing O.](https://www.linkedin.com/in/ugochinyereokogeri/)   |
+| [Brandon R.](https://www.linkedin.com/in/brandon-riley-906794262/)    | [Kaiden T.](https://www.linkedin.com/in/kaiden-terrana/)     |
+| [Cass K.](https://www.linkedin.com/in/casskress/)    | [Max C.](https://www.linkedin.com/in/maxwell-c-69714121b/)        |
+| [Griffin P.](https://www.linkedin.com/in/griffin-paradee-7b0980218/)    |   |
+| [Jaelin V.](https://www.linkedin.com/in/jaelin-vernon-926b17255/)     |   |
+| [Lily K.](https://www.linkedin.com/in/lilykniseley25/)       |   |
+| [Yohermry K.](https://www.linkedin.com/in/yohermrykpodo/)   |   |
+
 
 ## Implementation
 Embed pictures / videos (after Imagine) of it being used
