@@ -19,20 +19,50 @@ Ruin the Show was created by a team of designers and developers from the Rochest
 
 
 ## Implementation
-Embed pictures / videos (after Imagine) of it being used
+Add images with links to the Instagram sources 
+
+https://www.instagram.com/p/DI670IuO3ti/?img_index=1
+https://www.instagram.com/p/DI6eAd7usoe/?img_index=1
 
 ## How It's Made
-(icons of tech stack, maybe in a client-server-hardware table)
+
+The system uses a Finite State Machine with an Event-Driven architecture to handle hardware input and control rendering.
+
+### Software Used: 
+
+* Node.js
+* P5.js
+* Arduino 
 
 ### Navigating the Repo 
-[insert file directory visualization]
 
-explain the contents of each folder / file at a high level 
+    src
+    ├── arduino         # Everything hardware-related
+    │   ├── Panel       # Arduino code
+    │   └── panel.js    # Connects the arduino & server
+    ├── client          # Front-End related code
+    │   ├── assets      # Images, videos, audio, and lighting 
+    │   ├── sketch.js   # Rendering code 
+    │   └── ...              
+    ├── server          # Server-side code
+    │   ├── game.js     # Controls the program via state machine
+    │   └── index.js    # Initializes node server, routes GET and POST requests to alter the state machine
+    └── ...
+    
 
 ### Running the project
-How to get started from scratch (what I had to do to get it on the New Media computer basically)
 
-Also mention the keyboard controls option for if you want to test / use without the hardware
+1. Install node and npm, if not already installed
+2. Clone the repo
+3. Run `npm i`
+4. Connect the Arduino to your computer, and update `src/arduino/panel.js line:20` to be the correct port. 
+
+    1. Note: You may run the project in "development mode", which uses keyboard controls in place of the Arduino. See `src/client/sketch.js line:5` for the keyboard controls. 
+5. For a full installation, ensure Resolume Arena is open to the file `src/client/assets/lighting/ImagineRITxRTS.avc`and lights are connected. 
+6. Run `npm test`
+7. Open `localhost:3000` in your web browser
+
+    1. Click the HTML button that appears. It will hide itself and ensure videos and audio are allowed to play. 
 
 ### Hardware
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
@@ -54,4 +84,4 @@ Tech, justifications for why we used the tech, problems encountered, what is goi
 Highlight the spritesheet class & anything else unique
 
 ## Acknowledgements 
-NMDE, NMID, The Strong, professors, etc 
+NMDE, NMID, The Strong, Austin Willoughby, Marc, design profs, etc 
