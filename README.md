@@ -95,12 +95,33 @@ This file processes input and output for the Arduino. It can be reached via `src
 
 `loop()` reads the state of each interactable component, and sets a reference to the previous state. 
 
-`processCommand(String command)` takes in a command, given from `src/arduino/panel.js`. It then parses what the command is, and turns on / off relevant LEDs, then prints an "acknowledged" response after it successfully executes the command. 
+`processCommand(String command)` takes in a command, given from `panel.js`. It then parses what the command is, and turns on / off relevant LEDs, then prints an "acknowledged" response after it successfully executes the command. 
 
 ### Panel.js
 
-<!-- (go into detail on what's in here) -->
-This file communicates and handles events between the server and the podium. It can be reached via `src/arduino/panel.js`. 
+This file executes and handles events between the server and the podium. It can be reached via `src/arduino/panel.js`. 
+
+#### Events & Input Received 
+
+In `serialSetup() ... serial.on('data', ...)`, different strings are received from `Panel.ino`. There are 3 different types of messages received: 
+
+1. System Started ("Game Controller Intialized!")
+2. Command From Server Acknowledged ("[...]ACK")
+3. Component Interacted With ("CHEAT_PRESSED", "JOYSTICK_POSITION:", etc)
+
+The first type of message starts the game, calling `game.awake()`. 
+
+The second type is effectively ignored by the server. 
+
+The third type of message sends commands to `game.js` depending on which message was received. Each message type has effectively the same implementation; sending an event to the server with any relevant information. 
+
+#### Events & Output Given
+
+This file also has public methods that control the state of the LEDs, that the server could access to turn on and off the LEDs as needed. 
+
+#### Development Mode
+
+During development, we created a flag to allow us to test the program without being connected to the Arduino. Errors will print to the console, but will not crash the program. 
 
 ## Server
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
