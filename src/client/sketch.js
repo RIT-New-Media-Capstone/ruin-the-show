@@ -840,7 +840,9 @@ function drawAudience() {
     }
 }
 
-//Displays time and ratings(score) 
+/* 
+* Displays time and ratings(score)
+*/
 function drawHUD() {
     if (assets.timer) {
         image(assets.timer, -20, 55, assets.timer.width / 5, assets.timer.height / 5);
@@ -895,20 +897,27 @@ function drawCountdown() {
         }
     }
 }
+
+// Calculate the time remaining 
 function getTimeRemaining() {
     if (!timerActive) return timerDuration;
     let elapsed = millis() - timerStart;
     return max(0, timerDuration - elapsed);
 }
 
-// Game (Playing State) Cues
-// Applause
+/* Game (Playing State) Cues*/
+
+// APPLAUSE CUE
+
+/*
+OLD applause cue 
 function drawApplauseON() {
     if (assets.applauseon) {
         image(assets.applauseon, width / 2 - 148, -50, width / 4, height / 4);
     }
-}
+}*/
 
+// Start the applause cue  timer and visibility 
 function startApplauseFlash() {
     if (applause.interval) return;
     applause.drawCue = true;
@@ -917,12 +926,13 @@ function startApplauseFlash() {
     }, 250);
 }
 
+// Stop the applause cue timer and visiblity 
 function stopApplauseFlash() {
     clearInterval(applause.interval);
     applause.interval = null;
     applause.drawCue = false;
 }
-
+// Display the Applause 
 function drawApplauseSign() {
     if(assets.applauseSign) {
         let assetWidth = assets.applauseSign.width / 5
@@ -931,6 +941,7 @@ function drawApplauseSign() {
     }
 }
 
+//Animation for Applause to come in 
 function animateApplause(direction) {
     if (applause.timer <= applause.lerpTotalTime) {
         if (direction === 'left') {
@@ -954,7 +965,7 @@ function animateApplause(direction) {
     }
 }
 
-// Cheat
+// Animate Cheat cue coming in
 function animateCheat(direction) {
     if (cheat.timer <= cheat.lerpTotalTime) {
         if (direction === 'right') {
@@ -977,11 +988,15 @@ function animateCheat(direction) {
         cheat.timer = 0
     }
 }
+
+// Display the Cheat Cue 
 function drawCheat() {
     if (assets.cheat) {
         image(assets.cheat, cheat.currentXPos, 100, width / 3, height / 1.5);
     }
 }
+
+//Display the Cheat Feedback
 function drawCheatFeedback() {
     push()
     let c = color(0, 0, 0, 0)
@@ -1003,7 +1018,8 @@ function drawCheatFeedback() {
     backgroundLayer.rect(0, 0, width, height)
     pop()
 }
-// Joystick
+
+// Draw the host spotlight - Joystick Interaction and changes the position 
 function drawSpotlight() {
     push()
     let newJoystickPosition = map(RTSstate.feedback.JOYSTICK_POS, -50, 50, 0, width - assets.spotlight.width / 12);
@@ -1031,7 +1047,7 @@ function drawSpotlight() {
     }
     pop()
 }
-// Lever
+// Draw the Lever
 function drawLeverCue() {
     if (assets.levercamera) {
         if (dial.shouldTintGreen) {
@@ -1055,6 +1071,7 @@ function drawLeverCue() {
     }
 }
 
+//Display the Lever Feedback which tint the screen 
 function drawLeverFeedback() {
     if (assets.levertarget && assets.levermarker) {
         push()
@@ -1099,7 +1116,7 @@ function drawLeverFeedback() {
         pop()
     }
 }
-// Podiums
+// Draw Podium lights 
 function drawPodiumLight(podiumNumber) {
     const asset = assets[`podiumlit${podiumNumber}`];
     const x = podiumOffsets[podiumNumber];
@@ -1155,6 +1172,8 @@ function drawRightLight(index) {
     }
     backgroundLayer.image(assets.rightLit, x, 100, width / 3, height / 1.5);
 }
+
+//Dispay the Red contestant light on the podium
 function drawWrongLight(index) {
     let x = 0
     switch (index) {
@@ -1178,6 +1197,8 @@ function drawWrongLight(index) {
 }
 
 // DRAW Functions (End)
+
+//Display the Score function 
 function drawScore() {
     if (RTSstate.score >= 0) {
         image(end.shadow, 0, 0, width, height)
@@ -1249,6 +1270,9 @@ function drawScore() {
         pop()
     }
 }
+
+
+//Display and fill the stars based of the score 
 function drawStar(index, filledIn) {
     switch (index) {
         case 1:
@@ -1269,6 +1293,7 @@ function drawStar(index, filledIn) {
     }
 }
 
+//Keyboard Mapping 
 window.keyPressed = function () {
     if (keyboardInputs) {
         let event = null
