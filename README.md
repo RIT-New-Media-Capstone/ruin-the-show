@@ -24,7 +24,7 @@ Add images with links to the Instagram sources
 https://www.instagram.com/p/DI670IuO3ti/?img_index=1
 https://www.instagram.com/p/DI6eAd7usoe/?img_index=1
 
-## How It's Made
+## Technical Overview
 
 The system uses a Finite State Machine with an Event-Driven architecture to handle hardware input and control rendering.
 
@@ -64,28 +64,54 @@ The system uses a Finite State Machine with an Event-Driven architecture to hand
 
     1. Click the HTML button that appears. It will hide itself and ensure videos and audio are allowed to play. 
 
-### Hardware
+## Hardware
+<!-- -- Notes:  (delete later) -->
+
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
 
-Images: Arduino mock up (ask Max what visualizer he used at the beginning of the semester & try and get a diagram of what we currently have - work with Brandon), image / diagram of the actual podium 
+Images: Tinkercad Mockup, image / diagram of the actual podium 
 
 In this section, include that, on certain actions, information is being sent to the server. 
 
-### Server
+<!-- -- Full description below:  -->
+
+We used Arduino for the physical components, and SerialPort to connect it to Node. When a button is pressed (or other feature interacted with), an event is emitted and processed in the server. 
+
+### Overview
+
+<!-- images below -->
+![Tinkercad Diagram]()
+![Podium in Context]()
+
+The podium was built out of wood, and created with an Arduino Uno, 4 small LED buttons, 2 large arcade buttons, a custom lever (a potentiometer and a 3D printed handle), and a joystick. 
+
+The RFID scanner (and accompanying wristbands) were supplied by The Strong Museum of Play. 
+
+<!-- (add more here) -->
+
+### Panel.ino
+
+<!-- (go into detail on what's in here) -->
+
+### Panel.js
+
+<!-- (go into detail on what's in here) -->
+
+## Server
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
 
 Highlight and break down the state machine 
 
 In this section include how information is transferring from server to client 
 
-### Client
+## Client
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
 
 Highlight the spritesheet class & anything else unique
 
-### Known Bugs
+## Known Bugs
 
 1. List bugs here
 
 ## Acknowledgements 
-NMDE, NMID, The Strong, Austin Willoughby, Marc, design profs, etc 
+NMDE, NMID, The Strong, Austin Willoughby, Marc, Jack Nalitt
