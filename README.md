@@ -83,5 +83,9 @@ Tech, justifications for why we used the tech, problems encountered, what is goi
 
 Highlight the spritesheet class & anything else unique
 
+### Known Bugs
+
+1. List bugs here
+
 ## Acknowledgements 
 NMDE, NMID, The Strong, Austin Willoughby, Marc, design profs, etc 
