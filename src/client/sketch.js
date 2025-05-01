@@ -1,6 +1,12 @@
+/**
+ * @file sketch.js
+ * @description Handles the displaying of graphics on the frontend based off of game state from the server 
+ */
+
+
 "use strict";
 
-// PLAN B: 
+// PLAN B: Keyboard Shortcuts for testing or if buttons are not working 
 const keyboardInputs = true
 const keyboardMapping = {
     applause: 'q',
@@ -29,13 +35,13 @@ let RTSstate = {
         MIN: -50,
     },
     cues: {
-        APPLAUSE_CUE: false,
-        CHEAT_CUE: false,
-        PODIUM_1_CUE: false,
-        PODIUM_2_CUE: false,
+        APPLAUSE_CUE: false, // the applause sign asset
+        CHEAT_CUE: false,  // the cheat card asset
+        PODIUM_1_CUE: false, //the podium spotlights on contestants 
+        PODIUM_2_CUE: false, 
         PODIUM_3_CUE: false,
         PODIUM_4_CUE: false,
-        LEVER_CUE: false,
+        LEVER_CUE: false, // the camera zoom on the screen 
         LEVER_TARGET: null,
         JOYSTICK_CUE: false,
         JOYSTICK_TARGET: 0, // Host's position on screen
@@ -55,12 +61,13 @@ let RTSstate = {
     }
 };
 
+// a queue tracking the gameState and events 
 let RTSmessages = []
 
 
 // II. Initialize objects/variables for assets
 // *Sprite Sheets are calculated by a single frame's width & height, how many rows and columns a sheet has, and indexing the current frame
-// -Sprite Sheets*
+// -Sprite Sheets* Note sizing was not standardized.
 const defaultSpriteSheetConfig = {
     totalColumns: 5,
     totalRows: 4,
@@ -181,7 +188,8 @@ const contestants = {
     }
 };
 // Global Variables
-// -Game States
+// -Game States 
+// RTS = Ruin the Show
 let previousState = RTSstate.state;
 let previousCue = RTSstate.cues
 let previousFeedback = RTSstate.feedback
@@ -710,16 +718,6 @@ window.draw = function () {
         image(backgroundLayer, 0, 0, width, height, zoom.zoomX, zoom.zoomY, zoom.zoomWidth, zoom.zoomHeight);
 
         // Applause Visuals
-        // drawApplause();
-
-        // Applause Cue
-        // if (RTSstate.cues.APPLAUSE_CUE) {
-        //     if (!previousCue.APPLAUSE_CUE) startApplauseFlash()
-        //     if (applause.drawCue) drawApplauseON();
-        // } else {
-        //     if (previousCue.APPLAUSE_CUE) stopApplauseFlash()
-        // }
-
         if (!RTSstate.cues.APPLAUSE_CUE && previousCue.APPLAUSE_CUE) {
             applause.timer = 1
         }
@@ -797,6 +795,8 @@ window.draw = function () {
 // VI. Functions below each responsible for particular asset
 
 // DRAW Functions (Playing)
+
+//Displays Background
 function drawBackground() {
     // assets.background.animator.play();
     // assets.background.animator.update();
@@ -809,6 +809,8 @@ function drawBackground() {
         backgroundLayer.image(assets.stagelights, 0, -45, width, height / 3);
     }
 }
+
+//Displays the podiums 
 function drawPodiums() {
     if (assets.podium1) {
         backgroundLayer.image(assets.podium1, width / 4.5, height / 2 + 20, width / 4, height / 4);
@@ -823,16 +825,22 @@ function drawPodiums() {
         backgroundLayer.image(assets.podium4, width / 1.74, height / 2 + 20, width / 4, height / 4);
     }
 }
+
+//Displays the Applause signs 
 function drawApplause() {
     if (assets.applause) {
         image(assets.applause, width / 2 - 150, -55, width / 4, height / 4);
     }
 }
+
+//Displays the audience 
 function drawAudience() {
     if (assets.audience) {
         image(assets.audience, 0, 100, width, height);
     }
 }
+
+//Displays time and ratings(score) 
 function drawHUD() {
     if (assets.timer) {
         image(assets.timer, -20, 55, assets.timer.width / 5, assets.timer.height / 5);
@@ -868,6 +876,8 @@ function drawHUD() {
         pop()
     }
 }
+
+// display game timer 
 function drawCountdown() {
     if (timerActive) {
         let remaining = getTimeRemaining();
