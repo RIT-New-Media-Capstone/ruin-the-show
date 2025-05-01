@@ -1,3 +1,8 @@
+/**
+ * @filename: game.js
+ * @description: Backend which handles the game state, events and tirggers 
+ */
+
 import panel, { turnOnCheatLED, turnOffCheatLED, turnOnApplauseLED, turnOffApplauseLED, turnOnPodiumLED, turnOffPodiumLED } from "../arduino/panel.js"
 
 // OSC for lighting - connects to resolume (needs to be running on same machine)
