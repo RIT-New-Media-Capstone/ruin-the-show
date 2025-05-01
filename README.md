@@ -124,11 +124,51 @@ This file also has public methods that control the state of the LEDs, that the s
 During development, we created a flag to allow us to test the program without being connected to the Arduino. Errors will print to the console, but will not crash the program. 
 
 ## Server
-Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
 
-Highlight and break down the state machine 
+As the backbone of this application, this part of the repository is responsible for the actual gameplay of Ruin the Show. There are two javascript files conatined here: 'game.js' and 'index.js'. The former processes how the game is run, and the latter communicates data between the server folder and client folder.
 
-In this section include how information is transferring from server to client 
+### Game.js
+
+As an event driven architecture, the main components of 'game.js' can be listed as such:
+
+1. Finite State Machine
+2. Recognized Inputs from panel.js
+3. MIDI OSC Outputs
+4. RFID Event Handling
+
+#### 1. Finite State Machine
+
+The Finite State Machine (FSM) is the core backbone of this entire application, where all gameplay elements can stem from this aspect of code. Recognized as the class "GameMachine", the five main methods of understanding how the game runs involve getState(), step(), run(), stop(), and addEvent(). Before the game actually runs, there are some initialized variables and objects that can be considered as resetting the game too, the most imporant being the eventQueue. To recognize feedback, a second array called messages_for_frontend acts as another list of events that the frontend should follow.
+
+The getState() method contains a few objects that were gathered for affecting frontend elements in 'sketch.js'. This includes score, the actual state of the game (Idle, Onboarding, etc.), host, cues, and feedback.
+
+The step() method is the main processor of the FSM. It is a mass of if/else conditions that can be summed up as moving through different states of the game, recognizing specific Arduino inputs, and adjust specific values such as the score, position, and others. The biggest part of the game is the 'PLAYING' state where 'on' and 'off' states for the minigames are cycling through within that particular state, which is coordinating visual cues. It utilizes setTimeout()s, along with some events from the Arduino impacting the loop. The function, moveToPlaying(), is called when transitioning from the Onboarding state to Playing state, and is essentially resetting all known variables of the game itself.
+
+The run() method is what starts the game machine up, specifically within the awake() function that is called from on `npm start`. When its called, the game will then immediately loop with various inputs from panel and changing variables from the inside altering the state of the game. 
+
+The stop() method is responsible for immediately stopping the FSM loop, however this is ultimately never called.
+
+The addEvent() method maintains coordination with the eventQueue array. Items, or in this case events and respective data, are added to the array. This will be sent through the step() method  with conditions in place throughout that impact various parts of the game.
+
+#### 2. Recognized Functions from panel.js
+
+Through importing the functions from 'panel.js', all inputs are recognized such as all 6 buttons, the joystick, and the potentiometer (lever). There is also the ability to turn LEDs on and off for each of the buttons from this file too.
+
+#### 3. MIDI OSC Outputs
+
+<!-- 3 on the list should be added here -->
+
+#### 4. RFID Event Handling
+
+<!-- 4 on the list should be added here -->
+
+### Index.js
+
+Through the utilization of Node.js, the project setup occurs at this specific file. A notable framework from Node.js in use is Express. The only get and post requests that are noteworthy are '/getState' and '/setState' respectively, leaving out the get request '/' which hosts index.html. 
+
+As the main file for handling communication between files in this application, the main goal of index.js is to understand the current state of the game and send that information out to 'sketch.js'. This is the purpose of '/getState'.
+
+As a backup plan on the occurence of something on Arduino side malfunctioning, keyboard shortcuts are mapped to specific componenets. This is done through '/setState', as all inputs are recognized in game.js instead of the frontend file 'sketch.js'.
 
 ## Client
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
