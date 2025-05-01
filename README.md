@@ -69,10 +69,6 @@ The system uses a Finite State Machine with an Event-Driven architecture to hand
 
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
 
-Images: Tinkercad Mockup, image / diagram of the actual podium 
-
-In this section, include that, on certain actions, information is being sent to the server. 
-
 <!-- -- Full description below:  -->
 
 We used Arduino for the physical components, and SerialPort to connect it to Node. When a button is pressed (or other feature interacted with), an event is emitted and processed in the server. 
@@ -85,17 +81,26 @@ We used Arduino for the physical components, and SerialPort to connect it to Nod
 
 The podium was built out of wood, and created with an Arduino Uno, 4 small LED buttons, 2 large arcade buttons, a custom lever (a potentiometer and a 3D printed handle), and a joystick. 
 
+The joystick may be subsituted for another controller that exclusively moves horizontally. We used the joystick as it was readily available. 
+
 The RFID scanner (and accompanying wristbands) were supplied by The Strong Museum of Play. 
 
-<!-- (add more here) -->
+Prototypes of the podium were built with cardboard, and while it was functional, would not have held up during the exhibition. The wood construction was extremely durable and held up well throughout the length of the exhibit and afterwards. The only issue we ran into was the height required smaller children to use a stepstool to effectively reach the buttons. 
 
 ### Panel.ino
 
-<!-- (go into detail on what's in here) -->
+This file processes input and output for the Arduino. It can be reached via `src/arduino/Panel/Panel.ino`.
+
+`setup()` intializes all of the buttons and LEDs, turning off all LEDs to start. 
+
+`loop()` reads the state of each interactable component, and sets a reference to the previous state. 
+
+`processCommand(String command)` takes in a command, given from `src/arduino/panel.js`. It then parses what the command is, and turns on / off relevant LEDs, then prints an "acknowledged" response after it successfully executes the command. 
 
 ### Panel.js
 
 <!-- (go into detail on what's in here) -->
+This file communicates and handles events between the server and the podium. It can be reached via `src/arduino/panel.js`. 
 
 ## Server
 
