@@ -65,11 +65,6 @@ The system uses a Finite State Machine with an Event-Driven architecture to hand
     1. Click the HTML button that appears. It will hide itself and ensure videos and audio are allowed to play. 
 
 ## Hardware
-<!-- -- Notes:  (delete later) -->
-
-Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
-
-<!-- -- Full description below:  -->
 
 We used Arduino for the physical components, and SerialPort to connect it to Node. When a button is pressed (or other feature interacted with), an event is emitted and processed in the server. 
 
@@ -125,30 +120,41 @@ During development, we created a flag to allow us to test the program without be
 
 ## Server
 
-As the backbone of this application, this part of the repository is responsible for the actual gameplay of Ruin the Show. There are two javascript files conatined here: 'game.js' and 'index.js'. The former processes how the game is run, and the latter communicates data between the server folder and client folder.
+As the backbone of this application, this part of the repository is responsible for the actual gameplay of Ruin the Show. The server is split into two files: `game.js` and `index.js`. 
 
 ### Game.js
 
-As an event driven architecture, the main components of 'game.js' can be listed as such:
+This file is the main source of all state related variables and events. It can be reached at `src/server/game.js`. There are four main components of `game.js`:
 
 1. Finite State Machine
-2. Recognized Inputs from panel.js
-3. MIDI OSC Outputs
+2. Recognized Inputs from `panel.js`
+3. Resolume OSC Outputs
 4. RFID Event Handling
 
 #### 1. Finite State Machine
 
-The Finite State Machine (FSM) is the core backbone of this entire application, where all gameplay elements can stem from this aspect of code. Recognized as the class "GameMachine", the five main methods of understanding how the game runs involve getState(), step(), run(), stop(), and addEvent(). Before the game actually runs, there are some initialized variables and objects that can be considered as resetting the game too, the most imporant being the eventQueue. To recognize feedback, a second array called messages_for_frontend acts as another list of events that the frontend should follow.
+The Finite State Machine (FSM) is the driving force of the entire application. The FSM is contained in the `GameMachine` class. 
 
-The getState() method contains a few objects that were gathered for affecting frontend elements in 'sketch.js'. This includes score, the actual state of the game (Idle, Onboarding, etc.), host, cues, and feedback.
+`GameMachine.getState()` returns an object with data about the current state of the game that the client would need. This includes the users' score, the current scene (Idle, Onboarding, Playing, End), details about the host, any event cues, and event feedback.
 
-The step() method is the main processor of the FSM. It is a mass of if/else conditions that can be summed up as moving through different states of the game, recognizing specific Arduino inputs, and adjust specific values such as the score, position, and others. The biggest part of the game is the 'PLAYING' state where 'on' and 'off' states for the minigames are cycling through within that particular state, which is coordinating visual cues. It utilizes setTimeout()s, along with some events from the Arduino impacting the loop. The function, moveToPlaying(), is called when transitioning from the Onboarding state to Playing state, and is essentially resetting all known variables of the game itself.
+`GameMachine.step()` is the primary section of this class, containing nested conditionals that fire events and handle fired events as needed. The top level conditionals are checking for what scene is active, secondary level conditionals are designated for relevant interactions - for example, when the game is in Idle, the user can only have two interactions; RFID scan, and Applause button pressed. There are conditionals for each of those events, and all other events are ignored. 
 
-The run() method is what starts the game machine up, specifically within the awake() function that is called from on `npm start`. When its called, the game will then immediately loop with various inputs from panel and changing variables from the inside altering the state of the game. 
+`GameMachine.run()` begins the game loop if it hasn't already been started. It does this by calling the `loop` function (containing a call to `GameMachine.step()`) repeatedly using `setImmediate()`.
 
-The stop() method is responsible for immediately stopping the FSM loop, however this is ultimately never called.
+`GameMachine.stop()` immediately stops the game loop that is created in `GameMachine.run()`, however it is unutilized in the codebase. 
 
-The addEvent() method maintains coordination with the eventQueue array. Items, or in this case events and respective data, are added to the array. This will be sent through the step() method  with conditions in place throughout that impact various parts of the game.
+`GameMachine.addEvent()` adds events to our `eventQueue` queue. Each event is an object containing a name (an enum) and a data object (defaulting to an empty object). This event is parsed in `GameMachine.step()`, and when it is processed, the event is dequeued using the `Array.shift()` function. 
+
+We chose to implement the FSM structure since our game has multiple states with large blocks of code to be executed. The FSM pattern was the simplest way we found to avoid unnecessary checks, and increase performance. 
+
+We chose to use an event-driven architecture as well due to the nature of our interactions. We needed something that could communicate with many parties (server, client, hardware) when something happens, and events are able to do that most effectively. We also wanted to make sure the structure we chose allowed for multiple simultaneous interactions, as users could hit multiple buttons at the same time, since the gameplay encourages it. Putting our events in a queue like this meant they would each be processed in the order they occurred in. 
+
+<!-- running edit line -->
+
+Before the game actually runs, there are some initialized variables and objects that can be considered as resetting the game too, the most imporant being the eventQueue. To recognize feedback, a second array called messages_for_frontend acts as another list of events that the frontend should follow.
+
+The function, moveToPlaying(), is called when transitioning from the Onboarding state to Playing state, and is essentially resetting all known variables of the game itself.
+
 
 #### 2. Recognized Functions from panel.js
 
