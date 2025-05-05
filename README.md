@@ -182,8 +182,15 @@ We chose to use Resolume via OSC since we had worked with the software and metho
 
 #### 4. RFID Integration
 
-<!-- 4 on the list should be added here -->
+The last part of the server is integrating the RFID provided by The Strong Museum of Play. They requested we utilize their technology present in their LevelUp videogame exhibit into our exhibit design, so we incorporate the scanner into the podium, and had wristbands for guests that they could use to interact with the game. 
 
+Guests with an RFID wristband could scan their wristband to start the game. At scale, this would store the user's ID, and would add their final score to their cumulative score for the whole Beyond the Buzzer exhibit. They could also, if they did not receive a wristband, begin the game by pressing a button on the podium (the applause button). 
+
+Additionally, for repeat visitors, they could tap their RFID band to skip the onboarding video. At scale this could be worked to use their user ID as well, checking if they have already played within the past hour before letting them skip the onboarding video, to avoid visitors accidentally skipping the video.
+
+When users scan their RFID bands, the events are sent as an SSE event. In `awake()`, we create an event listener for the `tap` event, which adds the `GameMachine.events.RFID_SCAN` event to the `eventQueue`, and allows for the interactions stated. 
+
+We also implemented custom lighting for the RFID scanner. We created several presets for the scanner in `RTSrfidPresets`, and trigger each one dependent on the state of the game. The presets are changed when cued, primarily on game-state changes. If there is an error in changing the lights, for example if the network is down momentarily, it waits for 2 seconds before trying to send the lighting change again. 
 
 ## Client
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
