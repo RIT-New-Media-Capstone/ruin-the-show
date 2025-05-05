@@ -66,7 +66,7 @@ The system uses a Finite State Machine with an Event-Driven architecture to hand
 
 We used Arduino for the physical components, and SerialPort to connect it to Node. When a button is pressed (or other feature interacted with), an event is emitted and processed in the server. 
 
-### Overview
+### Physical Construction
 
 <!-- images below -->
 ![Tinkercad Diagram]()
@@ -204,6 +204,102 @@ When users scan their RFID bands, the events are sent as an SSE event. In `awake
 We also implemented custom lighting for the RFID scanner. We created several presets for the scanner in `RTSrfidPresets`, and trigger each one dependent on the state of the game. The presets are changed when cued, primarily on game-state changes. If there is an error in changing the lights, for example if the network is down momentarily, it waits for 2 seconds before trying to send the lighting change again. 
 
 ## Client
+
+The client is broken up into x parts: 
+
+1. p5.js rendering 
+2. Assets
+3. Static files
+
+Each of these are things that are displayed to visitors visually in some regard, and are hosted and changed in the browser. 
+
+### Sketch.js (p5.js Rendering)
+
+<!-- add overview -->
+
+#### State-affected Variables
+
+There are a number of variables that are tied to the state of the game - a full list can be found within the `RTSstate` object. Each of these affect a different aspect of what is being rendered. 
+
+In `syncStateLoop()` we are polling the server every 50ms at the `/getState` endpoint, copying the old values to a `previousState` variable, then populating the state object with the new values. Additionally, if there are any animation cues that were sent, those would also be handled accordingly. 
+
+#### Front-end Rendering Variables
+
+Not every variable that affects the front-end are affected by the server state. 
+
+For example, the game timer that is displayed is independent from the internal timer (as that is a `setTimeout` rather than a variable). The timer presented to the visitor utilizes the `millis()` function, calculating the difference between the current time and the time the game began in `getTimeRemaining()`. This is then parsed into minute:second format, and displayed to the user in the UI in `drawCountdown()`. 
+
+<!-- talk about zoom and others -->
+
+#### Static Assets
+
+We generally organized our static assets by what scene they are for, and included relevant variables within the object, giving us 3 different objects related to static assets: `idleOnboarding`, combining the idle and onboarding scenes, `assets` holding the main game assets, and `end` holding the game over assets. Some assets in these objects are animated assets, and the animated assets are differentiated by being initialized with an object instead of an empty string. 
+
+All of our assets are loaded in `window.preload`, regardless of type. With more time we may have looked into lazy loading of game and end state assets, as loading every asset on reload results in the page having slow load speed, however for the purposes of our installation, we only needed to load the page once at the start of the exhibition, and let it loop over the course of the day, so it was a nonissue. 
+
+We are also loading our background audio through the same manner, storing the paths and ideal volume for each track in the `audio` object. Sound effects are given alongside lighting cues through Resolume Arena (more on that above). 
+
+#### Simple Animations 
+
+<!-- should tint green for example -->
+
+#### Character Animations 
+
+Our more complex character animations are all handled through spritesheets. We created a `SpriteAnimator` class to manage each animated object. 
+
+The `SpriteAnimator` class takes in the relevant animations (idle, walkLeft, etc) for a given animated object, and what the default animation should be (which defaults to idle unless otherwise specified). 
+
+The function `SpriteAnimator.setAnimation` will change what spritesheet is currently being looped through on an object, and has optional parameters for if it should not loop, and if it shouldn't, what happens when it reaches the end of the spritesheet. The animation can be played and paused with `SpriteAnimator.play()` and `SpriteAnimator.stop()` respectively. 
+
+Each relevant frame, `SpriteAnimator.update()` and `SpriteAnimator.draw()` are called. `update()` changes which frame of the spritesheet is being displayed. If the animation is loopable, it will wrap the animation back to the beginning of the spritesheet, otherwise it will stop the animation and if there is an `onComplete` callback function, will execute that. `draw()` will draw whatever `update()` designates at the appropriate position and size. There are two ways that size can be passed into this function: 
+
+1. Scale
+
+The scale parameter evenly scales the width and height. This is generally the most used parameter, as it prevents image distortion, and is applicable in most cases. 
+
+2. Specified width & height
+
+This is generally used in animations that take up the whole screen, or where the exact width and height matters to the animation. If each of these variables are passed in, they overwrite the scaled parameter. If only the width or only the height are sent in, the other size with default to sprite size multiplied by the scale. 
+
+Each animated object is initialized in `window.preload`. The structure is as follows: 
+        
+    animatedObject      # Example: host
+    ├── animation       # Example: 'idle'
+    │   ├── file        # Name of the spritesheet. Example 'AL_idle'
+    │   ├── config      # Object detailing which configuration was used in exporting
+    |   ├── frames      # Array with details about each frame (x, y, w, h) in relation to the overall spritesheet
+    │   ├── image       # Set in preload, the actual spritesheet
+    |   └── animator    # Set in preload, SpriteAnimator object 
+    ├── animation         
+    │   └── ...              
+    └── ...
+
+The `config` property is an object that contains the total columns, rows, width, and height of the spritesheet. We organized with the designers a system through which all spritesheets would be created, and the `config` property details which of the 3 types were used for the given spritesheet. 
+
+The `frames` property is populated via `populateFrames()`, which takes in the `config` property and which array to update. It then loops through each frame of the animation, populating the array with x, y, width, and height properties of each frame in relation to the complete spritesheet. 
+
+
+
+#### Graphics Buffer Layers 
+
+<!-- game vs hud -->
+
+#### Keyboard Controls
+
+The keyboard controls present are designated for "Development Mode", with a flag to enable or disable them. They are enabled by default, but can be disabled to avoid accidental interference while the full installation is active. 
+
+The keyboard controls are meant to mimic the physical Arduino controls, with the exception of the lever. The lever keypress maps to either fully up or fully down, thus a successful completion of the interaction. The keyboard interactions use the same data flow as the physical interactions aside from how they get to the server; the physical buttons emit an event that gets handled in the server, the keyboard creates a POST request that gets handled in the server. 
+
+The current state of the keyboard controls are: 
+
+| Applause | Cheat | Joystick Left | Joystick Right | Lever Up | Lever Down | Podium 1-4 | RFID Scan |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| `q` | `e` | `a` | `d` | `w` | `s` | `1, 2, 3, 4` | `[SPACEBAR]` |
+
+These are parsed in `window.keyPressed` through a switch statement, using the controls dictionary to dictate what data is sent via POST request to the server. More information about the POST request can be found above. 
+
+<!-- running edit -->
+
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
 
 Highlight the spritesheet class & anything else unique
