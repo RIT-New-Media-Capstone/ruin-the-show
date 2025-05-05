@@ -24,7 +24,7 @@ Ruin the Show was created by a team of designers and developers from the Rochest
 
 We implemented the full exhibit at Imagine RIT on Saturday, April 26, 2025. From a technical and a design standpoint, the exhibit was a huge success. 
 
-The program ran the length of the exhibition (8 hours) without errors, lag, or needing to be reset. The physical podium also lasted well throughout the day, only needing to adjust the smaller buttons once due to them getting accidentally dislodged from the button casing. 
+For the technical successes, the program ran the length of the exhibition (8 hours) without errors, lag, or needing to be reset. The physical podium also lasted well throughout the day, only needing to adjust the smaller buttons once due to them getting accidentally dislodged from the button casing. 
 
 Additionally, visitors of all ages stopped by and enjoyed the exhibit. The design and music drew people in to the room we were stationed in, and the game itself functioned well for individuals and larger groups (up to 6), so people could play by themselves or with family and/or friends. 
 
