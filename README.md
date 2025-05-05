@@ -5,7 +5,7 @@ Ruin the Show is an interactive exhibit that takes you behind the scenes of a ga
 [Visit our Website](https://ruintheshow.com)
 
 ## Meet the Team
-Ruin the Show was created by a team of designers and developers from the Rochester Institute of Technology, partnering with the Strong Museum of Play as their Senior Capstones for New Media Design (BFA) and New Media Interactive Development (BS). 
+Ruin the Show was created by a team of designers and developers from the Rochester Institute of Technology (RIT), partnering with the Strong Museum of Play as their Senior Capstones for New Media Design (BFA) and New Media Interactive Development (BS). 
 
 | Designers                 | Developers    |
 | --------                  | -------       |
@@ -20,7 +20,17 @@ Ruin the Show was created by a team of designers and developers from the Rochest
 
 ## Implementation
 
-Featured on [RIT's Instagram](https://www.instagram.com/p/DI670IuO3ti/?img_index=1)
+<!-- clean image of the whole installation -->
+
+We implemented the full exhibit at Imagine RIT on Saturday, April 26, 2025. From a technical and a design standpoint, the exhibit was a huge success. 
+
+The program ran the length of the exhibition (8 hours) without errors, lag, or needing to be reset. The physical podium also lasted well throughout the day, only needing to adjust the smaller buttons once due to them getting accidentally dislodged from the button casing. 
+
+Additionally, visitors of all ages stopped by and enjoyed the exhibit. The design and music drew people in to the room we were stationed in, and the game itself functioned well for individuals and larger groups (up to 6), so people could play by themselves or with family and/or friends. 
+
+<!-- images of people having fun -->
+
+Most notably, our exhibit was [featured on RIT's Instagram](https://www.instagram.com/p/DI670IuO3ti/?img_index=1) as the primary image for their campus-wide event. 
 
 ## Technical Overview
 
@@ -68,17 +78,17 @@ We used Arduino for the physical components, and SerialPort to connect it to Nod
 
 ### Physical Construction
 
-<!-- images below -->
-![Tinkercad Diagram]()
+<!-- upload podium images -->
+![Tinkercad Diagram](./src/arduino/Panel/RTS-panel-diagram.png)
 ![Podium in Context]()
 
-The podium was built out of wood, and created with an Arduino Uno, 4 small LED buttons, 2 large arcade buttons, a custom lever (a potentiometer and a 3D printed handle), and a joystick. 
+The podium was built out of wood, and using an Arduino Uno, 4 small LED buttons, 2 large arcade buttons, a custom lever (a potentiometer and a 3D-printed handle), and a joystick. 
 
 The joystick may be substituted for another controller that exclusively moves horizontally. We used the joystick as it was readily available. 
 
-The RFID scanner (and accompanying wristbands) were supplied by The Strong Museum of Play. 
+The RFID scanner and accompanying wristbands were supplied by The Strong Museum of Play. 
 
-Prototypes of the podium were built with cardboard, and while it was functional, would not have held up during the exhibition. The wood construction was extremely durable and held up well throughout the length of the exhibit and afterwards. The only issue we ran into was the height required smaller children to use a stepstool to effectively reach the buttons. 
+Prototypes of the podium were built with cardboard, and while it was functional, would not have held up during the exhibition. The wood construction was extremely durable and held up well throughout the length of the exhibition and afterwards. The only issue we ran into was the height required smaller children to use a stepstool to effectively reach the buttons. 
 
 ### Panel.ino
 
@@ -122,7 +132,7 @@ As the backbone of this application, this part of the repository is responsible 
 
 ### Index.js
 
-This file sets up the express application, starts the node server, and handles GET and POST requests. It largely serves with the GET and POST requests as the connection between the back end and the front end, so understanding relevant information about the state of the application, and communicating this information. It can be reached at `src/server/index.js`. 
+This file sets up the express application, starts the node server, and handles GET and POST requests. It largely serves with the GET and POST requests as the connection between the back end and the front end, so must understand relevant information about the state of the application, and communicate this information. It can be reached at `src/server/index.js`. 
 
 #### Setting up Express & Starting the Server
 
@@ -138,7 +148,7 @@ We are using Express for this project due to its ease and familiarity. It is use
 
 #### POST Requests
 
-We have a single POST request, and it is not particularly necessary for the application to function, but moreso a feature of the "Development Mode". This allows for testing and gameplay to occur with keyboard controls in place of or in addition to Arduino controls. We implemented this mode as a failsafe in the event of the hardware malfunctioning during the length of our exhibition, and for developers to test remotely, without access to the hardware.
+We have a single POST request, and it is not particularly necessary for the application to function, but moreso a feature of the "Development Mode". This allows for testing and gameplay to occur with keyboard controls in place of or in addition to Arduino controls. We implemented this mode as a failsafe in the event of the hardware malfunctioning during the exhibition, and for developers to test remotely, without access to the hardware.
 
 `app.post('/setState', ...)` was created so that the game state variables could be altered and updated from the client on a keypress, in addition to from the server on an Arduino button press. The POST request is written to expect two values in the body: `event` and `data`. `event` is a string that corresponds to an event name in the server (`'applause-button-pressed'`, `'rfid-scan'`, etc), particularly looking for an input-based event. If the string is not one of those events, or if the event is not a string at all, it returns early with a 400 status code. Otherwise, it adds the event to the queue of events, alongside any `data` that is sent along with it. `data` defaults to an empty object, and contains any relevant data for a given event (podium number, lever position, etc). More information about the event-driven architecture can be found below. 
 
@@ -171,7 +181,7 @@ We chose to implement the FSM structure since our game has multiple states with 
 
 In addition to the FSM, we implemented an event-driven architecture for the project. There are two types of events; game events (stored in `eventQueue`) and animation events (stored in `messages_for_frontend`).
 
-`eventQueue` is the primary list used within the state machine. There are 2 main categories of events that are added to this queue, with each category being its own enum; game state altering events (`events`) and feedback-based events (`feedback`). 
+`eventQueue` is the primary list used within the state machine. There are 2 main categories of events that are added to this queue, with each category as its own enum; game state altering events (`events`) and feedback-based events (`feedback`). 
 
 The `events` enum has all of the events that relate to the state of the game. There are input-based events (`events.CHEAT_BUTTON_PRESSED`, `events.LEVER_MOVED`, etc) that are added to the queue when the hardware has been interacted with (emitted in `src/arduino/panel.js`), controller events (`events.TURN_ON_APPLAUSE`, `events.TURN_OFF_PODIUM`, etc) that are added to the queue on timers specific to each mechanic. There are also state-related events (`events.RETURN_IDLE`, `events.GAME_OVER`, etc) that are added to the queue on timers to control what the state of the game is, and alter the FSM. 
 
@@ -193,19 +203,19 @@ We chose to use Resolume via OSC since we had worked with the software and metho
 
 #### 4. RFID Integration
 
-The last part of the server is integrating the RFID provided by The Strong Museum of Play. They requested we utilize their technology present in their LevelUp videogame exhibit into our exhibit design, so we incorporate the scanner into the podium, and had wristbands for guests that they could use to interact with the game. 
+The last part of the server is integrating the RFID provided by The Strong Museum of Play. They requested we utilize their technology present in their LevelUp videogame exhibit into our exhibit design, so we incorporated the scanner into the podium, and provided wristbands for guests that they could use to interact with the game. 
 
 Guests with an RFID wristband could scan their wristband to start the game. At scale, this would store the user's ID, and would add their final score to their cumulative score for the whole Beyond the Buzzer exhibit. They could also, if they did not receive a wristband, begin the game by pressing a button on the podium (the applause button). 
 
 Additionally, for repeat visitors, they could tap their RFID band to skip the onboarding video. At scale this could be worked to use their user ID as well, checking if they have already played within the past hour before letting them skip the onboarding video, to avoid visitors accidentally skipping the video.
 
-When users scan their RFID bands, the events are sent as an SSE event. In `awake()`, we create an event listener for the `tap` event, which adds the `GameMachine.events.RFID_SCAN` event to the `eventQueue`, and allows for the interactions stated. 
+When users scan their RFID wristbands, the events are sent as an SSE event. In `awake()`, we create an event listener for the `tap` event, which adds the `GameMachine.events.RFID_SCAN` event to the `eventQueue`, and allows for the interactions stated. 
 
 We also implemented custom lighting for the RFID scanner. We created several presets for the scanner in `RTSrfidPresets`, and trigger each one dependent on the state of the game. The presets are changed when cued, primarily on game-state changes. If there is an error in changing the lights, for example if the network is down momentarily, it waits for 2 seconds before trying to send the lighting change again. 
 
 ## Client
 
-The client is broken up into x parts: 
+The client is broken up into 3 parts: 
 
 1. p5.js rendering 
 2. Assets
@@ -215,7 +225,25 @@ Each of these are things that are displayed to visitors visually in some regard,
 
 ### Sketch.js (p5.js Rendering)
 
-<!-- add overview -->
+This file is the primary interface the user sees. As such it is a lengthy file with a lot of complex pieces. This file would likely benefit from another refactor, pulling some of the complex pieces or helper functions out of the file, or other changes to improve readability. It can be found at `src/client/sketch.js` and is called through our `client/index.html` file. 
+
+Below you can find information about: 
+
+1. What is stored 
+    1. State-affected Variables
+    2. Rendering Variables
+2. What is drawn
+    1. Static Assets
+    2. Simple Animations 
+    3. Complex / Character Animations 
+3. How they are drawn
+    1. Graphics layers
+    2. Scene by Scene
+        1. Idle & Onboarding Scenes
+        2. Main Game Scene
+        3. Game Over Scene
+4. Development Mode 
+    1. Keyboard Controls
 
 #### State-affected Variables
 
@@ -225,13 +253,15 @@ In `syncStateLoop()` we are polling the server every 50ms at the `/getState` end
 
 Each animation cue is handled through `changeAnimations()` which takes the message from the server. The message contains a `target` and a `name`, the `target` being the object to animate, the `name` corresponding to the name of the animation. It first splits up by `target`, then, if necessary, the `name`, to trigger the relevant animation.  
 
-#### Front-end Rendering Variables
+#### Rendering Variables
 
 Not every variable that affects the front-end are affected by the server state. 
 
 For example, the game timer that is displayed is independent from the internal timer (as that is a `setTimeout` rather than a variable). The timer presented to the visitor utilizes the `millis()` function, calculating the difference between the current time and the time the game began in `getTimeRemaining()`. This is then parsed into minute:second format, and displayed to the user in the UI in `drawCountdown()`. 
 
-<!-- talk about zoom and others -->
+Additionally, the camera zoom is achieved through altering the source rectangle of the background layer (deeper explanation below). There are a number of variables associated with this, particularly because the values are lerped over a set time, to ensure smooth transitions. 
+
+Other global variables present are for our assets, and information related to the asset.  
 
 #### Static Assets
 
@@ -243,9 +273,15 @@ We are also loading our background audio through the same manner, storing the pa
 
 #### Simple Animations 
 
-<!-- should tint green for example -->
+Our simple animations are the midway point between a static image and a spritesheet (like our more complex animations). Elements animated this way typically only have color, visibility, and/or position updated each frame.
 
-#### Character Animations 
+For example, the spotlight on the host will appear and disappear on cues. Additionally, based on events received from the server through `messages_for_frontend` (see above for more details), it may be tinted green or red before disappearing. This is achieved through variables that tint the image before rendering it. 
+
+Another example is in the cheat and applause cues - both function very similarly, just at different sides of the screen. They both, when cued, translate inwards from off-screen, before reaching their final position. When they need to be hidden (either on a button press or otherwise), they translate outwards offscreen. 
+
+All of the animation types here are done programmatically using static assets, and are most commonly found in rendering cues and feedback. 
+
+#### Complex / Character Animations 
 
 Our more complex character animations are all handled through spritesheets. We created a `SpriteAnimator` class to manage each animated object. 
 
@@ -298,23 +334,27 @@ These scenes are very simple; idle displays a looping gif, and onboarding displa
 
 These sections each also clean up any visual elements that may have been present in a previous scene - idle cleans up elements from the end scene, and onboarding cleans up elements from the idle scene. 
 
-#### The Game Scene
+#### The Main Game Scene
 
 When the scene first transitions, it immediately cleans up the previous scene, and plays the background music associated with the scene. 
 
-All of the game show elements are then drawn to the screen. This includes the background, contestants, podiums, spotlight (if cued), host, and audience. These each are either static images, simple animations, or spritesheet animations, depending on the asset. These are each drawn on the `backgroundLayer` graphics layer. `backgroundLayer` is drawn to fill the whole screen, and be zoomed in or out at a specific calculation; this uses the source rectangle parameters of the image call to zoom in / out from the center to the desired amount, lerping between values once the lever is stationary for 2 consective frames. 
+All of the game show elements are then drawn to the screen. This includes the background, contestants, podiums, spotlight (if cued), host, and audience. These each are either static images, simple animations, or spritesheet animations, depending on the asset. These are each drawn on the `backgroundLayer` graphics layer. `backgroundLayer` is drawn to fill the whole screen, and be zoomed in or out at a specific calculation; this uses the source rectangle parameters of the image call to zoom in / out from the center to the desired amount, lerping between values once the lever is stationary for 2 consecutive frames. 
 
 Additionally, all of the UI is separately drawn on a different graphics layer. These are each drawn to the default graphics layer on top of the `backgroundLayer`. This includes pop-up cues, the timer and user's current score. 
+
+There are also a lot of helper methods used within this scene, primarily to control animations and more complex assets. 
 
 #### The End Scene
 
 This scene starts by cleaning up any elements from the previous scene, then draws the curtains closing. Once the curtains are closed, the user's score is displayed on top of it, and their total stars are animated appearing one at a time. These are each drawn once, without a call to `background()` to ease computational complexity. 
 
-The total stars earned are calculated on a bellcurve of user data gathered in testing. The average player earns 3 stars on their first playthrough, with most players receiving 2-4 stars. 5 stars is given a higher threshold, making it much more difficult to achieve, and 1 star is given a low threshold, making it extremely easy to receive. The goal was to make 5 stars feel like an accomplishment, and have most players be able to receive 2 stars easily. 
+The total stars earned are calculated on a bell curve of user data gathered in testing. The average player earns 3 stars on their first playthrough, with most players receiving 2-4 stars. 5 stars is given a higher threshold, making it much more difficult to achieve, and 1 star is given a low threshold, making it extremely easy to receive. The goal was to make 5 stars feel like an accomplishment, and have most players be able to receive 2 stars easily. 
 
 The score that visitors see at the end is additionally multiplied by 10, so it guarantees a round number regardless of points earned, emulating the round numbers frequently seen on game shows. 
 
 The background that visitors get is based on the number of stars they receive - 0-1 stars displays a "fail" background, featuring a message that they got caught cheating, 2-3 stars displays a "not bad" background, with encouraging flavor text, and 4-5 stars displays "success" with a message congratulating the player on a job well done. 
+
+When the scene ends (either on a timer or a button press), the scene transitions back to the idle scene, and perpetuates the loop. 
 
 #### Keyboard Controls
 
@@ -330,21 +370,44 @@ The current state of the keyboard controls are:
 
 These are parsed in `window.keyPressed` through a switch statement, using the controls dictionary to dictate what data is sent via POST request to the server. More information about the POST request can be found above. 
 
-<!-- running edit -->
+### Assets Folder
 
-Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
+All of our assets are loaded through the assets folder, and organized as such: 
 
-Highlight the spritesheet class & anything else unique
+    assets
+    ├── audio               # Background music 
+    ├── background          # Static assets for the background    
+    ├── end state           # Static assets for the end scene
+    ├── fonts               # Fonts used
+    ├── idle onboarding        
+    │   ├── 00_RTS_Splash.gif       # Idle scene gif   
+    │   ├── onboarding.mp4          # Onboarding scene video 
+    │   └── ...                     # Unused assets
+    ├── interactions        # Static assets for each interaction
+    │   ├── applause         
+    │   ├── cheat 
+    │   ├── joystick
+    │   ├── lever
+    │   └── podiums     
+    ├── lighting            # Files for Resolume Arena 
+    │   ├── Media                   # Accompanying assets
+    │   └── ImagineRITxRTS.avc      # Resolume Arena source file
+    └── spritesheets        # Each spritesheet
+        ├── host                    # All host-related spritesheets
+        ├── misc                    # Other spritesheets
+        └── ...                     # Spritesheets for each contestant
+
+Not every asset uploaded is used within the code. A lot of the file names are also difficult to figure out what they are for at a glance, due to how they were transferred between designers and developers. The assets overall could benefit strongly from being combed through, renamed, and deleted if unused, updating `sketch.js` to match. 
+
+### Index.html
+
+The `index.html` file (found at `src/client/index.html`) is largely empty aside from a script tag for `sketch.js` and a single button with an onclick event. 
+
+The button is strictly developer facing, and does not affect visitors to the installation. It serves as a method of user interaction on the webpage to bypass the "autoplay block" on modern web browsers, allowing us to play our audio and videos. So, when the button is clicked (by the developer when starting the server), it removes itself from the DOM, and does not reappear unless the webpage is reloaded. For the purposes of our installation, we would load the server and click the button before visitors arrived, this way it would be set for the whole day. 
 
 ## Known Bugs
 
-1. Long initial load time
-2. Joystick doesn't hide on no interaction 
-3. Cheat & applause intro animation sometimes skips
-4. Zoom stacks
-5. In game stars do not correlate to End stars
-
-<!-- reword and remember more ? -->
-
-## Acknowledgements 
-NMDE, NMID, The Strong, Austin Willoughby, Marc, Jack Nalitt
+1. Long initial webpage load time.
+2. If the joystick or lever is not interacted with during the timer, it will not properly hide itself from the canvas. This results in the spotlight remaining static until cued again, and the zoom cues stacking (displaying multiple in a row, one at a time). 
+3. Cues occasionally do not get drawn to the canvas, but the LED will still light up.
+4. In-game stars do not properly correlate with the final stars earned.
