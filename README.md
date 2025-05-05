@@ -19,10 +19,8 @@ Ruin the Show was created by a team of designers and developers from the Rochest
 
 
 ## Implementation
-Add images with links to the Instagram sources 
 
-https://www.instagram.com/p/DI670IuO3ti/?img_index=1
-https://www.instagram.com/p/DI6eAd7usoe/?img_index=1
+Featured on [RIT's Instagram](https://www.instagram.com/p/DI670IuO3ti/?img_index=1)
 
 ## Technical Overview
 
@@ -120,16 +118,27 @@ During development, we created a flag to allow us to test the program without be
 
 ## Server
 
-As the backbone of this application, this part of the repository is responsible for the actual gameplay of Ruin the Show. The server is split into two files: `game.js` and `index.js`. 
+As the backbone of this application, this part of the repository is responsible for the actual gameplay of Ruin the Show. The server is split into two files: `index.js` and `game.js`. 
+
+### Index.js
+
+<!-- edit line -->
+
+Through the utilization of Node.js, the project setup occurs at this specific file. A notable framework from Node.js in use is Express. The only get and post requests that are noteworthy are '/getState' and '/setState' respectively, leaving out the get request '/' which hosts index.html. 
+
+As the main file for handling communication between files in this application, the main goal of index.js is to understand the current state of the game and send that information out to 'sketch.js'. This is the purpose of '/getState'.
+
+As a backup plan on the occurence of something on Arduino side malfunctioning, keyboard shortcuts are mapped to specific componenets. This is done through '/setState', as all inputs are recognized in game.js instead of the frontend file 'sketch.js'.
+
 
 ### Game.js
 
 This file is the main source of all state related variables and events. It can be reached at `src/server/game.js`. There are four main components of `game.js`:
 
 1. Finite State Machine
-2. Recognized Inputs from `panel.js`
+2. Event Firing & Handling
 3. Resolume OSC Outputs
-4. RFID Event Handling
+4. RFID Integration
 
 #### 1. Finite State Machine
 
@@ -147,34 +156,28 @@ The Finite State Machine (FSM) is the driving force of the entire application. T
 
 We chose to implement the FSM structure since our game has multiple states with large blocks of code to be executed. The FSM pattern was the simplest way we found to avoid unnecessary checks, and increase performance. 
 
-We chose to use an event-driven architecture as well due to the nature of our interactions. We needed something that could communicate with many parties (server, client, hardware) when something happens, and events are able to do that most effectively. We also wanted to make sure the structure we chose allowed for multiple simultaneous interactions, as users could hit multiple buttons at the same time, since the gameplay encourages it. Putting our events in a queue like this meant they would each be processed in the order they occurred in. 
+#### 2. Event Firing & Handling
 
-<!-- running edit line -->
+In addition to the FSM, we implemented an event-driven architecture for the project. There are two types of events; game events (stored in `eventQueue`) and animation events (stored in `messages_for_frontend`).
 
-Before the game actually runs, there are some initialized variables and objects that can be considered as resetting the game too, the most imporant being the eventQueue. To recognize feedback, a second array called messages_for_frontend acts as another list of events that the frontend should follow.
+`eventQueue` is the primary list used within the state machine. There are 2 main categories of events that are added to this cue, with each category being its own enum; game state altering events (`events`) and feedback-based events (`feedback`). 
 
-The function, moveToPlaying(), is called when transitioning from the Onboarding state to Playing state, and is essentially resetting all known variables of the game itself.
+The `events` enum has all of the events that relate to the state of the game. There are input-based events (`events.CHEAT_BUTTON_PRESSED`, `events.LEVER_MOVED`, etc) that are added to the queue when the hardware has been interacted with (emitted in `src/arduino/panel.js`), controller events (`events.TURN_ON_APPLAUSE`, `events.TURN_OFF_PODIUM`, etc) that are added to the queue on timers specific to each mechanic. There are also state-related events (`events.RETURN_IDLE`, `events.GAME_OVER`, etc) that are added to the queue on timers to control what the state of the game is, and alter the FSM. 
 
+The `feedback` enum contains events for each mechanic, and whether the feedback the user should receive was positive (points gained, example: `feedback.APPLAUSE_GOOD`) or negative (points lost, example: `feedback.APPLAUSE_BAD`). These events are fired alongside the points changing, and primarily serve to trigger animation events.  
 
-#### 2. Recognized Functions from panel.js
+`messages_for_frontend` is a list that gets sent to the client in `src/server/index.js` through the `/getState` endpoint. Each message is an object that contains a `target` and a `name`: the `target` is which visual element is being animated (the host Al, the audience, etc), and the `name` is which animation should occur (idle, walkRight, walkLeft, etc). These messages are then parsed by the client, altering the target to run the named animation. 
 
-Through importing the functions from 'panel.js', all inputs are recognized such as all 6 buttons, the joystick, and the potentiometer (lever). There is also the ability to turn LEDs on and off for each of the buttons from this file too.
+We chose to use an event-driven architecture due to the nature of our interactions. We needed something that could communicate with many parties (server, client, hardware) when something happens, and events are able to do that most effectively. We also wanted to make sure the structure we chose allowed for multiple simultaneous interactions, as users could hit multiple buttons at the same time, since the gameplay encourages it. Putting our events in a queue like this meant they would each be processed in the order they occurred in. 
 
-#### 3. MIDI OSC Outputs
+#### 3. Lighting OSC Outputs
 
 <!-- 3 on the list should be added here -->
 
-#### 4. RFID Event Handling
+#### 4. RFID Integration
 
 <!-- 4 on the list should be added here -->
 
-### Index.js
-
-Through the utilization of Node.js, the project setup occurs at this specific file. A notable framework from Node.js in use is Express. The only get and post requests that are noteworthy are '/getState' and '/setState' respectively, leaving out the get request '/' which hosts index.html. 
-
-As the main file for handling communication between files in this application, the main goal of index.js is to understand the current state of the game and send that information out to 'sketch.js'. This is the purpose of '/getState'.
-
-As a backup plan on the occurence of something on Arduino side malfunctioning, keyboard shortcuts are mapped to specific componenets. This is done through '/setState', as all inputs are recognized in game.js instead of the frontend file 'sketch.js'.
 
 ## Client
 Tech, justifications for why we used the tech, problems encountered, what is going on in each section 
