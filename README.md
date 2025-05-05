@@ -172,7 +172,13 @@ We chose to use an event-driven architecture due to the nature of our interactio
 
 #### 3. Lighting OSC Outputs
 
-<!-- 3 on the list should be added here -->
+The installation includes environmental lighting, which is also controlled through this section of the code. The lighting patterns are done through Resolume Arena, and the server sends OSC commands to the software on each cue. Within the Resolume file (`src/client/Assets/Lighting/ImagineRITxRTS.avc`), each lighting preset is organized by column, and named appropriately. 
+
+The OSC client is initialized near the top of the file, using the Resolume default port of 7000. For the purposes of our installation, we have the connection running through the localhost address, thus Resolume would have to be open on the same computer in order for this to function properly. 
+
+The commands are sent to Resolume via `GameMachine.sendOscCue(cueType)`. This method takes in which cue is being sent (of type `GameMachine.lighting`) and via switch statement dictates which lighting preset should be triggered. It then uses that to send the OSC command, triggering the specified column. If there was an invalid preset, or a new one that hadn't been accounted for through this function, it would return early, printing the invalid cue. 
+
+We chose to use Resolume via OSC since we had worked with the software and method previously, and chose to implement each preset as a column due to its ease and adaptability. By sending whole columns, we could link multiple different outputs all with the same call, allowing us to have sound effects and different lighting all triggered at once. 
 
 #### 4. RFID Integration
 
