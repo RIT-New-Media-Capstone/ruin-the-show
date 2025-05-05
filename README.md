@@ -17,10 +17,11 @@ Ruin the Show was created by a team of designers and developers from the Rochest
 | [Lily K.](https://www.linkedin.com/in/lilykniseley25/)       |   |
 | [Yohermry K.](https://www.linkedin.com/in/yohermrykpodo/)   |   |
 
+![The team](./imagine-rit-images/team%20dbc.jpg)
 
 ## Implementation
 
-<!-- clean image of the whole installation -->
+![Full installation at Imagine RIT](./imagine-rit-images/installation.jpg)
 
 We implemented the full exhibit at Imagine RIT on Saturday, April 26, 2025. From a technical and a design standpoint, the exhibit was a huge success. 
 
@@ -28,9 +29,14 @@ For the technical successes, the program ran the length of the exhibition (8 hou
 
 Additionally, visitors of all ages stopped by and enjoyed the exhibit. The design and music drew people in to the room we were stationed in, and the game itself functioned well for individuals and larger groups (up to 6), so people could play by themselves or with family and/or friends. 
 
-<!-- images of people having fun -->
-
 Most notably, our exhibit was [featured on RIT's Instagram](https://www.instagram.com/p/DI670IuO3ti/?img_index=1) as the primary image for their campus-wide event. 
+
+<div style="display: flex; overflow-x: scroll; padding: 10px; gap: 10px;">
+  <img src="imagine-rit-images/visitors-1.jpg" alt="Two siblings playing the game" style="width: 400px; height: auto;">
+  <img src="imagine-rit-images/visitors-2.jpg" alt="A parent and their child playing the game" style="width: 300px; height: auto;">
+  <img src="imagine-rit-images/visitors-3.jpg" alt="A child playing solo" style="width: 300px; height: auto;">
+  <img src="imagine-rit-images/visitors-line.jpg" alt="A line out of the room of visitors waiting to play" style="width: 300px; height: auto;">
+</div>
 
 ## Technical Overview
 
@@ -78,9 +84,12 @@ We used Arduino for the physical components, and SerialPort to connect it to Nod
 
 ### Physical Construction
 
-<!-- upload podium images -->
 ![Tinkercad Diagram](./src/arduino/Panel/RTS-panel-diagram.png)
-![Podium in Context]()
+<div style="display: flex; overflow-x: scroll; padding: 10px; gap: 10px;">
+  <img src="src/arduino/Panel/podium-underside.jpg" alt="The wiring in practice" style="width: 300px; height: auto;">
+<img src="imagine-rit-images/installation.jpg" alt="The construction, lighting, and draping" style="width: 400px; height: auto;">
+
+</div>
 
 The podium was built out of wood, and using an Arduino Uno, 4 small LED buttons, 2 large arcade buttons, a custom lever (a potentiometer and a 3D-printed handle), and a joystick. 
 
