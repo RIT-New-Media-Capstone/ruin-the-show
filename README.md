@@ -221,7 +221,9 @@ Each of these are things that are displayed to visitors visually in some regard,
 
 There are a number of variables that are tied to the state of the game - a full list can be found within the `RTSstate` object. Each of these affect a different aspect of what is being rendered. 
 
-In `syncStateLoop()` we are polling the server every 50ms at the `/getState` endpoint, copying the old values to a `previousState` variable, then populating the state object with the new values. Additionally, if there are any animation cues that were sent, those would also be handled accordingly. 
+In `syncStateLoop()` we are polling the server every 50ms at the `/getState` endpoint, copying the old values to a `previousState` variable, then populating the state object with the new values. Additionally, if there are any animation cues that were sent, those would also be handled accordingly.
+
+Each animation cue is handled through `changeAnimations()` which takes the message from the server. The message contains a `target` and a `name`, the `target` being the object to animate, the `name` corresponding to the name of the animation. It first splits up by `target`, then, if necessary, the `name`, to trigger the relevant animation.  
 
 #### Front-end Rendering Variables
 
@@ -278,11 +280,41 @@ The `config` property is an object that contains the total columns, rows, width,
 
 The `frames` property is populated via `populateFrames()`, which takes in the `config` property and which array to update. It then loops through each frame of the animation, populating the array with x, y, width, and height properties of each frame in relation to the complete spritesheet. 
 
-
-
 #### Graphics Buffer Layers 
 
-<!-- game vs hud -->
+This project utilizes p5.js [graphics buffer layers](https://p5js.org/reference/p5/p5.Graphics/). We chose to implement this knowing the installation would run off of a computer that can support it (as it is not usually supported on mobile devices). It allows us to have more control over what and how we are rendering, and features like zoom would be unimplementable (or at the very least be more complex) without it. 
+
+The bulk of the way it is used is in the game scene to separate the game show background and the UI. By doing this, we can ensure the UI is always shown on top of the game show background, and we can resize and move the game show background (like when the zoom lever is moved) without altering the size or position of the UI. 
+
+A commonly occurring logic error to watch out for during development using this resource - any visual objects added to the graphics layer after it is drawn (via an `image([layer name]))` call) will not appear on screen, as the layer was already drawn to the screen. This largely can be avoided with cleanly written and collapsable code, however it is an easy mistake to make if you don't pay attention to where in `draw()` you are adding a call. 
+
+#### Drawing Each Scene
+
+`window.draw()` is split up by the active scene. There are also helper functions that draw individual scene elements as they are needed, and updating the elements as relevant.  
+
+#### The Idle and Onboarding Scenes
+
+These scenes are very simple; idle displays a looping gif, and onboarding displays a video. They each function very similar as well - if the media is not playing, begin playing it, and draw it to the screen. 
+
+These sections each also clean up any visual elements that may have been present in a previous scene - idle cleans up elements from the end scene, and onboarding cleans up elements from the idle scene. 
+
+#### The Game Scene
+
+When the scene first transitions, it immediately cleans up the previous scene, and plays the background music associated with the scene. 
+
+All of the game show elements are then drawn to the screen. This includes the background, contestants, podiums, spotlight (if cued), host, and audience. These each are either static images, simple animations, or spritesheet animations, depending on the asset. These are each drawn on the `backgroundLayer` graphics layer. `backgroundLayer` is drawn to fill the whole screen, and be zoomed in or out at a specific calculation; this uses the source rectangle parameters of the image call to zoom in / out from the center to the desired amount, lerping between values once the lever is stationary for 2 consective frames. 
+
+Additionally, all of the UI is separately drawn on a different graphics layer. These are each drawn to the default graphics layer on top of the `backgroundLayer`. This includes pop-up cues, the timer and user's current score. 
+
+#### The End Scene
+
+This scene starts by cleaning up any elements from the previous scene, then draws the curtains closing. Once the curtains are closed, the user's score is displayed on top of it, and their total stars are animated appearing one at a time. These are each drawn once, without a call to `background()` to ease computational complexity. 
+
+The total stars earned are calculated on a bellcurve of user data gathered in testing. The average player earns 3 stars on their first playthrough, with most players receiving 2-4 stars. 5 stars is given a higher threshold, making it much more difficult to achieve, and 1 star is given a low threshold, making it extremely easy to receive. The goal was to make 5 stars feel like an accomplishment, and have most players be able to receive 2 stars easily. 
+
+The score that visitors see at the end is additionally multiplied by 10, so it guarantees a round number regardless of points earned, emulating the round numbers frequently seen on game shows. 
+
+The background that visitors get is based on the number of stars they receive - 0-1 stars displays a "fail" background, featuring a message that they got caught cheating, 2-3 stars displays a "not bad" background, with encouraging flavor text, and 4-5 stars displays "success" with a message congratulating the player on a job well done. 
 
 #### Keyboard Controls
 
