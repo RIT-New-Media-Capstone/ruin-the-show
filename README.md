@@ -74,7 +74,7 @@ We used Arduino for the physical components, and SerialPort to connect it to Nod
 
 The podium was built out of wood, and created with an Arduino Uno, 4 small LED buttons, 2 large arcade buttons, a custom lever (a potentiometer and a 3D printed handle), and a joystick. 
 
-The joystick may be subsituted for another controller that exclusively moves horizontally. We used the joystick as it was readily available. 
+The joystick may be substituted for another controller that exclusively moves horizontally. We used the joystick as it was readily available. 
 
 The RFID scanner (and accompanying wristbands) were supplied by The Strong Museum of Play. 
 
@@ -84,7 +84,7 @@ Prototypes of the podium were built with cardboard, and while it was functional,
 
 This file processes input and output for the Arduino. It can be reached via `src/arduino/Panel/Panel.ino`.
 
-`setup()` intializes all of the buttons and LEDs, turning off all LEDs to start. 
+`setup()` initializes all of the buttons and LEDs, turning off all LEDs to start. 
 
 `loop()` reads the state of each interactable component, and sets a reference to the previous state. 
 
@@ -98,7 +98,7 @@ This file executes and handles events between the server and the podium. It can 
 
 In `serialSetup() ... serial.on('data', ...)`, different strings are received from `Panel.ino`. There are 3 different types of messages received: 
 
-1. System Started ("Game Controller Intialized!")
+1. System Started ("Game Controller Initialized!")
 2. Command From Server Acknowledged ("[...]ACK")
 3. Component Interacted With ("CHEAT_PRESSED", "JOYSTICK_POSITION:", etc)
 
@@ -140,7 +140,7 @@ We are using Express for this project due to its ease and familiarity. It is use
 
 We have a single POST request, and it is not particularly necessary for the application to function, but moreso a feature of the "Development Mode". This allows for testing and gameplay to occur with keyboard controls in place of or in addition to Arduino controls. We implemented this mode as a failsafe in the event of the hardware malfunctioning during the length of our exhibition, and for developers to test remotely, without access to the hardware.
 
-`app.post('/setState', ...)` was created so that the game state variables could be altered and updated from the client on a keypress, in addition to from the server on an Arduino button press. The POST request is written to expect two values in the body: `event` and `data`. `event` is a string that corresponds to an event name in the server (`'applause-button-pressed'`, `'rfid-scan'`, etc), particularly looking for an input-based event. If the string is not one of those events, or if the event is not a string at all, it returns early with a 400 status code. Otherwise, it adds the event to the queue of events, alongside any `data` that is sent along with it. `data` defaults to an empty object, and contains any relevant data for a given event (podium number, lever position, etc). More information about the event-driven architechture can be found below. 
+`app.post('/setState', ...)` was created so that the game state variables could be altered and updated from the client on a keypress, in addition to from the server on an Arduino button press. The POST request is written to expect two values in the body: `event` and `data`. `event` is a string that corresponds to an event name in the server (`'applause-button-pressed'`, `'rfid-scan'`, etc), particularly looking for an input-based event. If the string is not one of those events, or if the event is not a string at all, it returns early with a 400 status code. Otherwise, it adds the event to the queue of events, alongside any `data` that is sent along with it. `data` defaults to an empty object, and contains any relevant data for a given event (podium number, lever position, etc). More information about the event-driven architecture can be found below. 
 
 ### Game.js
 
@@ -171,7 +171,7 @@ We chose to implement the FSM structure since our game has multiple states with 
 
 In addition to the FSM, we implemented an event-driven architecture for the project. There are two types of events; game events (stored in `eventQueue`) and animation events (stored in `messages_for_frontend`).
 
-`eventQueue` is the primary list used within the state machine. There are 2 main categories of events that are added to this cue, with each category being its own enum; game state altering events (`events`) and feedback-based events (`feedback`). 
+`eventQueue` is the primary list used within the state machine. There are 2 main categories of events that are added to this queue, with each category being its own enum; game state altering events (`events`) and feedback-based events (`feedback`). 
 
 The `events` enum has all of the events that relate to the state of the game. There are input-based events (`events.CHEAT_BUTTON_PRESSED`, `events.LEVER_MOVED`, etc) that are added to the queue when the hardware has been interacted with (emitted in `src/arduino/panel.js`), controller events (`events.TURN_ON_APPLAUSE`, `events.TURN_OFF_PODIUM`, etc) that are added to the queue on timers specific to each mechanic. There are also state-related events (`events.RETURN_IDLE`, `events.GAME_OVER`, etc) that are added to the queue on timers to control what the state of the game is, and alter the FSM. 
 
