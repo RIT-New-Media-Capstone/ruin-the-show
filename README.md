@@ -122,14 +122,25 @@ As the backbone of this application, this part of the repository is responsible 
 
 ### Index.js
 
-<!-- edit line -->
+This file sets up the express application, starts the node server, and handles GET and POST requests. It largely serves with the GET and POST requests as the connection between the back end and the front end, so understanding relevant information about the state of the application, and communicating this information. It can be reached at `src/server/index.js`. 
 
-Through the utilization of Node.js, the project setup occurs at this specific file. A notable framework from Node.js in use is Express. The only get and post requests that are noteworthy are '/getState' and '/setState' respectively, leaving out the get request '/' which hosts index.html. 
+#### Setting up Express & Starting the Server
 
-As the main file for handling communication between files in this application, the main goal of index.js is to understand the current state of the game and send that information out to 'sketch.js'. This is the purpose of '/getState'.
+We are using Express for this project due to its ease and familiarity. It is used in this project to serve our assets and scripts to the client, and for routing. 
 
-As a backup plan on the occurence of something on Arduino side malfunctioning, keyboard shortcuts are mapped to specific componenets. This is done through '/setState', as all inputs are recognized in game.js instead of the frontend file 'sketch.js'.
+`app.listen(PORT, ...)` starts up the server at localhost at port 3000 (`localhost:3000`). From there, the application can be loaded and all functionality can occur. 
 
+#### GET Requests 
+
+`app.get('/', ...)` serves the client our `index.html` file, containing tags for p5.js and our client-side scripts. 
+
+`app.get('/getState', ...)` communicates between the server and the client the current state of the game. It contains two parts: variables tied to the state of the game (`state`) and animation events that need to be triggered (`messages`). `state` pulls data from the `GameMachine.getState()` method in `src/server/game.js`, sending it to the client to update as needed. `messages` takes the `GameMachine.messages_for_frontend` array, sending that to the client, then clearing the array, assuming that the client handles any and all events it receives. More information on what both of these are and contain can be found below.  
+
+#### POST Requests
+
+We have a single POST request, and it is not particularly necessary for the application to function, but moreso a feature of the "Development Mode". This allows for testing and gameplay to occur with keyboard controls in place of or in addition to Arduino controls. We implemented this mode as a failsafe in the event of the hardware malfunctioning during the length of our exhibition, and for developers to test remotely, without access to the hardware.
+
+`app.post('/setState', ...)` was created so that the game state variables could be altered and updated from the client on a keypress, in addition to from the server on an Arduino button press. The POST request is written to expect two values in the body: `event` and `data`. `event` is a string that corresponds to an event name in the server (`'applause-button-pressed'`, `'rfid-scan'`, etc), particularly looking for an input-based event. If the string is not one of those events, or if the event is not a string at all, it returns early with a 400 status code. Otherwise, it adds the event to the queue of events, alongside any `data` that is sent along with it. `data` defaults to an empty object, and contains any relevant data for a given event (podium number, lever position, etc). More information about the event-driven architechture can be found below. 
 
 ### Game.js
 
@@ -199,7 +210,13 @@ Highlight the spritesheet class & anything else unique
 
 ## Known Bugs
 
-1. List bugs here
+1. Long initial load time
+2. Joystick doesn't hide on no interaction 
+3. Cheat & applause intro animation sometimes skips
+4. Zoom stacks
+5. In game stars do not correlate to End stars
+
+<!-- reword and remember more ? -->
 
 ## Acknowledgements 
 NMDE, NMID, The Strong, Austin Willoughby, Marc, Jack Nalitt
