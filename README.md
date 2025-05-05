@@ -32,10 +32,10 @@ Additionally, visitors of all ages stopped by and enjoyed the exhibit. The desig
 Most notably, our exhibit was [featured on RIT's Instagram](https://www.instagram.com/p/DI670IuO3ti/?img_index=1) as the primary image for their campus-wide event. 
 
 <div style="display: flex; overflow-x: scroll; padding: 10px; gap: 10px;">
-  <img src="imagine-rit-images/visitors-1.jpg" alt="Two siblings playing the game" style="width: 400px; height: auto;">
-  <img src="imagine-rit-images/visitors-2.jpg" alt="A parent and their child playing the game" style="width: 300px; height: auto;">
-  <img src="imagine-rit-images/visitors-3.jpg" alt="A child playing solo" style="width: 300px; height: auto;">
-  <img src="imagine-rit-images/visitors-line.jpg" alt="A line out of the room of visitors waiting to play" style="width: 300px; height: auto;">
+  <img src="./imagine-rit-images/visitors-1.jpg" alt="Two siblings playing the game" style="width: 400px; height: auto;">
+  <img src="./imagine-rit-images/visitors-2.jpg" alt="A parent and their child playing the game" style="width: 300px; height: auto;">
+  <img src="./imagine-rit-images/visitors-3.jpg" alt="A child playing solo" style="width: 300px; height: auto;">
+  <img src="./imagine-rit-images/visitors-line.jpg" alt="A line out of the room of visitors waiting to play" style="width: 300px; height: auto;">
 </div>
 
 ## Technical Overview
@@ -87,7 +87,7 @@ We used Arduino for the physical components, and SerialPort to connect it to Nod
 ![Tinkercad Diagram](./src/arduino/Panel/RTS-panel-diagram.png)
 <div style="display: flex; overflow-x: scroll; padding: 10px; gap: 10px;">
   <img src="src/arduino/Panel/podium-underside.jpg" alt="The wiring in practice" style="width: 300px; height: auto;">
-<img src="imagine-rit-images/installation.jpg" alt="The construction, lighting, and draping" style="width: 400px; height: auto;">
+<img src="./imagine-rit-images/installation.jpg" alt="The construction, lighting, and draping" style="width: 400px; height: auto;">
 
 </div>
 
