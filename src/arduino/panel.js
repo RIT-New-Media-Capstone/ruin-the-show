@@ -1,3 +1,9 @@
+/**
+ * @filename: panel.js
+ * @description: The code that makes the hardware functional
+ */
+
+
 // Event manager & boilerplate for hooking up ardiuno 
 
 import { SerialPort } from 'serialport';
