@@ -762,9 +762,11 @@ class GameMachine {
                     this.addEvent(this.events.TURN_ON_PODIUM, { num: podiumToTrigger });
                 }, randomRange(this.podium.cooldownMin, this.podium.cooldownMax) * 1000);
             }
-            // Set feedback 
+            // Set feedback and push corresponding messages to the frontend queue
             if (event.name === this.feedback.PODIUM_GOOD) {
                 const podiumNum = event.data.podiumNum
+
+                // Indicate correct answer and highlight podium green
                 machine.messages_for_frontend.push({
                     name: 'right',
                     target: podiumNum
@@ -774,6 +776,8 @@ class GameMachine {
                     target: 'podium',
                     location: podiumNum
                 })
+
+                // After 4 seconds, return podium to idle state
                 setTimeout(() => {
                     machine.messages_for_frontend.push({
                         name: 'idle',
@@ -781,6 +785,8 @@ class GameMachine {
                     })
                 }, 4 * 1000);
             }
+
+            // Indicate wrong answer and highlight podium red
             if (event.name === this.feedback.PODIUM_BAD) {
                 const podiumNum = event.data.podiumNum
                 machine.messages_for_frontend.push({
@@ -800,18 +806,23 @@ class GameMachine {
                     })
                 }, 4 * 1000);
             }
+
+            //applause success
             if (event.name === this.feedback.APPLAUSE_GOOD) {
                 machine.messages_for_frontend.push({
                     name: 'stars',
                     target: 'audience'
                 })
             }
+            //applause fail
             if (event.name === this.feedback.APPLAUSE_BAD) {
                 machine.messages_for_frontend.push({
                     name: 'hands',
                     target: 'audience'
                 })
             }
+
+            //cheat success and fail
             if (event.name === this.feedback.CHEAT_GOOD) {
                 machine.messages_for_frontend.push({
                     name: 'green',
@@ -824,6 +835,7 @@ class GameMachine {
                     target: 'screen'
                 })
             }
+            //joystick success and fail
             if (event.name === this.feedback.JOYSTICK_GOOD) {
                 machine.messages_for_frontend.push({
                     name: 'green',
@@ -836,6 +848,8 @@ class GameMachine {
                     target: 'light'
                 })
             }
+
+            //lever sucess an fail
             if (event.name === this.feedback.LEVER_GOOD) {
                 machine.messages_for_frontend.push({
                     name: 'green',
@@ -883,9 +897,12 @@ class GameMachine {
         }
     }
 
+    // ====== MAIN LOOP CONTROL ======
     run() {
         if (this.isRunning) return;
         this.isRunning = true;
+        
+        // Define and start loop
         const loop = () => {
             this.step();
             if (this.isRunning) {
